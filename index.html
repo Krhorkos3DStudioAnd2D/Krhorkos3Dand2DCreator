@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Krhorkos3Dand2DCreator</title>
+    <link rel="icon" href="https://img.icons8.com/fluency/96/ff7675/3d-printer.png">
     <style>
         * {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
         :root {
@@ -249,8 +250,11 @@
 let contador = 0;
 function abrirEditor(tipo) {
     document.getElementById('pantallaInicio').classList.add('oculto');
-    if (tipo === '3d') { document.getElementById('interfaz3D').classList.remove('oculto'); }
-    else { document.getElementById('interfaz2D').classList.remove('oculto'); }
+    if (tipo === '3d') {
+        document.getElementById('interfaz3D').classList.remove('oculto');
+    } else {
+        document.getElementById('interfaz2D').classList.remove('oculto');
+    }
 }
 function volverInicio() {
     document.getElementById('interfaz3D').classList.add('oculto');
@@ -280,5 +284,6 @@ function seleccionarNodo(elemento) {
     elemento.style.background = 'var(--primario)';
 }
 </script>
+
 </body>
 </html>
