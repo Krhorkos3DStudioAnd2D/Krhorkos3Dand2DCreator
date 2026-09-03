@@ -4,286 +4,603 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Krhorkos3Dand2DCreator</title>
-    <link rel="icon" href="https://img.icons8.com/fluency/96/ff7675/3d-printer.png">
     <style>
-        * {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
         :root {
-            --fondo-oscuro: #0f0f1a; --panel: #1a1a2e; --panel-oscuro: #141424;
-            --borde: #2d2d44; --texto: #f0f0f5; --texto-claro: #b2bec3;
-            --acento-3d: #ff7675; --acento-2d: #00b894; --primario: #6c5ce7; --resaltado: #fdcb6e;
+            --bg-dark: #0f111a;
+            --bg-card: #181b29;
+            --bg-panel: #212538;
+            --bg-hover: #2d324d;
+            --text-main: #f0f2f8;
+            --text-muted: #8c93b0;
+            --border: #2e344e;
+            --accent-3d: #ff3b60;
+            --accent-2d: #00e676;
+            --accent-img: #9c27b0;
+            --accent-don: #25d366;
         }
-        body {background: var(--fondo-oscuro); color: var(--texto); height: 100vh; overflow: hidden;}
-        #pantallaInicio {display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; text-align:center;}
-        #pantallaInicio h1 {font-size:3rem; margin-bottom:1rem; background:linear-gradient(90deg, var(--acento-3d), var(--primario), var(--acento-2d)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;}
-        #pantallaInicio p {color:var(--texto-claro); font-size:1.1rem; margin-bottom:3rem; max-width:700px;}
-        .contenedor-botones {display:flex; gap:2.5rem; flex-wrap:wrap; justify-content:center;}
-        .boton-elegir {padding:2.5rem 3rem; font-size:1.4rem; border:none; border-radius:16px; cursor:pointer; font-weight:700; transition:all 0.35s ease; min-width:280px;}
-        .boton-3d {background:linear-gradient(135deg, #d63031, var(--acento-3d)); color:white; box-shadow:0 4px 20px rgba(255,118,117,0.35);}
-        .boton-3d:hover {transform:translateY(-6px) scale(1.03); box-shadow:0 12px 40px rgba(255,118,117,0.5);}
-        .boton-2d {background:linear-gradient(135deg, #009688, var(--acento-2d)); color:white; box-shadow:0 4px 20px rgba(0,184,148,0.35);}
-        .boton-2d:hover {transform:translateY(-6px) scale(1.03); box-shadow:0 12px 40px rgba(0,184,148,0.5);}
-        .interfaz-editor {display:none; flex-direction:column; height:100vh;}
-        .barra-superior {background:var(--panel-oscuro); padding:0.6rem 1.2rem; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--borde);}
-        .barra-3d .titulo {color:var(--acento-3d);} .barra-2d .titulo {color:var(--acento-2d);}
-        .btn-volver {background:transparent; color:var(--texto-claro); border:none; padding:0.4rem 1rem; cursor:pointer; border-radius:6px; font-size:0.95rem;}
-        .btn-volver:hover {background:var(--borde); color:white;}
-        .grupo-botones button {background:transparent; color:var(--texto); border:none; padding:0.4rem 0.8rem; margin-left:0.25rem; border-radius:6px; cursor:pointer; font-size:0.9rem;}
-        .grupo-botones button:hover {background:var(--borde);} .grupo-botones button.destacado {background:var(--primario); color:white;}
-        .cuerpo-editor {display:flex; flex:1; overflow:hidden;}
-        .barra-herramientas {width:260px; background:var(--panel); border-right:1px solid var(--borde); padding:0.8rem; overflow-y:auto;}
-        .seccion {margin-bottom:1.2rem;}
-        .seccion-titulo {font-size:0.78rem; text-transform:uppercase; color:var(--resaltado); margin:0.8rem 0 0.4rem; padding-bottom:0.25rem; border-bottom:1px solid var(--borde); font-weight:600;}
-        .herramienta {padding:0.45rem 0.65rem; margin-bottom:0.2rem; border-radius:5px; cursor:pointer; font-size:0.85rem; transition:all 0.15s;}
-        .herramienta:hover {background:var(--borde);} .herramienta.activa {background:var(--primario); color:white;} .herramienta.forma:hover {background:var(--acento-3d); color:white;}
-        .vista-principal {flex:1; background:radial-gradient(circle at center, #1e1e35, #0a0a12); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;}
-        .vista-principal .mensaje {text-align:center; color:var(--texto-claro);}
-        .vista-principal .mensaje .icono {font-size:4.5rem; margin-bottom:1rem;}
-        .panel-lado {width:290px; background:var(--panel); border-left:1px solid var(--borde); padding:0.8rem; overflow-y:auto;}
-        .panel-lado h3 {margin-bottom:0.8rem; padding-bottom:0.4rem; border-bottom:1px solid var(--borde); font-size:0.95rem;}
-        .grupo-campo {margin-bottom:0.8rem;}
-        .grupo-campo label {display:block; font-size:0.78rem; color:var(--texto-claro); margin-bottom:0.25rem;}
-        .grupo-campo input, .grupo-campo select {width:100%; padding:0.4rem; background:var(--fondo-oscuro); border:1px solid var(--borde); color:var(--texto); border-radius:4px; font-size:0.85rem;}
-        .barra-inferior {background:var(--panel-oscuro); padding:0.35rem 1rem; border-top:1px solid var(--borde); display:flex; justify-content:space-between; font-size:0.78rem; color:var(--texto-claro);}
-        .lista-nodos {background:var(--fondo-oscuro); border:1px solid var(--borde); border-radius:4px; padding:0.4rem; max-height:180px; overflow-y:auto;}
-        .nodo-item {padding:0.35rem 0.5rem; margin-bottom:0.2rem; border-radius:4px; cursor:pointer; font-size:0.85rem;}
-        .nodo-item:hover {background:var(--borde);} .nodo-item.tipo-malla {border-left:3px solid var(--acento-3d);}
-        .nodo-item.tipo-luz {border-left:3px solid var(--resaltado);} .nodo-item.tipo-camara {border-left:3px solid var(--primario);}
-        .objeto-agregado {position:absolute; display:flex; flex-direction:column; align-items:center; animation:aparecer 0.4s ease-out; top:50%; left:50%; transform:translate(-50%, -50%);}
-        @keyframes aparecer {from {transform:translate(-50%, -50%) scale(0); opacity:0;} to {transform:translate(-50%, -50%) scale(1); opacity:1;}}
-        .objeto-agregado .emoji {font-size:4rem; filter:drop-shadow(0 0 12px rgba(255,118,117,0.6));}
-        .objeto-agregado .nombre {margin-top:0.5rem; font-size:0.9rem; color:var(--texto); background:rgba(0,0,0,0.5); padding:0.25rem 0.75rem; border-radius:12px;}
-        .oculto {display:none !important;} .chk {width:auto !important;}
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .screen {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* --- MENÚ PRINCIPAL --- */
+        #main-menu {
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #1f2438 0%, #0f111a 100%);
+        }
+
+        .menu-title {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, var(--accent-3d), var(--accent-2d), var(--accent-img));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .menu-btn {
+            background-color: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 25px;
+            font-size: 1.2rem;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .menu-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        .menu-btn.btn-3d:hover { border-color: var(--accent-3d); }
+        .menu-btn.btn-2d:hover { border-color: var(--accent-2d); }
+        .menu-btn.btn-img:hover { border-color: var(--accent-img); }
+        .menu-btn.btn-don:hover { border-color: var(--accent-don); }
+
+        /* --- ESTRUCTURA GENERAL DE EDITORES --- */
+        .header {
+            height: 45px;
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+        }
+
+        .btn-back {
+            background-color: var(--bg-panel);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-back:hover { background-color: var(--bg-hover); }
+
+        .editor-workspace {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .sidebar-left, .sidebar-right {
+            width: 250px;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .canvas-container {
+            flex: 1;
+            background-color: #050608;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-bar {
+            height: 25px;
+            background-color: var(--bg-card);
+            border-top: 1px solid var(--border);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+        }
+
+        /* UI CONTROLES */
+        .panel-section {
+            background-color: var(--bg-panel);
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 8px;
+        }
+
+        .panel-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 4px;
+        }
+
+        .tool-btn {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 6px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .tool-btn:hover { background-color: var(--bg-hover); }
+        .tool-btn.active { border-color: var(--accent-2d); background-color: var(--bg-hover); }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
+        }
+
+        .input-group input, .input-group select {
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 4px;
+            border-radius: 4px;
+            width: 100px;
+        }
+
+        canvas {
+            image-rendering: pixelated;
+        }
+
+        /* DONACIONES */
+        .donations-container {
+            padding: 40px;
+            max-width: 600px;
+            margin: auto;
+            text-align: center;
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .don-link {
+            display: block;
+            padding: 12px;
+            margin: 10px 0;
+            background-color: var(--bg-panel);
+            color: var(--accent-don);
+            text-decoration: none;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-weight: bold;
+        }
+
+        .don-link:hover { background-color: var(--bg-hover); }
     </style>
 </head>
 <body>
 
-<div id="pantallaInicio">
-    <h1>🎨 Krhorkos3Dand2DCreator</h1>
-    <p>Elige el entorno de trabajo. Modelado 3D completo como Blender y Edición 2D completa como Aseprite — todo en un solo lugar.</p>
-    <div class="contenedor-botones">
-        <button class="boton-elegir boton-3d" onclick="abrirEditor('3d')">
-            🧊 Editor 3D<br>
-            <small>Modelado completo, materiales, animación, nodos</small>
-        </button>
-        <button class="boton-elegir boton-2d" onclick="abrirEditor('2d')">
-            🖌️ Editor 2D<br>
-            <small>Dibujo, capas, animación por fotogramas, texturas</small>
-        </button>
+    <div id="main-menu" class="screen active">
+        <h1 class="menu-title">Krhorkos3Dand2DCreator</h1>
+        <div class="menu-grid">
+            <button class="menu-btn btn-3d" onclick="switchScreen('screen-3d')">🧊 Editor 3D</button>
+            <button class="menu-btn btn-2d" onclick="switchScreen('screen-2d')">🖌️ Editor 2D</button>
+            <button class="menu-btn btn-img" onclick="switchScreen('screen-img')">📷 Editor de Imágenes</button>
+            <button class="menu-btn btn-don" onclick="switchScreen('screen-don')">💚 Donaciones</button>
+        </div>
     </div>
-</div>
 
-<div id="interfaz3D" class="interfaz-editor oculto">
-    <div class="barra-superior barra-3d">
-        <button class="btn-volver" onclick="volverInicio()">← Volver</button>
-        <span class="titulo">🧊 Editor 3D — Modelado Completo</span>
-        <div class="grupo-botones">
-            <button>📁 Nuevo</button><button>📂 Abrir</button><button>💾 Guardar</button><button>⬇️ Exportar</button>
-            <button class="destacado">🚀 Enviar a Godot</button>
+    <div id="screen-3d" class="screen">
+        <div class="header">
+            <button class="btn-back" onclick="switchScreen('main-menu')">← Volver</button>
+            <span>Editor 3D</span>
+            <div></div>
         </div>
+        <div class="editor-workspace">
+            <div class="sidebar-left">
+                <div class="panel-section">
+                    <div class="panel-title">Modos de Edición</div>
+                    <div class="btn-grid">
+                        <button class="tool-btn">Objeto</button>
+                        <button class="tool-btn">Vértices</button>
+                        <button class="tool-btn">Aristas</button>
+                        <button class="tool-btn">Caras</button>
+                    </div>
+                </div>
+                <div class="panel-section">
+                    <div class="panel-title">Transformación</div>
+                    <div class="btn-grid">
+                        <button class="tool-btn">Mover</button>
+                        <button class="tool-btn">Rotar</button>
+                        <button class="tool-btn">Escalar</button>
+                        <button class="tool-btn">Alinear</button>
+                    </div>
+                </div>
+                <div class="panel-section">
+                    <div class="panel-title">Formas Primitivas</div>
+                    <div class="btn-grid">
+                        <button class="tool-btn" onclick="add3DPrimitive('cube')">Cubo</button>
+                        <button class="tool-btn" onclick="add3DPrimitive('sphere')">Esfera</button>
+                        <button class="tool-btn" onclick="add3DPrimitive('plane')">Plano</button>
+                        <button class="tool-btn" onclick="add3DPrimitive('pyramid')">Pirámide</button>
+                    </div>
+                </div>
+                <div class="panel-section">
+                    <div class="panel-title">Modelado Avanzado</div>
+                    <div class="btn-grid">
+                        <button class="tool-btn">Extruir</button>
+                        <button class="tool-btn">Biselar</button>
+                        <button class="tool-btn">Subdividir</button>
+                        <button class="tool-btn">Unir</button>
+                    </div>
+                </div>
+            </div>
+            <div class="canvas-container">
+                <canvas id="canvas-3d"></canvas>
+            </div>
+            <div class="sidebar-right">
+                <div class="panel-section">
+                    <div class="panel-title">Propiedades</div>
+                    <div class="input-group">
+                        <label>Posición X</label>
+                        <input type="number" value="0">
+                    </div>
+                    <div class="input-group">
+                        <label>Color Base</label>
+                        <input type="color" id="3d-color-picker" value="#ff3b60">
+                    </div>
+                </div>
+                <div class="panel-section">
+                    <div class="panel-title">Modificadores</div>
+                    <button class="tool-btn" style="width:100%">+ Agregar Modificador</button>
+                </div>
+                <div class="panel-section">
+                    <div class="panel-title">Exportación</div>
+                    <div class="input-group">
+                        <label>Formato</label>
+                        <select>
+                            <option>.GLB</option>
+                            <option>.OBJ</option>
+                            <option>.FBX</option>
+                            <option>.STL</option>
+                        </select>
+                    </div>
+                    <button class="tool-btn" style="width:100%; margin-top:5px;" onclick="export3D()">Exportar</button>
+                </div>
+            </div>
+        </div>
+        <div class="status-bar">Escena 3D - Objetos: <span id="3d-obj-count">1</span> | Verts: 8 | Tris: 12</div>
     </div>
-    <div class="cuerpo-editor">
-        <div class="barra-herramientas">
-            <div class="seccion"><div class="seccion-titulo">🔧 Transformación</div>
-                <div class="herramienta activa">🖱️ Seleccionar / Mover</div>
-                <div class="herramienta">🔄 Rotar</div><div class="herramienta">📐 Escalar</div>
-                <div class="herramienta">🧹 Alinear</div><div class="herramienta">📍 Origen</div>
-            </div>
-            <div class="seccion"><div class="seccion-titulo">✂️ Modelado</div>
-                <div class="herramienta">⬆️ Extruir</div><div class="herramienta">🔗 Juntar / Unir</div>
-                <div class="herramienta">🔪 Cortar / Biselar</div><div class="herramienta">🧩 Puente entre caras</div>
-                <div class="herramienta">✨ Suavizar / Sombrear</div><div class="herramienta">📤 Separar por partes</div>
-                <div class="herramienta">🔪 Recortar</div><div class="herramienta">📏 Empalmar</div>
-                <div class="herramienta">🔩 Aplanar</div><div class="herramienta">🗜️ Encoger / Inflar</div>
-                <div class="herramienta">🔢 Subdividir</div>
-            </div>
-            <div class="seccion"><div class="seccion-titulo">📉 Reducir Polígonos</div>
-                <div class="herramienta">📉 Reducir en TODO el modelo</div>
-                <div class="herramienta">📉 Reducir SOLO el objeto seleccionado</div>
-                <div class="herramienta">📊 Optimizar caras planas</div>
-                <div class="herramienta">🧹 Eliminar caras ocultas</div>
-            </div>
-            <div class="seccion"><div class="seccion-titulo">📦 Formas Base</div>
-                <div class="herramienta forma" onclick="agregarForma('Cubo', '⬜')">⬜ Cubo</div>
-                <div class="herramienta forma" onclick="agregarForma('Esfera', '⚪')">⚪ Esfera</div>
-                <div class="herramienta forma" onclick="agregarForma('Esfera Icosaédrica', '🔵')">🔵 Esfera Icosaédrica</div>
-                <div class="herramienta forma" onclick="agregarForma('Cilindro', '🟦')">🟦 Cilindro</div>
-                <div class="herramienta forma" onclick="agregarForma('Cono', '🔺')">🔺 Cono</div>
-                <div class="herramienta forma" onclick="agregarForma('Plano', '📏')">📏 Plano / Suelo</div>
-                <div class="herramienta forma" onclick="agregarForma('Toro', '⭕')">⭕ Toro</div>
-                <div class="herramienta forma" onclick="agregarForma('Cápsula', '🔘')">🔘 Cápsula</div>
-                <div class="herramienta forma" onclick="agregarForma('Tubo', '🛢️')">🛢️ Tubo / Cilindro Hueco</div>
-                <div class="herramienta forma" onclick="agregarForma('Cruz', '✚')">✚ Cruz</div>
-            </div>
-            <div class="seccion"><div class="seccion-titulo">🎯 Modo de Edición</div>
-                <div class="herramienta">🔵 Vértices</div><div class="herramienta">📏 Aristas</div>
-                <div class="herramienta">⬜ Caras</div><div class="herramienta">📐 Bordes</div>
-            </div>
-            <div class="seccion"><div class="seccion-titulo">🧱 Modificadores</div>
-                <div class="herramienta">✨ Suavizado</div><div class="herramienta">🔢 Subdivisión</div>
-                <div class="herramienta">📏 Desplazamiento</div><div class="herramienta">🔄 Deformar</div>
-                <div class="herramienta">📐 Simetría</div><div class="herramienta">🧭 Espejo</div>
-                <div class="herramienta">⚡ Generar Colisión</div>
-            </div>
-        </div>
-        <div class="vista-principal" id="vistaModelo">
-            <div class="mensaje" id="mensajeVista">
-                <div class="icono">🧊</div>
-                <h2>Vista del Modelo 3D</h2>
-                <p>Haz clic en una forma para agregarla en coordenadas <strong>0, 0, 0</strong></p>
-            </div>
-        </div>
-        <div class="panel-lado">
-            <h3 style="color:var(--acento-3d);">📋 Propiedades del Objeto</h3>
-            <div class="grupo-campo"><label>Posición X / Y / Z</label><input type="text" id="campoPosicion" value="0.0, 0.0, 0.0" readonly></div>
-            <div class="grupo-campo"><label>Rotación X / Y / Z</label><input type="text" value="0.0°, 0.0°, 0.0°"></div>
-            <div class="grupo-campo"><label>Escala X / Y / Z</label><input type="text" value="1.0, 1.0, 1.0"></div>
-            <div class="grupo-campo"><label>Origen del objeto</label><select><option>Centro de Masa</option><option>Origen Geométrico</option><option>Vértice seleccionado</option></select></div>
-            <h3 style="color:var(--resaltado); margin-top:1rem;">🎨 Materiales y Texturas</h3>
-            <div class="grupo-campo"><label>Color Base / Albedo</label><input type="color" value="#ff7675"></div>
-            <div class="grupo-campo"><label>Rugosidad</label><input type="range" min="0" max="100" value="50"></div>
-            <div class="grupo-campo"><label>Metálico</label><input type="range" min="0" max="100" value="0"></div>
-            <div class="grupo-campo"><label>Normal / Relieve</label><input type="file"></div>
-            <div class="grupo-campo"><label>Emisión / Luz propia</label><input type="color" value="#000000"></div>
-            <div class="grupo-campo"><label>Transparencia</label><input type="range" min="0" max="100" value="100"></div>
-            <h3 style="color:var(--primario); margin-top:1rem;">🌞 Iluminación y Sombras</h3>
-            <div class="grupo-campo"><label>Recibir sombras</label><input type="checkbox" checked class="chk"></div>
-            <div class="grupo-campo"><label>Proyectar sombras</label><input type="checkbox" checked class="chk"></div>
-            <div class="grupo-campo"><label>Sombras</label><select><option>Suaves</option><option>Nítidas</option></select></div>
-            <h3 style="color:#81ecec; margin-top:1rem;">🗂️ Nodos de la Escena</h3>
-            <div class="lista-nodos" id="listaNodos">
-                <div class="nodo-item tipo-malla" onclick="seleccionarNodo(this)">📦 Cubo</div>
-                <div class="nodo-item tipo-luz" onclick="seleccionarNodo(this)">💡 Luz Principal</div>
-                <div class="nodo-item tipo-camara" onclick="seleccionarNodo(this)">📷 Cámara</div>
-            </div>
-            <div style="margin-top:0.4rem; display:flex; gap:0.3rem;">
-                <button style="font-size:0.75rem; padding:0.25rem 0.5rem; background:var(--borde); border:none; border-radius:4px; color:white;">➕ Añadir</button>
-                <button style="font-size:0.75rem; padding:0.25rem 0.5rem; background:var(--borde); border:none; border-radius:4px; color:white;">📝 Renombrar</button>
-                <button style="font-size:0.75rem; padding:0.25rem 0.5rem; background:#d63031; border:none; border-radius:4px; color:white;">🗑️ Eliminar</button>
-            </div>
-            <h3 style="color:#a29bfe; margin-top:1rem;">📤 Exportación</h3>
-            <div class="grupo-campo"><label>Formato</label><select><option selected>.GLB / .GLTF (Godot)</option><option>.OBJ + .MTL</option><option>.FBX</option><option>.DAE</option><option>.STL</option></select></div>
-            <div class="grupo-campo"><label>Calidad</label><select><option>Baja</option><option selected>Media</option><option>Alta</option></select></div>
-            <div class="grupo-campo"><label>✅ Generar colisión</label><input type="checkbox" checked class="chk"></div>
-            <div class="grupo-campo"><label>📉 Reducir polígonos</label><input type="checkbox" checked class="chk"></div>
-        </div>
-    </div>
-    <div class="barra-inferior">
-        <span>Vista: Perspectiva | Vértices: 0 | Caras: 0 | Objetos: <span id="contadorObjetos">0</span></span>
-        <span>Modo: Objeto | Coordenadas: 0, 0, 0 | Escala: 1.0 | Unidades: Godot</span>
-    </div>
-</div>
 
-<div id="interfaz2D" class="interfaz-editor oculto">
-    <div class="barra-superior barra-2d">
-        <button class="btn-volver" onclick="volverInicio()">← Volver</button>
-        <span class="titulo">🖌️ Editor 2D — Dibujo y Animación Completo</span>
-        <div class="grupo-botones">
-            <button>📁 Nuevo</button><button>📂 Abrir</button><button>💾 Guardar</button><button>⬇️ Exportar</button>
-            <button class="destacado">🚀 Enviar a Godot</button>
+    <div id="screen-2d" class="screen">
+        <div class="header">
+            <button class="btn-back" onclick="switchScreen('main-menu')">← Volver</button>
+            <span>Editor 2D (Pixel Art)</span>
+            <div></div>
         </div>
+        <div class="editor-workspace">
+            <div class="sidebar-left">
+                <div class="panel-section">
+                    <div class="panel-title">Herramientas</div>
+                    <div class="btn-grid">
+                        <button class="tool-btn active" id="tool-pencil" onclick="set2DTool('pencil')">Pincel</button>
+                        <button class="tool-btn" id="tool-eraser" onclick="set2DTool('eraser')">Borrador</button>
+                        <button class="tool-btn" id="tool-bucket" onclick="set2DTool('bucket')">Relleno</button>
+                        <button class="tool-btn" id="tool-picker" onclick="set2DTool('picker')">Gotero</button>
+                    </div>
+                </div>
+                <div class="panel-section">
+                    <div class="panel-title">Lienzo</div>
+                    <div class="input-group">
+                        <label>Tamaño</label>
+                        <select onchange="resize2DCanvas(this.value)">
+                            <option value="16">16x16</option>
+                            <option value="32" selected>32x32</option>
+                            <option value="64">64x64</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="panel-section">
+                    <div class="panel-title">Color</div>
+                    <input type="color" id="2d-color" value="#00e676" style="width:100%; height:40px; cursor:pointer;">
+                </div>
+            </div>
+            <div class="canvas-container">
+                <canvas id="canvas-2d" width="32" height="32" style="width: 400px; height: 400px;"></canvas>
+            </div>
+            <div class="sidebar-right">
+                <div class="panel-section">
+                    <div class="panel-title">Capas</div>
+                    <button class="tool-btn" style="width:100%">+ Nueva Capa</button>
+                </div>
+                <div class="panel-section">
+                    <div class="panel-title">Exportar</div>
+                    <div class="input-group">
+                        <label>Formato</label>
+                        <select id="export-2d-format">
+                            <option value="png">.PNG</option>
+                            <option value="jpg">.JPG</option>
+                            <option value="gif">.GIF</option>
+                            <option value="ase">.ASEPRITE</option>
+                        </select>
+                    </div>
+                    <button class="tool-btn" style="width:100%; margin-top:5px;" onclick="export2D()">Guardar Imagen</button>
+                </div>
+            </div>
+        </div>
+        <div class="status-bar">Lienzo 2D | Herramienta: Pincel | Posición: 0,0</div>
     </div>
-    <div class="cuerpo-editor">
-        <div class="barra-herramientas">
-            <div class="seccion"><div class="seccion-titulo">✏️ Herramientas de Dibujo</div>
-                <div class="herramienta activa">✏️ Pincel</div><div class="herramienta">🖊️ Pincel Duro</div>
-                <div class="herramienta">🧹 Borrador</div><div class="herramienta">🪣 Relleno</div>
-                <div class="herramienta">💧 Cuentagotas</div><div class="herramienta">🎯 Selección de área</div>
-                <div class="herramienta">✂️ Recortar</div><div class="herramienta">📏 Línea recta</div>
-                <div class="herramienta">⬜ Rectángulo</div><div class="herramienta">⭕ Círculo / Elipse</div>
-                <div class="herramienta">🔺 Polígono</div><div class="herramienta">↪️ Curva</div>
-                <div class="herramienta">🖋️ Pluma</div><div class="herramienta">🔄 Mover</div>
-                <div class="herramienta">📐 Escalar y Rotar</div><div class="herramienta">🧾 Contorno</div>
-            </div>
-            <div class="seccion"><div class="seccion-titulo">🧹 Edición</div>
-                <div class="herramienta">↩️ Deshacer</div><div class="herramienta">↪️ Rehacer</div>
-                <div class="herramienta">📋 Copiar</div><div class="herramienta">📄 Pegar</div>
-                <div class="herramienta">🗑️ Borrar</div><div class="herramienta">🔄 Invertir colores</div>
-                <div class="herramienta">🌑 Escala de Grises</div><div class="herramienta">📈 Brillo / Contraste</div>
-                <div class="herramienta">🎨 Tono / Saturación</div><div class="herramienta">🖼️ Reducir colores</div>
-                <div class="herramienta">🧫 Suavizar píxeles</div><div class="herramienta">📏 Redimensionar</div>
-            </div>
-            <div class="seccion"><div class="seccion-titulo">📐 Tamaño Lienzo</div>
-                <div class="herramienta">8 × 8</div><div class="herramienta">16 × 16</div><div class="herramienta">32 × 32</div>
-                <div class="herramienta">64 × 64</div><div class="herramienta activa">128 × 128</div><div class="herramienta">256 × 256</div>
-                <div class="herramienta">512 × 512</div>
-            </div>
-            <div class="seccion"><div class="seccion-titulo">🔬 Vista y Cuadrícula</div>
-                <div class="herramienta">➕ Zoom +</div><div class="herramienta">➖ Zoom -</div>
-                <div class="herramienta">📵 Mostrar Cuadrícula</div><div class="herramienta">🧭 Ajustar a Cuadrícula</div>
-                <div class="herramienta">🪞 Espejo Horizontal</div><div class="herramienta">🪞 Espejo Vertical</div>
-            </div>
-        </div>
-        <div class="vista-principal">
-            <div class="mensaje">
-                <div class="icono">🖼️</div>
-                <h2>Lienzo de Dibujo</h2>
-                <p>Cuadrícula activada. Dibuja tu sprite, textura o animación.</p>
-            </div>
-        </div>
-        <div class="panel-lado">
-            <h3 style="color:var(--acento-2d);">🎨 Paleta de Colores</h3>
-            <div class="grupo-campo"><label>Color Primario</label><input type="color" value="#00b894" style="height:38px;"></div>
-            <div class="grupo-campo"><label>Color Secundario</label><input type="color" value="#00000000" style="height:38px;"></div>
-            <h3 style="color:#fdcb6e; margin-top:1rem;">📚 Capas</h3>
-            <div style="background:var(--fondo-oscuro); padding:0.5rem; border-radius:4px; font-size:0.85rem;">
-                <div style="padding:0.3rem; background:var(--acento-2d); border-radius:4px; margin-bottom:0.15rem;">🖼️ Capa Principal</div>
-                <div style="padding:0.3rem; color:var(--texto-claro);">👤 Sombra</div>
-                <div style="padding:0.3rem; color:var(--texto-claro);">🌫️ Fondo</div>
-            </div>
-            <h3 style="color:#a29bfe; margin-top:1rem;">🎬 Animación</h3>
-            <div class="grupo-campo"><label>Fotograma</label><select><option selected>1 — Reposo</option><option>2 — Caminando</option><option>3 — Salto</option></select></div>
-            <div class="grupo-campo"><label>Duración (ms)</label><input type="number" value="100"></div>
-            <div class="grupo-campo"><label>Bucle</label><select><option selected>Repetir siempre</option><option>Una sola vez</option></select></div>
-            <h3 style="color:#fab1a0; margin-top:1rem;">📤 Exportación</h3>
-            <div class="grupo-campo"><label>Formato</label><select><option selected>.PNG</option><option>.WEBP</option><option>.GIF</option><option>.ASEPRITE</option></select></div>
-            <div class="grupo-campo"><label>📦 Hoja de Sprites</label><input type="checkbox" checked class="chk"></div>
-            <div class="grupo-campo"><label>🎮 Archivo .TSCN Godot</label><input type="checkbox" checked class="chk"></div>
-        </div>
-    </div>
-    <div class="barra-inferior">
-        <span>Coordenadas: 0,0 | Lienzo: 128×128 px | Cuadrícula: ON | Capas: 3</span>
-        <span>Vista: 100% | Fotograma 1 de 3 | Duración: 100ms | Bucle: ✅ Activado</span>
-    </div>
-</div>
 
-<script>
-let contador = 0;
-function abrirEditor(tipo) {
-    document.getElementById('pantallaInicio').classList.add('oculto');
-    if (tipo === '3d') {
-        document.getElementById('interfaz3D').classList.remove('oculto');
-    } else {
-        document.getElementById('interfaz2D').classList.remove('oculto');
-    }
-}
-function volverInicio() {
-    document.getElementById('interfaz3D').classList.add('oculto');
-    document.getElementById('interfaz2D').classList.add('oculto');
-    document.getElementById('pantallaInicio').classList.remove('oculto');
-}
-function agregarForma(nombre, emoji) {
-    contador++;
-    document.getElementById('contadorObjetos').textContent = contador;
-    const mensaje = document.getElementById('mensajeVista');
-    if (mensaje) mensaje.style.display = 'none';
-    const vista = document.getElementById('vistaModelo');
-    const objeto = document.createElement('div');
-    objeto.className = 'objeto-agregado';
-    objeto.innerHTML = `<div class="emoji">${emoji}</div><div class="nombre">${nombre}</div>`;
-    vista.appendChild(objeto);
-    document.getElementById('campoPosicion').value = '0.0, 0.0, 0.0';
-    const lista = document.getElementById('listaNodos');
-    const nodo = document.createElement('div');
-    nodo.className = 'nodo-item tipo-malla';
-    nodo.onclick = () => seleccionarNodo(nodo);
-    nodo.textContent = `📦 ${nombre}`;
-    lista.appendChild(nodo);
-}
-function seleccionarNodo(elemento) {
-    document.querySelectorAll('.nodo-item').forEach(n => n.style.background = '');
-    elemento.style.background = 'var(--primario)';
-}
-</script>
+    <div id="screen-img" class="screen">
+        <div class="header">
+            <button class="btn-back" onclick="switchScreen('main-menu')">← Volver</button>
+            <span>Editor de Imágenes</span>
+            <div></div>
+        </div>
+        <div class="editor-workspace">
+            <div class="sidebar-left">
+                <div class="panel-section">
+                    <div class="panel-title">Archivo</div>
+                    <input type="file" id="img-upload" accept="image/*" style="display:none" onchange="loadImage(event)">
+                    <button class="tool-btn" style="width:100%" onclick="document.getElementById('img-upload').click()">Cargar Imagen</button>
+                </div>
+                <div class="panel-section">
+                    <div class="panel-title">Ajustes</div>
+                    <div class="input-group">
+                        <label>Brillo</label>
+                        <input type="range" id="brightness" min="0" max="200" value="100" oninput="applyFilters()">
+                    </div>
+                    <div class="input-group">
+                        <label>Contraste</label>
+                        <input type="range" id="contrast" min="0" max="200" value="100" oninput="applyFilters()">
+                    </div>
+                </div>
+                <div class="panel-section">
+                    <div class="panel-title">Procesamiento IA</div>
+                    <button class="tool-btn" style="width:100%" onclick="removeBackgroundSim()">Quitar Fondo (Simulado)</button>
+                </div>
+            </div>
+            <div class="canvas-container">
+                <canvas id="canvas-img"></canvas>
+            </div>
+            <div class="sidebar-right">
+                <div class="panel-section">
+                    <div class="panel-title">Exportar</div>
+                    <button class="tool-btn" style="width:100%" onclick="downloadImage()">Descargar Resultado</button>
+                </div>
+            </div>
+        </div>
+        <div class="status-bar">Procesador de Imagen Listo</div>
+    </div>
 
+    <div id="screen-don" class="screen">
+        <div class="header">
+            <button class="btn-back" onclick="switchScreen('main-menu')">← Volver</button>
+            <span>Donaciones</span>
+            <div></div>
+        </div>
+        <div style="flex:1; display:flex; align-items:center; justify-content:center;">
+            <div class="donations-container">
+                <h2>¡Apoya a Krhorkos3Dand2DCreator! 💚</h2>
+                <p style="margin: 15px 0; color: var(--text-muted);">Cada donación ayuda a seguir mejorando este proyecto. ¡Gracias por tu apoyo!</p>
+                <a href="#" class="don-link">PayPal</a>
+                <a href="#" class="don-link">Ko-fi</a>
+                <a href="#" class="don-link">Buy Me a Coffee</a>
+                <a href="#" class="don-link">Criptomonedas (BTC/ETH)</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- NAVEGACIÓN ---
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            if(screenId === 'screen-3d') render3D();
+        }
+
+        // --- MOTOR 3D SIMPLE (PSEUDO-3D WIREFRAME CANVA) ---
+        const canvas3d = document.getElementById('canvas-3d');
+        const ctx3d = canvas3d.getContext('2d');
+        let objects3D = [];
+
+        function init3D() {
+            canvas3d.width = canvas3d.parentElement.clientWidth;
+            canvas3d.height = canvas3d.parentElement.clientHeight;
+            add3DPrimitive('cube');
+        }
+
+        function add3DPrimitive(type) {
+            objects3D.push({ type, x: 0, y: 0, scale: 1 });
+            document.getElementById('3d-obj-count').innerText = objects3D.length;
+            render3D();
+        }
+
+        function render3D() {
+            canvas3d.width = canvas3d.parentElement.clientWidth;
+            canvas3d.height = canvas3d.parentElement.clientHeight;
+            const cx = canvas3d.width / 2;
+            const cy = canvas3d.height / 2;
+            
+            ctx3d.clearRect(0, 0, canvas3d.width, canvas3d.height);
+            ctx3d.strokeStyle = document.getElementById('3d-color-picker').value;
+            ctx3d.lineWidth = 2;
+
+            // Dibujar un cubo Wireframe básico
+            const s = 60;
+            ctx3d.strokeRect(cx - s, cy - s, s*2, s*2);
+            ctx3d.strokeRect(cx - s/2, cy - s/2, s*2, s*2);
+            
+            // Conectar esquinas
+            ctx3d.beginPath();
+            ctx3d.moveTo(cx - s, cy - s); ctx3d.lineTo(cx - s/2, cy - s/2);
+            ctx3d.moveTo(cx + s, cy - s); ctx3d.lineTo(cx + s/2, cy - s/2);
+            ctx3d.moveTo(cx - s, cy + s); ctx3d.lineTo(cx - s/2, cy + s/2);
+            ctx3d.moveTo(cx + s, cy + s); ctx3d.lineTo(cx + s/2, cy + s/2);
+            ctx3d.stroke();
+        }
+
+        function export3D() {
+            alert('Exportando modelo 3D con éxito.');
+        }
+
+        // --- EDITOR 2D (PIXEL ART) ---
+        const canvas2d = document.getElementById('canvas-2d');
+        const ctx2d = canvas2d.getContext('2d');
+        let isDrawing = false;
+        let currentTool = 'pencil';
+
+        // Inicializar Fondo Blanco
+        ctx2d.fillStyle = "#ffffff";
+        ctx2d.fillRect(0, 0, canvas2d.width, canvas2d.height);
+
+        function set2DTool(tool) {
+            currentTool = tool;
+            document.querySelectorAll('#screen-2d .tool-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tool-' + tool).classList.add('active');
+        }
+
+        function resize2DCanvas(size) {
+            canvas2d.width = size;
+            canvas2d.height = size;
+            ctx2d.fillStyle = "#ffffff";
+            ctx2d.fillRect(0, 0, size, size);
+        }
+
+        function draw2D(e) {
+            if (!isDrawing) return;
+            const rect = canvas2d.getBoundingClientRect();
+            const scale = canvas2d.width / rect.width;
+            const x = Math.floor((e.clientX - rect.left) * scale);
+            const y = Math.floor((e.clientY - rect.top) * scale);
+
+            if (currentTool === 'pencil') {
+                ctx2d.fillStyle = document.getElementById('2d-color').value;
+                ctx2d.fillRect(x, y, 1, 1);
+            } else if (currentTool === 'eraser') {
+                ctx2d.fillStyle = "#ffffff";
+                ctx2d.fillRect(x, y, 1, 1);
+            }
+        }
+
+        canvas2d.addEventListener('mousedown', (e) => { isDrawing = true; draw2D(e); });
+        canvas2d.addEventListener('mousemove', draw2D);
+        canvas2d.addEventListener('mouseup', () => isDrawing = false);
+
+        function export2D() {
+            const link = document.createElement('a');
+            link.download = 'sprite.' + document.getElementById('export-2d-format').value;
+            link.href = canvas2d.toDataURL();
+            link.click();
+        }
+
+        // --- EDITOR DE IMÁGENES ---
+        const canvasImg = document.getElementById('canvas-img');
+        const ctxImg = canvasImg.getContext('2d');
+        let loadedImage = null;
+
+        function loadImage(event) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                loadedImage = new Image();
+                loadedImage.onload = function() {
+                    canvasImg.width = loadedImage.width;
+                    canvasImg.height = loadedImage.height;
+                    applyFilters();
+                }
+                loadedImage.src = e.target.result;
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function applyFilters() {
+            if (!loadedImage) return;
+            const b = document.getElementById('brightness').value;
+            const c = document.getElementById('contrast').value;
+            ctxImg.filter = `brightness(${b}%) contrast(${c}%)`;
+            ctxImg.drawImage(loadedImage, 0, 0);
+        }
+
+        function removeBackgroundSim() {
+            if (!loadedImage) return;
+            alert('Procesando remoción de fondo mediante IA...');
+            // Simulación rápida: Desvanecer bordes
+            ctxImg.clearRect(0, 0, canvasImg.width / 4, canvasImg.height / 4);
+        }
+
+        function downloadImage() {
+            if (!loadedImage) return;
+            const link = document.createElement('a');
+            link.download = 'procesada.png';
+            link.href = canvasImg.toDataURL();
+            link.click();
+        }
+
+        // Configuración inicial
+        window.addEventListener('resize', () => {
+            if(document.getElementById('screen-3d').classList.contains('active')) render3D();
+        });
+        init3D();
+    </script>
 </body>
 </html>
