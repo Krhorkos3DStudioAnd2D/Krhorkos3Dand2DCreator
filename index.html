@@ -15,12 +15,14 @@
         :root {
             --fondo-oscuro: #0f0f1a;
             --panel: #1a1a2e;
+            --panel-oscuro: #141424;
             --borde: #2d2d44;
             --texto: #f0f0f5;
             --texto-claro: #b2bec3;
             --acento-3d: #ff7675;
             --acento-2d: #00b894;
             --primario: #6c5ce7;
+            --resaltado: #fdcb6e;
         }
 
         body {
@@ -41,7 +43,7 @@
         }
 
         #pantallaInicio h1 {
-            font-size: 2.8rem;
+            font-size: 3rem;
             margin-bottom: 1rem;
             background: linear-gradient(90deg, var(--acento-3d), var(--primario), var(--acento-2d));
             -webkit-background-clip: text;
@@ -58,7 +60,9 @@
 
         .contenedor-botones {
             display: flex;
-            gap: 2rem;
+            gap: 2.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .boton-elegir {
@@ -68,28 +72,30 @@
             border-radius: 16px;
             cursor: pointer;
             font-weight: 700;
-            transition: all 0.3s ease;
-            min-width: 260px;
+            transition: all 0.35s ease;
+            min-width: 280px;
         }
 
         .boton-3d {
             background: linear-gradient(135deg, #d63031, var(--acento-3d));
             color: white;
+            box-shadow: 0 4px 20px rgba(255, 118, 117, 0.35);
         }
 
         .boton-3d:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(255, 118, 117, 0.4);
+            transform: translateY(-6px) scale(1.03);
+            box-shadow: 0 12px 40px rgba(255, 118, 117, 0.5);
         }
 
         .boton-2d {
             background: linear-gradient(135deg, #009688, var(--acento-2d));
             color: white;
+            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35);
         }
 
         .boton-2d:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 184, 148, 0.4);
+            transform: translateY(-6px) scale(1.03);
+            box-shadow: 0 12px 40px rgba(0, 184, 148, 0.5);
         }
 
         /* ===== INTERFAZ DEL EDITOR ===== */
@@ -100,8 +106,8 @@
         }
 
         .barra-superior {
-            background: var(--panel);
-            padding: 0.7rem 1.2rem;
+            background: var(--panel-oscuro);
+            padding: 0.6rem 1.2rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -115,35 +121,27 @@
             background: transparent;
             color: var(--texto-claro);
             border: none;
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 1rem;
             cursor: pointer;
             border-radius: 6px;
             font-size: 0.95rem;
         }
 
-        .btn-volver:hover {
-            background: var(--borde);
-            color: white;
-        }
+        .btn-volver:hover { background: var(--borde); color: white; }
 
         .grupo-botones button {
             background: transparent;
             color: var(--texto);
             border: none;
-            padding: 0.5rem 0.9rem;
-            margin-left: 0.3rem;
+            padding: 0.4rem 0.8rem;
+            margin-left: 0.25rem;
             border-radius: 6px;
             cursor: pointer;
+            font-size: 0.9rem;
         }
 
-        .grupo-botones button:hover {
-            background: var(--borde);
-        }
-
-        .grupo-botones button.destacado {
-            background: var(--primario);
-            color: white;
-        }
+        .grupo-botones button:hover { background: var(--borde); }
+        .grupo-botones button.destacado { background: var(--primario); color: white; }
 
         .cuerpo-editor {
             display: flex;
@@ -152,29 +150,31 @@
         }
 
         .barra-herramientas {
-            width: 230px;
+            width: 260px;
             background: var(--panel);
             border-right: 1px solid var(--borde);
-            padding: 1rem;
+            padding: 0.8rem;
             overflow-y: auto;
         }
 
-        .barra-herramientas h3 {
-            font-size: 0.85rem;
+        .seccion { margin-bottom: 1.2rem; }
+        .seccion-titulo {
+            font-size: 0.78rem;
             text-transform: uppercase;
-            color: var(--texto-claro);
-            margin: 1rem 0 0.5rem;
-            padding-bottom: 0.3rem;
+            color: var(--resaltado);
+            margin: 0.8rem 0 0.4rem;
+            padding-bottom: 0.25rem;
             border-bottom: 1px solid var(--borde);
+            font-weight: 600;
         }
 
         .herramienta {
-            padding: 0.55rem 0.7rem;
-            margin-bottom: 0.25rem;
-            border-radius: 6px;
+            padding: 0.45rem 0.65rem;
+            margin-bottom: 0.2rem;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.2s;
+            font-size: 0.85rem;
+            transition: all 0.15s;
         }
 
         .herramienta:hover { background: var(--borde); }
@@ -183,7 +183,7 @@
 
         .vista-principal {
             flex: 1;
-            background: radial-gradient(circle, #1e1e35, #0a0a12);
+            background: radial-gradient(circle at center, #1e1e35, #0a0a12);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -201,17 +201,84 @@
             margin-bottom: 1rem;
         }
 
+        .panel-lado {
+            width: 290px;
+            background: var(--panel);
+            border-left: 1px solid var(--borde);
+            padding: 0.8rem;
+            overflow-y: auto;
+        }
+
+        .panel-lado h3 {
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid var(--borde);
+            font-size: 0.95rem;
+        }
+
+        .grupo-campo { margin-bottom: 0.8rem; }
+        .grupo-campo label {
+            display: block;
+            font-size: 0.78rem;
+            color: var(--texto-claro);
+            margin-bottom: 0.25rem;
+        }
+
+        .grupo-campo input, .grupo-campo select {
+            width: 100%;
+            padding: 0.4rem;
+            background: var(--fondo-oscuro);
+            border: 1px solid var(--borde);
+            color: var(--texto);
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .barra-inferior {
+            background: var(--panel-oscuro);
+            padding: 0.35rem 1rem;
+            border-top: 1px solid var(--borde);
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: var(--texto-claro);
+        }
+
+        .lista-nodos {
+            background: var(--fondo-oscuro);
+            border: 1px solid var(--borde);
+            border-radius: 4px;
+            padding: 0.4rem;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .nodo-item {
+            padding: 0.35rem 0.5rem;
+            margin-bottom: 0.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .nodo-item:hover { background: var(--borde); }
+        .nodo-item.tipo-malla { border-left: 3px solid var(--acento-3d); }
+        .nodo-item.tipo-luz { border-left: 3px solid var(--resaltado); }
+        .nodo-item.tipo-camara { border-left: 3px solid var(--primario); }
+
         .objeto-agregado {
             position: absolute;
             display: flex;
             flex-direction: column;
             align-items: center;
             animation: aparecer 0.4s ease-out;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         @keyframes aparecer {
-            from { transform: scale(0); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+            from { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         }
 
         .objeto-agregado .emoji {
@@ -228,61 +295,8 @@
             border-radius: 12px;
         }
 
-        .coordenadas-label {
-            position: absolute;
-            bottom: 20px;
-            font-size: 0.85rem;
-            color: var(--acento-3d);
-            background: rgba(0,0,0,0.6);
-            padding: 0.4rem 1rem;
-            border-radius: 6px;
-        }
-
-        .panel-lado {
-            width: 270px;
-            background: var(--panel);
-            border-left: 1px solid var(--borde);
-            padding: 1rem;
-            overflow-y: auto;
-        }
-
-        .panel-lado h3 {
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--borde);
-        }
-
-        .grupo-campo {
-            margin-bottom: 1rem;
-        }
-
-        .grupo-campo label {
-            display: block;
-            font-size: 0.8rem;
-            color: var(--texto-claro);
-            margin-bottom: 0.3rem;
-        }
-
-        .grupo-campo input, .grupo-campo select {
-            width: 100%;
-            padding: 0.45rem;
-            background: var(--fondo-oscuro);
-            border: 1px solid var(--borde);
-            color: var(--texto);
-            border-radius: 4px;
-        }
-
-        .barra-inferior {
-            background: var(--panel);
-            padding: 0.4rem 1.2rem;
-            border-top: 1px solid var(--borde);
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: var(--texto-claro);
-        }
-
         .oculto { display: none !important; }
+        .chk { width: auto !important; }
     </style>
 </head>
 <body>
@@ -292,28 +306,29 @@
 =================================== -->
 <div id="pantallaInicio">
     <h1>🎨 Krhorkos3Dand2DCreator</h1>
-    <p>Elige qué vas a crear. Al seleccionar se abrirá la interfaz completa de ese editor.</p>
+    <p>Elige el entorno de trabajo. Modelado 3D completo como Blender y Edición 2D completa como Aseprite — todo en un solo lugar.</p>
     <div class="contenedor-botones">
         <button class="boton-elegir boton-3d" onclick="abrirEditor('3d')">
             🧊 Editor 3D<br>
-            <small>Modelado y Assets 3D</small>
+            <small>Modelado completo, materiales, animación, nodos</small>
         </button>
         <button class="boton-elegir boton-2d" onclick="abrirEditor('2d')">
             🖌️ Editor 2D<br>
-            Dibujo, Sprites y Texturas
+            Dibujo, capas, animación por fotogramas, texturas
         </button>
     </div>
 </div>
 
 <!-- ==================================
-    INTERFAZ EDITOR 3D
+    EDITOR 3D — TODO LO DE BLENDER
 =================================== -->
 <div id="interfaz3D" class="interfaz-editor oculto">
     <div class="barra-superior barra-3d">
         <button class="btn-volver" onclick="volverInicio()">← Volver</button>
-        <span class="titulo">🧊 Editor 3D — Krhorkos3Dand2DCreator</span>
+        <span class="titulo">🧊 Editor 3D — Modelado Completo</span>
         <div class="grupo-botones">
             <button>📁 Nuevo</button>
+            <button>📂 Abrir</button>
             <button>💾 Guardar</button>
             <button>⬇️ Exportar</button>
             <button class="destacado">🚀 Enviar a Godot</button>
@@ -321,75 +336,214 @@
     </div>
 
     <div class="cuerpo-editor">
+        <!-- BARRA IZQUIERDA — HERRAMIENTAS COMPLETAS DE BLENDER -->
         <div class="barra-herramientas">
-            <h3>Herramientas</h3>
-            <div class="herramienta activa">🖱️ Seleccionar</div>
-            <div class="herramienta">🔄 Rotar</div>
-            <div class="herramienta">📐 Escalar</div>
-            <div class="herramienta">✂️ Extruir</div>
-            <div class="herramienta">🔪 Cortar</div>
-            <div class="herramienta">✨ Suavizar</div>
+            <div class="seccion">
+                <div class="seccion-titulo">🔧 Transformación</div>
+                <div class="herramienta activa">🖱️ Seleccionar / Mover</div>
+                <div class="herramienta">🔄 Rotar</div>
+                <div class="herramienta">📐 Escalar</div>
+                <div class="herramienta">🧹 Alinear</div>
+                <div class="herramienta">📍 Origen</div>
+            </div>
 
-            <h3>Formas Base</h3>
-            <div class="herramienta forma" onclick="agregarForma('Cubo', '⬜')">⬜ Cubo</div>
-            <div class="herramienta forma" onclick="agregarForma('Esfera', '⚪')">⚪ Esfera</div>
-            <div class="herramienta forma" onclick="agregarForma('Cilindro', '🔵')">🔵 Cilindro</div>
-            <div class="herramienta forma" onclick="agregarForma('Cono', '🔺')">🔺 Cono</div>
-            <div class="herramienta forma" onclick="agregarForma('Plano', '📏')">📏 Plano / Suelo</div>
+            <div class="seccion">
+                <div class="seccion-titulo">✂️ Modelado</div>
+                <div class="herramienta">⬆️ Extruir</div>
+                <div class="herramienta">🔗 Juntar / Unir</div>
+                <div class="herramienta">🔪 Cortar / Biselar</div>
+                <div class="herramienta">🧩 Puente entre caras</div>
+                <div class="herramienta">✨ Suavizar / Sombrear</div>
+                <div class="herramienta">📤 Separar por partes</div>
+                <div class="herramienta">🔪 Recortar</div>
+                <div class="herramienta">📏 Empalmar</div>
+                <div class="herramienta">🔩 Aplanar</div>
+                <div class="herramienta">🗜️ Encoger / Inflar</div>
+                <div class="herramienta">🔢 Subdividir</div>
+            </div>
+
+            <div class="seccion">
+                <div class="seccion-titulo">📉 Reducir Polígonos</div>
+                <div class="herramienta">📉 Reducir en TODO el modelo</div>
+                <div class="herramienta">📉 Reducir SOLO el objeto seleccionado</div>
+                <div class="herramienta">📊 Optimizar caras planas</div>
+                <div class="herramienta">🧹 Eliminar caras ocultas</div>
+            </div>
+
+            <div class="seccion">
+                <div class="seccion-titulo">📦 Formas Base</div>
+                <div class="herramienta forma" onclick="agregarForma('Cubo', '⬜')">⬜ Cubo</div>
+                <div class="herramienta forma" onclick="agregarForma('Esfera', '⚪')">⚪ Esfera</div>
+                <div class="herramienta forma" onclick="agregarForma('Esfera Icosaédrica', '🔵')">🔵 Esfera Icosaédrica</div>
+                <div class="herramienta forma" onclick="agregarForma('Cilindro', '🟦')">🟦 Cilindro</div>
+                <div class="herramienta forma" onclick="agregarForma('Cono', '🔺')">🔺 Cono</div>
+                <div class="herramienta forma" onclick="agregarForma('Plano', '📏')">📏 Plano / Suelo</div>
+                <div class="herramienta forma" onclick="agregarForma('Toro / Rosquilla', '⭕')">⭕ Toro</div>
+                <div class="herramienta forma" onclick="agregarForma('Cápsula', '🔘')">🔘 Cápsula</div>
+                <div class="herramienta forma" onclick="agregarForma('Cilindro Hueco', '🛢️')">🛢️ Tubo / Cilindro Hueco</div>
+                <div class="herramienta forma" onclick="agregarForma('Cruz', '✚')">✚ Cruz</div>
+            </div>
+
+            <div class="seccion">
+                <div class="seccion-titulo">🎯 Modo de Edición</div>
+                <div class="herramienta">🔵 Vértices</div>
+                <div class="herramienta">📏 Aristas</div>
+                <div class="herramienta">⬜ Caras</div>
+                <div class="herramienta">📐 Bordes</div>
+            </div>
+
+            <div class="seccion">
+                <div class="seccion-titulo">🧱 Modificadores</div>
+                <div class="herramienta">✨ Suavizado</div>
+                <div class="herramienta">🔢 Subdivisión</div>
+                <div class="herramienta">📏 Desplazamiento</div>
+                <div class="herramienta">🔄 Deformar</div>
+                <div class="herramienta">📐 Simetría</div>
+                <div class="herramienta">🧭 Espejo</div>
+                <div class="herramienta">⚡ Generar Colisión</div>
+            </div>
         </div>
 
+        <!-- VISTA PRINCIPAL 3D -->
         <div class="vista-principal" id="vistaModelo">
             <div class="mensaje" id="mensajeVista">
                 <div class="icono">🧊</div>
                 <h2>Vista del Modelo 3D</h2>
-                <p>Haz clic en una forma para agregarla en coordenadas 0, 0, 0</p>
+                <p>Haz clic en una forma para agregarla en coordenadas <strong>0, 0, 0</strong></p>
             </div>
-            <div class="coordenadas-label">📍 Coordenadas: 0, 0, 0</div>
         </div>
 
+        <!-- PANEL DERECHO — PROPIEDADES Y NODOS -->
         <div class="panel-lado">
-            <h3 style="color:var(--acento-3d);">Propiedades del Objeto</h3>
+            <h3 style="color:var(--acento-3d);">📋 Propiedades del Objeto</h3>
             <div class="grupo-campo">
                 <label>Posición X / Y / Z</label>
                 <input type="text" id="campoPosicion" value="0.0, 0.0, 0.0" readonly>
             </div>
             <div class="grupo-campo">
-                <label>Rotación</label>
-                <input type="text" value="0°, 0°, 0°">
+                <label>Rotación X / Y / Z</label>
+                <input type="text" value="0.0°, 0.0°, 0.0°">
             </div>
             <div class="grupo-campo">
-                <label>Color Base</label>
+                <label>Escala X / Y / Z</label>
+                <input type="text" value="1.0, 1.0, 1.0">
+            </div>
+            <div class="grupo-campo">
+                <label>Origen del objeto</label>
+                <select>
+                    <option>Centro de Masa</option>
+                    <option>Origen Geométrico</option>
+                    <option>Vértice seleccionado</option>
+                </select>
+            </div>
+
+            <h3 style="color:var(--resaltado); margin-top:1rem;">🎨 Materiales y Texturas</h3>
+            <div class="grupo-campo">
+                <label>Color Base / Albedo</label>
                 <input type="color" value="#ff7675">
             </div>
             <div class="grupo-campo">
-                <label>Material</label>
+                <label>Rugosidad (0 = liso / 1 = rugoso)</label>
+                <input type="range" min="0" max="100" value="50">
+            </div>
+            <div class="grupo-campo">
+                <label>Metálico</label>
+                <input type="range" min="0" max="100" value="0">
+            </div>
+            <div class="grupo-campo">
+                <label>Normal / Relieve</label>
+                <input type="file" accept=".png,.jpg,.webp">
+            </div>
+            <div class="grupo-campo">
+                <label>Emisión / Luz propia</label>
+                <input type="color" value="#000000">
+            </div>
+            <div class="grupo-campo">
+                <label>Transparencia / Opacidad</label>
+                <input type="range" min="0" max="100" value="100">
+            </div>
+
+            <h3 style="color:var(--primario); margin-top:1rem;">🌞 Iluminación y Sombras</h3>
+            <div class="grupo-campo">
+                <label>Recibir sombras</label>
+                <input type="checkbox" checked class="chk">
+            </div>
+            <div class="grupo-campo">
+                <label>Proyectar sombras</label>
+                <input type="checkbox" checked class="chk">
+            </div>
+            <div class="grupo-campo">
+                <label>Sombras suaves / nítidas</label>
                 <select>
-                    <option>Estándar</option>
-                    <option>Metálico</option>
+                    <option>Suaves</option>
+                    <option>Nítidas</option>
+                </select>
+            </div>
+
+            <h3 style="color:#81ecec; margin-top:1rem;">🗂️ Nodos de la Escena</h3>
+            <div class="lista-nodos" id="listaNodos">
+                <div class="nodo-item tipo-malla" onclick="seleccionarNodo(this)">📦 Cubo</div>
+                <div class="nodo-item tipo-luz" onclick="seleccionarNodo(this)">💡 Luz Principal</div>
+                <div class="nodo-item tipo-camara" onclick="seleccionarNodo(this)">📷 Cámara</div>
+            </div>
+            <div style="margin-top:0.4rem; display:flex; gap:0.3rem;">
+                <button style="font-size:0.75rem; padding:0.25rem 0.5rem; background:var(--borde); border:none; border-radius:4px; color:white;">➕ Añadir</button>
+                <button style="font-size:0.75rem; padding:0.25rem 0.5rem; background:var(--borde); border:none; border-radius:4px; color:white;">📝 Renombrar</button>
+                <button style="font-size:0.75rem; padding:0.25rem 0.5rem; background:#d63031; border:none; border-radius:4px; color:white;">🗑️ Eliminar</button>
+            </div>
+
+            <h3 style="color:#a29bfe; margin-top:1rem;">📤 Exportación</h3>
+            <div class="grupo-campo">
+                <label>Formato de archivo</label>
+                <select>
+                    <option selected>.GLB / .GLTF (Recomendado Godot)</option>
+                    <option>.OBJ + .MTL</option>
+                    <option>.FBX</option>
+                    <option>.DAE (Collada)</option>
+                    <option>.STL (Impresión 3D)</option>
+                    <option>.X3D</option>
                 </select>
             </div>
             <div class="grupo-campo">
-                <label>✅ Generar Colisión</label>
-                <input type="checkbox" checked style="width:auto;">
+                <label>Calidad al exportar</label>
+                <select>
+                    <option>🔽 Baja — Equipos modestos</option>
+                    <option selected>⚖️ Media — Equilibrada</option>
+                    <option>🔝 Alta — Máxima calidad</option>
+                    <option>🎬 Animación optimizada</option>
+                </select>
+            </div>
+            <div class="grupo-campo">
+                <label>✅ Generar colisión automática</label>
+                <input type="checkbox" checked class="chk">
+            </div>
+            <div class="grupo-campo">
+                <label>📉 Reducir polígonos al guardar</label>
+                <input type="checkbox" checked class="chk">
+            </div>
+            <div class="grupo-campo">
+                <label>📦 Incluir materiales y texturas</label>
+                <input type="checkbox" checked class="chk">
             </div>
         </div>
     </div>
 
     <div class="barra-inferior">
-        <span>Vista: Perspectiva | Objetos agregados: <span id="contadorObjetos">0</span></span>
-        <span>Escala: 1.0 | Unidades: Godot | Coordenadas: 0, 0, 0</span>
+        <span>Vista: Perspectiva / Ortogonal | Vértices: 0 | Aristas: 0 | Caras: 0 | Objetos: <span id="contadorObjetos">0</span></span>
+        <span>Modo: Objeto → Edición | Coordenadas: 0, 0, 0 | Escala: 1.0 | Unidades: Godot</span>
     </div>
 </div>
 
 <!-- ==================================
-    INTERFAZ EDITOR 2D (de momento igual, la mejoramos después)
+    EDITOR 2D — TODO LO DE ASESPRITE
 =================================== -->
 <div id="interfaz2D" class="interfaz-editor oculto">
     <div class="barra-superior barra-2d">
         <button class="btn-volver" onclick="volverInicio()">← Volver</button>
-        <span class="titulo">🖌️ Editor 2D — Krhorkos3Dand2DCreator</span>
+        <span class="titulo">🖌️ Editor 2D — Dibujo y Animación Completo</span>
         <div class="grupo-botones">
             <button>📁 Nuevo</button>
+            <button>📂 Abrir</button>
             <button>💾 Guardar</button>
             <button>⬇️ Exportar</button>
             <button class="destacado">🚀 Enviar a Godot</button>
@@ -397,58 +551,215 @@
     </div>
 
     <div class="cuerpo-editor">
+        <!-- BARRA IZQUIERDA — HERRAMIENTAS COMPLETAS DE ASESPRITE -->
         <div class="barra-herramientas">
-            <h3>Herramientas de Dibujo</h3>
-            <div class="herramienta activa">✏️ Pincel</div>
-            <div class="herramienta">🧹 Borrador</div>
-            <div class="herramienta">🪣 Relleno</div>
-            <div class="herramienta">💧 Cuentagotas</div>
-            <div class="herramienta">📏 Línea</div>
-            <div class="herramienta">✂️ Selección</div>
+            <div class="seccion">
+                <div class="seccion-titulo">✏️ Herramientas de Dibujo</div>
+                <div class="herramienta activa">✏️ Pincel</div>
+                <div class="herramienta">🖊️ Pincel Duro</div>
+                <div class="herramienta">🧹 Borrador</div>
+                <div class="herramienta">🪣 Relleno</div>
+                <div class="herramienta">💧 Cuentagotas</div>
+                <div class="herramienta">🎯 Selección de área</div>
+                <div class="herramienta">✂️ Recortar</div>
+                <div class="herramienta">📏 Línea recta</div>
+                <div class="herramienta">⬜ Rectángulo</div>
+                <div class="herramienta">⭕ Círculo / Elipse</div>
+                <div class="herramienta">🔺 Polígono / Triángulo</div>
+                <div class="herramienta">↪️ Curva</div>
+                <div class="herramienta">🖋️ Pluma</div>
+                <div class="herramienta">🔄 Transformar / Mover</div>
+                <div class="herramienta">📐 Escalar y Rotar</div>
+                <div class="herramienta">🧾 Contorno</div>
+            </div>
 
-            <h3>Tamaño Lienzo</h3>
-            <div class="herramienta">32 × 32</div>
-            <div class="herramienta">64 × 64</div>
-            <div class="herramienta activa">128 × 128</div>
-            <div class="herramienta">256 × 256</div>
+            <div class="seccion">
+                <div class="seccion-titulo">🧹 Edición y Corrección</div>
+                <div class="herramienta">↩️ Deshacer</div>
+                <div class="herramienta">↪️ Rehacer</div>
+                <div class="herramienta">📋 Copiar</div>
+                <div class="herramienta">📄 Pegar</div>
+                <div class="herramienta">🗑️ Borrar</div>
+                <div class="herramienta">🔄 Invertir colores</div>
+                <div class="herramienta">🌑 Escala de Grises</div>
+                <div class="herramienta">📈 Ajustar Brillo / Contraste</div>
+                <div class="herramienta">🎨 Cambiar Tono / Saturación</div>
+                <div class="herramienta">🖼️ Reducir colores</div>
+                <div class="herramienta">🧫 Suavizar píxeles</div>
+                <div class="herramienta">✨ Reducir parpadeo</div>
+                <div class="herramienta">📏 Redimensionar lienzo</div>
+                <div class="herramienta">🔍 Recortar a selección</div>
+            </div>
+
+            <div class="seccion">
+                <div class="seccion-titulo">📐 Tamaño de Lienzo</div>
+                <div class="herramienta">8 × 8 px</div>
+                <div class="herramienta">16 × 16 px</div>
+                <div class="herramienta">32 × 32 px</div>
+                <div class="herramienta">64 × 64 px</div>
+                <div class="herramienta activa">128 × 128 px</div>
+                <div class="herramienta">256 × 256 px</div>
+                <div class="herramienta">512 × 512 px</div>
+                <div class="herramienta">Personalizado...</div>
+            </div>
+
+            <div class="seccion">
+                <div class="seccion-titulo">🔬 Vista y Cuadrícula</div>
+                <div class="herramienta">➕ Aumentar Zoom</div>
+                <div class="herramienta">➖ Reducir Zoom</div>
+                <div class="herramienta">📵 Mostrar / Ocultar Cuadrícula</div>
+                <div class="herramienta">🧭 Ajustar a Cuadrícula</div>
+                <div class="herramienta">🔬 Cuadrícula de píxel</div>
+                <div class="herramienta">🪞 Espejo Horizontal</div>
+                <div class="herramienta">🪞 Espejo Vertical</div>
+            </div>
         </div>
 
+        <!-- VISTA PRINCIPAL 2D -->
         <div class="vista-principal">
             <div class="mensaje">
                 <div class="icono">🖼️</div>
                 <h2>Lienzo de Dibujo</h2>
-                <p>Aquí dibujarás tu textura o sprite.</p>
+                <p>Cuadrícula activada. Dibuja tu sprite, textura o animación.</p>
             </div>
         </div>
 
+        <!-- PANEL DERECHO — CAPAS, ANIMACIÓN, PALETA, EXPORTACIÓN -->
         <div class="panel-lado">
-            <h3 style="color:var(--acento-2d);">Capas y Color</h3>
+            <h3 style="color:var(--acento-2d);">🎨 Paleta de Colores</h3>
             <div class="grupo-campo">
-                <label>Color Actual</label>
-                <input type="color" value="#00b894" style="height:40px;">
+                <label>Color Primario</label>
+                <input type="color" value="#00b894" style="height:38px;">
             </div>
             <div class="grupo-campo">
-                <label>Capas</label>
-                <div style="background:var(--fondo-oscuro); padding:0.5rem; border-radius:4px; font-size:0.9rem;">
-                    <div style="padding:0.3rem; background:var(--acento-2d); border-radius:4px;">🖼️ Principal</div>
+                <label>Color Secundario / Transparencia</label>
+                <input type="color" value="#00000000" style="height:38px;">
+            </div>
+            <div class="grupo-campo">
+                <label>Paleta Predefinida</label>
+                <select>
+                    <option>Por defecto</option>
+                    <option>Escala de grises</option>
+                    <option>Godot estándar</option>
+                    <option>Personalizada...</option>
+                </select>
+            </div>
+
+            <h3 style="color:#fdcb6e; margin-top:1rem;">📚 Capas y Grupos</h3>
+            <div class="grupo-campo">
+                <label>Orden de capas (Abajo → Arriba)</label>
+                <div style="background:var(--fondo-oscuro); padding:0.5rem; border-radius:4px; font-size:0.85rem;">
+                    <div style="padding:0.3rem; background:var(--acento-2d); border-radius:4px; margin-bottom:0.15rem;">🖼️ Capa Principal</div>
                     <div style="padding:0.3rem; color:var(--texto-claro);">👤 Sombra</div>
                     <div style="padding:0.3rem; color:var(--texto-claro);">🌫️ Fondo</div>
+                    <div style="padding:0.3rem; color:var(--texto-claro);">✨ Brillo / Luz</div>
+                    <div style="padding:0.3rem; color:var(--texto-claro);">📜 Interfaz</div>
                 </div>
             </div>
+            <div style="display:flex; gap:0.3rem; margin-top:0.25rem;">
+                <button style="font-size:0.75rem; padding:0.25rem 0.4rem; background:var(--borde); border:none; border-radius:4px; color:white;">➕ Nueva</button>
+                <button style="font-size:0.75rem; padding:0.25rem 0.4rem; background:var(--borde); border:none; border-radius:4px; color:white;">⬆️ Subir</button>
+                <button style="font-size:0.75rem; padding:0.25rem 0.4rem; background:var(--borde); border:none; border-radius:4px; color:white;">⬇️ Bajar</button>
+                <button style="font-size:0.75rem; padding:0.25rem 0.4rem; background:#d63031; border:none; border-radius:4px; color:white;">🗑️</button>
+            </div>
+
+            <h3 style="color:#a29bfe; margin-top:1rem;">🎬 Animación — Fotogramas</h3>
             <div class="grupo-campo">
-                <label>Formato de Exportación</label>
+                <label>Fotograma actual / Total</label>
                 <select>
-                    <option selected>.PNG</option>
-                    <option>.WEBP</option>
-                    <option>Atlas Godot</option>
+                    <option selected>1 — Reposo</option>
+                    <option>2 — Caminando (1)</option>
+                    <option>3 — Caminando (2)</option>
+                    <option>4 — Salto</option>
+                    <option>5 — Acción / Ataque</option>
+                    <option>6 — Daño / Muerte</option>
+                </select>
+            </div>
+            <div class="grupo-campo">
+                <label>Duración del fotograma (ms)</label>
+                <input type="number" value="100" min="10" max="2000">
+            </div>
+            <div class="grupo-campo">
+                <label>🔄 Bucle de animación</label>
+                <select>
+                    <option>Desactivado</option>
+                    <option selected>Repetir siempre</option>
+                    <option>Repetir N veces</option>
+                    <option>Ir y volver (ping-pong)</option>
+                </select>
+            </div>
+            <div style="display:flex; gap:0.3rem; margin-top:0.25rem;">
+                <button style="font-size:0.75rem; padding:0.25rem 0.4rem; background:var(--borde); border:none; border-radius:4px; color:white;">➕ Fotograma</button>
+                <button style="font-size:0.75rem; padding:0.25rem 0.4rem; background:var(--borde); border:none; border-radius:4px; color:white;">▶️ Previsualizar</button>
+                <button style="font-size:0.75rem; padding:0.25rem 0.4rem; background:var(--borde); border:none; border-radius:4px; color:white;">📋 Duplicar</button>
+            </div>
+
+            <h3 style="color:#81ecec; margin-top:1rem;">✨ Efectos y Automatización</h3>
+            <div class="grupo-campo">
+                <label>✨ Generar sombras automáticas</label>
+                <input type="checkbox" checked class="chk">
+            </div>
+            <div class="grupo-campo">
+                <label>☀️ Generar luces automáticas</label>
+                <input type="checkbox" class="chk">
+            </div>
+            <div class="grupo-campo">
+                <label>🧩 Textura sin fisuras (repetible)</label>
+                <input type="checkbox" class="chk">
+            </div>
+            <div class="grupo-campo">
+                <label>🔬 Escala automática sin perder calidad</label>
+                <input type="checkbox" checked class="chk">
+            </div>
+            <div class="grupo-campo">
+                <label>🪞 Reflejo automático</label>
+                <select>
+                    <option>Ninguno</option>
+                    <option>Horizontal</option>
+                    <option>Vertical</option>
+                    <option>Ambos</option>
+                </select>
+            </div>
+
+            <h3 style="color:#fab1a0; margin-top:1rem;">📤 Exportación</h3>
+            <div class="grupo-campo">
+                <label>Formato de imagen</label>
+                <select>
+                    <option selected>.PNG (con transparencia)</option>
+                    <option>.JPG / .JPEG</option>
+                    <option>.WEBP (más ligero)</option>
+                    <option>.TGA</option>
+                    <option>.GIF (animado)</option>
+                    <option>.ASEPRITE (compatible con Aseprite)</option>
+                </select>
+            </div>
+            <div class="grupo-campo">
+                <label>📦 Exportar como hoja de sprites (Atlas)</label>
+                <input type="checkbox" checked class="chk">
+            </div>
+            <div class="grupo-campo">
+                <label>🎮 Generar archivo .TSCN para Godot</label>
+                <input type="checkbox" checked class="chk">
+            </div>
+            <div class="grupo-campo">
+                <label>📐 Recortar transparencia automáticamente</label>
+                <input type="checkbox" checked class="chk">
+            </div>
+            <div class="grupo-campo">
+                <label>Profundidad de color</label>
+                <select>
+                    <option>32 bits (completo)</option>
+                    <option selected>24 bits</option>
+                    <option>8 bits (paleta)</option>
+                    <option>1 bit (blanco/negro)</option>
                 </select>
             </div>
         </div>
     </div>
 
     <div class="barra-inferior">
-        <span>Coordenadas: 0,0 | Lienzo: 128×128 px | Capas: 3</span>
-        <span>Vista: 100% | Fotograma 1 de 1</span>
+        <span>Coordenadas: 0, 0 | Lienzo: 128 × 128 px | Cuadrícula: ON | Capas: 5</span>
+        <span>Vista: 100% | Fotograma 1 de 6 | Duración: 100ms | Bucle: ✅ Activado</span>
     </div>
 </div>
 
@@ -473,32 +784,32 @@ function volverInicio() {
     document.getElementById('pantallaInicio').classList.remove('oculto');
 }
 
-// ✅ FUNCIÓN PARA AGREGAR FORMAS EN COORDENADAS 0, 0, 0
+// AGREGAR FORMAS EN 0,0,0
 function agregarForma(nombre, emoji) {
     contador++;
     document.getElementById('contadorObjetos').textContent = contador;
-
-    // Ocultar mensaje inicial la primera vez
     const mensaje = document.getElementById('mensajeVista');
     if (mensaje) mensaje.style.display = 'none';
 
-    // Crear el objeto visual
     const vista = document.getElementById('vistaModelo');
     const objeto = document.createElement('div');
     objeto.className = 'objeto-agregado';
-    objeto.innerHTML = `
-        <div class="emoji">${emoji}</div>
-        <div class="nombre">${nombre}</div>
-    `;
-    // Siempre en el centro = coordenadas 0, 0, 0
-    objeto.style.top = '50%';
-    objeto.style.left = '50%';
-    objeto.style.transform = 'translate(-50%, -50%)';
-
+    objeto.innerHTML = `<div class="emoji">${emoji}</div><div class="nombre">${nombre}</div>`;
     vista.appendChild(objeto);
-
-    // Actualizar campo de posición a 0,0,0
     document.getElementById('campoPosicion').value = '0.0, 0.0, 0.0';
+
+    // Agregar a lista de nodos
+    const lista = document.getElementById('listaNodos');
+    const nodo = document.createElement('div');
+    nodo.className = 'nodo-item tipo-malla';
+    nodo.onclick = () => seleccionarNodo(nodo);
+    nodo.textContent = `📦 ${nombre}`;
+    lista.appendChild(nodo);
+}
+
+function seleccionarNodo(elemento) {
+    document.querySelectorAll('.nodo-item').forEach(n => n.style.background = '');
+    elemento.style.background = 'var(--primario)';
 }
 </script>
 
