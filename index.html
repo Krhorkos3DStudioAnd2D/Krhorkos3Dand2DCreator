@@ -10,7 +10,6 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            scroll-behavior: smooth;
         }
 
         :root {
@@ -23,345 +22,514 @@
             --texto: #f0f0f5;
             --texto-claro: #b2bec3;
             --borde: #2d2d44;
+            --panel-oscuro: #141424;
         }
 
         body {
-            background: linear-gradient(135deg, var(--fondo-oscuro), #16162a);
+            background: var(--fondo-oscuro);
             color: var(--texto);
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        header {
-            background: rgba(26, 26, 46, 0.85);
-            backdrop-filter: blur(10px);
-            padding: 1.2rem 2.5rem;
+        /* ===== PANTALLA DE BIENVENIDA ===== */
+        .pantalla-bienvenida {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            height: 100vh;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .pantalla-bienvenida h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--acento-3d), var(--primario), var(--acento-2d));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pantalla-bienvenida p {
+            color: var(--texto-claro);
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+            max-width: 700px;
+        }
+
+        .botones-seleccion {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .boton-elegir {
+            padding: 2rem 3rem;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.35s ease;
+            min-width: 240px;
+        }
+
+        .boton-3d {
+            background: linear-gradient(135deg, #d63031, var(--acento-3d));
+            color: white;
+            box-shadow: 0 4px 20px rgba(255, 118, 117, 0.35);
+        }
+
+        .boton-3d:hover {
+            transform: translateY(-6px) scale(1.05);
+            box-shadow: 0 10px 40px rgba(255, 118, 117, 0.5);
+        }
+
+        .boton-2d {
+            background: linear-gradient(135deg, #009688, var(--acento-2d));
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35);
+        }
+
+        .boton-2d:hover {
+            transform: translateY(-6px) scale(1.05);
+            box-shadow: 0 10px 40px rgba(0, 184, 148, 0.5);
+        }
+
+        /* ===== INTERFAZ DEL EDITOR ===== */
+        .interfaz-editor {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .interfaz-editor.activa {
+            display: flex;
+        }
+
+        /* BARRA SUPERIOR */
+        .barra-superior {
+            background: var(--panel-oscuro);
+            padding: 0.6rem 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             border-bottom: 1px solid var(--borde);
         }
 
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 800;
-            background: linear-gradient(90deg, var(--acento-3d), var(--primario), var(--acento-2d));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        nav a {
-            color: var(--texto-claro);
-            text-decoration: none;
-            margin-left: 2rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        nav a:hover {
-            color: var(--secundario);
-        }
-
-        .hero {
-            padding: 5rem 2.5rem;
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(90deg, var(--acento-3d), var(--primario), var(--acento-2d));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero p {
-            font-size: 1.3rem;
-            color: var(--texto-claro);
-            max-width: 900px;
-            margin: 0 auto 2.5rem;
-            line-height: 1.6;
-        }
-
-        .boton-principal {
-            padding: 1rem 2.5rem;
-            font-size: 1.2rem;
-            background: linear-gradient(90deg, var(--primario), var(--secundario));
-            color: white;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
+        .barra-superior .logo {
             font-weight: 700;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.4);
+            font-size: 1.1rem;
         }
 
-        .boton-principal:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 30px rgba(108, 92, 231, 0.5);
-        }
+        .barra-3d .logo { color: var(--acento-3d); }
+        .barra-2d .logo { color: var(--acento-2d); }
 
-        .seccion {
-            padding: 4rem 2.5rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .seccion h2 {
-            font-size: 2.2rem;
-            margin-bottom: 2.5rem;
-            text-align: center;
-            color: var(--secundario);
-        }
-
-        .tarjetas {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 2rem;
-        }
-
-        .tarjeta {
-            background: var(--fondo-card);
-            border: 1px solid var(--borde);
-            border-radius: 16px;
-            padding: 2rem;
-            transition: all 0.3s ease;
-        }
-
-        .tarjeta:hover {
-            transform: translateY(-8px);
-            border-color: var(--primario);
-            box-shadow: 0 10px 40px rgba(108, 92, 231, 0.15);
-        }
-
-        .tarjeta h3 {
-            font-size: 1.4rem;
-            margin-bottom: 1rem;
+        .barra-superior .botones {
             display: flex;
-            align-items: center;
             gap: 0.5rem;
         }
 
-        .tarjeta-3d h3 { color: var(--acento-3d); }
-        .tarjeta-2d h3 { color: var(--acento-2d); }
-        .tarjeta-exp h3 { color: var(--primario); }
+        .boton-barra {
+            background: transparent;
+            color: var(--texto);
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
 
-        .tarjeta p {
+        .boton-barra:hover { background: var(--borde); }
+        .boton-barra.primario { background: var(--primario); color: white; }
+        .boton-barra.primario:hover { background: #5b4cdb; }
+
+        .boton-volver {
+            background: transparent;
             color: var(--texto-claro);
-            line-height: 1.6;
+            border: none;
+            padding: 0.4rem 1rem;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .boton-volver:hover { background: var(--borde); color: white; }
+
+        /* AREA PRINCIPAL: Barra Lateral + Vista */
+        .area-principal {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* BARRA LATERAL IZQUIERDA */
+        .barra-lateral {
+            width: 240px;
+            background: var(--panel-oscuro);
+            border-right: 1px solid var(--borde);
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .barra-lateral h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--texto-claro);
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid var(--borde);
+        }
+
+        .herramienta {
+            padding: 0.5rem 0.7rem;
+            margin-bottom: 0.3rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.15s;
+        }
+
+        .herramienta:hover { background: var(--borde); }
+        .herramienta.activa { background: var(--primario); color: white; }
+
+        /* VISTA CENTRAL */
+        .vista-escena {
+            flex: 1;
+            background: radial-gradient(circle at center, #1e1e35, #0a0a12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .vista-escena .mensaje {
+            text-align: center;
+            color: var(--texto-claro);
+        }
+
+        .vista-escena .mensaje .icono {
+            font-size: 4rem;
             margin-bottom: 1rem;
         }
 
-        .lista-caracteristicas {
-            list-style: none;
+        /* BARRA LATERAL DERECHA — Propiedades */
+        .panel-propiedades {
+            width: 280px;
+            background: var(--panel-oscuro);
+            border-left: 1px solid var(--borde);
+            padding: 1rem;
+            overflow-y: auto;
         }
 
-        .lista-caracteristicas li {
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--borde);
-            color: #dfe6e9;
+        .grupo-prop {
+            margin-bottom: 1.2rem;
         }
 
-        .lista-caracteristicas li::before {
-            content: "✅ ";
-            color: var(--secundario);
-            font-weight: bold;
-        }
-
-        .formatos {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            margin-top: 1rem;
-        }
-
-        .formato {
-            background: rgba(108, 92, 231, 0.15);
-            color: var(--secundario);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
-        .estado-proyecto {
-            background: rgba(255, 118, 117, 0.1);
-            border: 1px solid var(--acento-3d);
-            border-radius: 12px;
-            padding: 1.5rem;
-            text-align: center;
-            margin-top: 3rem;
-        }
-
-        .estado-proyecto h3 { color: var(--acento-3d); margin-bottom: 0.5rem; }
-        .estado-proyecto p { color: var(--texto-claro); }
-
-        footer {
-            text-align: center;
-            padding: 2.5rem;
-            border-top: 1px solid var(--borde);
+        .grupo-prop label {
+            display: block;
+            font-size: 0.8rem;
             color: var(--texto-claro);
-            margin-top: 3rem;
+            margin-bottom: 0.3rem;
         }
+
+        .grupo-prop input, .grupo-prop select {
+            width: 100%;
+            padding: 0.4rem 0.6rem;
+            background: var(--fondo-oscuro);
+            border: 1px solid var(--borde);
+            color: var(--texto);
+            border-radius: 4px;
+        }
+
+        /* BARRA INFERIOR */
+        .barra-inferior {
+            background: var(--panel-oscuro);
+            padding: 0.4rem 1rem;
+            border-top: 1px solid var(--borde);
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--texto-claro);
+        }
+
+        /* OCULTAR POR DEFECTO */
+        .oculto { display: none !important; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo">Krhorkos3Dand2DCreator</div>
-        <nav>
-            <a href="#acerca">Acerca</a>
-            <a href="#editor3d">Editor 3D</a>
-            <a href="#editor2d">Editor 2D</a>
-            <a href="#exportar">Exportación</a>
-            <a href="#estado">Estado</a>
-        </nav>
-    </header>
+<!-- ==============================================
+    PANTALLA DE BIENVENIDA Y SELECCIÓN
+============================================== -->
+<div id="pantallaInicio" class="pantalla-bienvenida">
+    <h1>🎨 Krhorkos3Dand2DCreator</h1>
+    <p>Elige el tipo de recurso que vas a crear. Todo en un solo lugar, sin programas pesados y optimizado para exportar directamente a Godot.</p>
+    <div class="botones-seleccion">
+        <button class="boton-elegir boton-3d" onclick="abrirEditor('3d')">
+            🧊 Editor 3D<br>
+            <small>Modelado, materiales, colisiones</small>
+        </button>
+        <button class="boton-elegir boton-2d" onclick="abrirEditor('2d')">
+            🖌️ Editor 2D<br>
+            Dibujo, capas, animación y texturas
+        </button>
+    </div>
+</div>
 
-    <section class="hero">
-        <h1>Crea Assets 3D y 2D sin límites</h1>
-        <p>Una herramienta completa, todo en un solo lugar. Más potente que Blender y más versátil que Aseprite. Diseñado especialmente para desarrolladores de juegos indies que buscan rendimiento y simplicidad.</p>
-        <button class="boton-principal" onclick="proximamente()">🚀 Abrir Editor (Próximamente)</button>
-    </section>
+<!-- ==============================================
+    INTERFAZ DEL EDITOR 3D
+============================================== -->
+<div id="interfaz3D" class="interfaz-editor oculto">
+    <div class="barra-superior barra-3d">
+        <button class="boton-volver" onclick="volverAlInicio()">← Volver</button>
+        <span class="logo">🧊 Editor 3D — Krhorkos3Dand2DCreator</span>
+        <div class="botones">
+            <button class="boton-barra">📁 Nuevo</button>
+            <button class="boton-barra">💾 Guardar</button>
+            <button class="boton-barra">⬇️ Exportar</button>
+            <button class="boton-barra primario">🚀 Enviar a Godot</button>
+        </div>
+    </div>
 
-    <section class="seccion" id="acerca">
-        <h2>¿Qué es Krhorkos3Dand2DCreator?</h2>
-        <p style="text-align:center; max-width:800px; margin:0 auto; color:var(--texto-claro); font-size:1.1rem; line-height:1.7;">
-            Es una plataforma web diseñada para crear recursos para juegos sin necesidad de programas pesados. Funciona en tu navegador, no consume tu RAM, y está optimizada para exportar directamente a Godot y cualquier motor de juego. Todo en uno: modelado 3D + edición 2D + texturizado + animación + exportación universal.
-        </p>
-    </section>
+    <div class="area-principal">
+        <div class="barra-lateral">
+            <h3>🛠️ Herramientas</h3>
+            <div class="herramienta activa" onclick="seleccionarHerramienta(this)">🖱️ Seleccionar / Mover</div>
+            <div class="herramienta" onclick="seleccionarHerramienta(this)">🔄 Rotar</div>
+            <div class="herramienta" onclick="seleccionarHerramienta(this)">📐 Escalar</div>
+            <div class="herramienta" onclick="seleccionarHerramienta(this)">✂️ Extruir</div>
+            <div class="herramienta" onclick="seleccionarHerramienta(this)">🔪 Cortar</div>
+            <div class="herramienta" onclick="seleccionarHerramienta(this)">🔗 Unir</div>
+            <div class="herramienta" onclick="seleccionarHerramienta(this)">✨ Suavizar</div>
+            <div class="herramienta" onclick="seleccionarHerramienta(this)">🏗️ Puente</div>
 
-    <section class="seccion" id="editor3d">
-        <h2>🧊 Editor 3D — Más que Blender</h2>
-        <div class="tarjetas">
-            <div class="tarjeta tarjeta-3d">
-                <h3>Herramientas de Modelado</h3>
-                <ul class="lista-caracteristicas">
-                    <li>Extruir, cortar, unir y suavizar mallas</li>
-                    <li>Edición por vértices, aristas y caras</li>
-                    <li>Formas base listas para usar</li>
-                    <li>Escala, rotación y posición precisa</li>
-                    <li>Optimización automática de polígonos</li>
-                </ul>
-            </div>
-            <div class="tarjeta tarjeta-3d">
-                <h3>Materiales y Luces</h3>
-                <ul class="lista-caracteristicas">
-                    <li>Color, rugosidad, metálico y normales</li>
-                    <li>Vista previa con iluminación en tiempo real</li>
-                    <li>Generación automática de colisiones</li>
-                    <li>Preajustes optimizados para Godot</li>
-                    <li>Texturizado directo desde el editor 2D</li>
-                </ul>
-            </div>
-            <div class="tarjeta tarjeta-3d">
-                <h3>Ventajas Exclusivas</h3>
-                <ul class="lista-caracteristicas">
-                    <li>Interfaz simple, sin opciones confusas</li>
-                    <li>No consume tu RAM — funciona en navegador</li>
-                    <li>Vista previa exacta en Godot con 1 clic</li>
-                    <li>Reduce peso automáticamente al guardar</li>
-                    <li>Colisión generada sin trabajo extra</li>
-                </ul>
+            <h3 style="margin-top:1.5rem;">📦 Formas Base</h3>
+            <div class="herramienta">⬜ Cubo</div>
+            <div class="herramienta">⚪ Esfera</div>
+            <div class="herramienta">🔵 Cilindro</div>
+            <div class="herramienta">🔺 Cono</div>
+            <div class="herramienta">📏 Plano / Suelo</div>
+
+            <h3 style="margin-top:1.5rem;">🎯 Modo Edición</h3>
+            <div class="herramienta">🔵 Vértices</div>
+            <div class="herramienta">📏 Aristas</div>
+            <div class="herramienta">⬜ Caras</div>
+        </div>
+
+        <div class="vista-escena">
+            <div class="mensaje">
+                <div class="icono">🧊</div>
+                <h2>Vista del Modelo 3D</h2>
+                <p>Aquí verás tu modelo en tiempo real. Arrastra para rotar, rueda para acercar.</p>
             </div>
         </div>
-    </section>
 
-    <section class="seccion" id="editor2d">
-        <h2>🖌️ Editor 2D — Más que Aseprite</h2>
-        <div class="tarjetas">
-            <div class="tarjeta tarjeta-2d">
-                <h3>Dibujo y Animación</h3>
-                <ul class="lista-caracteristicas">
-                    <li>Pinceles, borrador, relleno y cuentagotas</li>
-                    <li>Edición por capas con nombres personalizados</li>
-                    <li>Línea de tiempo para animación por fotogramas</li>
-                    <li>Cuadrícula y guías de alineación</li>
-                    <li>Paleta de colores unificada por proyecto</li>
-                </ul>
+        <div class="panel-propiedades">
+            <h3 style="color:var(--acento-3d); margin-bottom:1rem;">📋 Propiedades del Objeto</h3>
+            <div class="grupo-prop">
+                <label>Posición X / Y / Z</label>
+                <input type="text" value="0.0, 0.0, 0.0">
             </div>
-            <div class="tarjeta tarjeta-2d">
-                <h3>Funciones Avanzadas</h3>
-                <ul class="lista-caracteristicas">
-                    <li>Generador de sombras y luces automáticas</li>
-                    <li>Texturas sin fisuras con 1 clic</li>
-                    <li>Escala inteligente sin perder calidad</li>
-                    <li>Vista previa pegada al modelo 3D en tiempo real</li>
-                    <li>Generación automática de hojas de sprites</li>
-                </ul>
+            <div class="grupo-prop">
+                <label>Rotación X / Y / Z</label>
+                <input type="text" value="0°, 0°, 0°">
             </div>
-            <div class="tarjeta tarjeta-2d">
-                <h3>Integración Total</h3>
-                <ul class="lista-caracteristicas">
-                    <li>Dibujas → se ve en tu modelo 3D al instante</li>
-                    <li>Exporta atlas listos para Godot (.tscn)</li>
-                    <li>Paletas compatibles con tu estilo visual</li>
-                    <li>Capas etiquetadas: fondo, personaje, UI, sombras</li>
-                    <li>Exporta también en formato .aseprite</li>
-                </ul>
+            <div class="grupo-prop">
+                <label>Escala X / Y / Z</label>
+                <input type="text" value="1.0, 1.0, 1.0">
+            </div>
+            <div class="grupo-prop">
+                <label>Material</label>
+                <select>
+                    <option>Estándar</option>
+                    <option>Metálico</option>
+                    <option>Transparente</option>
+                    <option>Emisivo / Luz</option>
+                </select>
+            </div>
+            <div class="grupo-prop">
+                <label>Color Base</label>
+                <input type="color" value="#ff7675">
+            </div>
+            <div class="grupo-prop">
+                <label>Rugosidad (0 = liso)</label>
+                <input type="range" min="0" max="100" value="50">
+            </div>
+            <div class="grupo-prop">
+                <label>Metálico</label>
+                <input type="range" min="0" max="100" value="0">
+            </div>
+            <div class="grupo-prop" style="margin-top:1.2rem; padding-top:1rem; border-top:1px solid var(--borde);">
+                <label>✅ Generar Colisión automática</label>
+                <input type="checkbox" checked style="width:auto;">
+            </div>
+            <div class="grupo-prop">
+                <label>📉 Reducir polígonos al guardar</label>
+                <input type="checkbox" checked style="width:auto;">
+            </div>
+            <div class="grupo-prop">
+                <label>💾 Calidad al exportar</label>
+                <select>
+                    <option>Baja — Para equipos modestos 💻</option>
+                    <option selected>Media — Equilibrada</option>
+                    <option>Alta — Máxima calidad</option>
+                </select>
             </div>
         </div>
-    </section>
+    </div>
 
-    <section class="seccion" id="exportar">
-        <h2>📦 Exportación a CUALQUIER Formato</h2>
-        <div class="tarjetas">
-            <div class="tarjeta tarjeta-exp">
-                <h3>🧊 Modelos 3D</h3>
-                <div class="formatos">
-                    <span class="formato">.glb / .gltf ★</span>
-                    <span class="formato">.obj + .mtl</span>
-                    <span class="formato">.fbx</span>
-                    <span class="formato">.dae (Collada)</span>
-                    <span class="formato">.stl (Impresión 3D)</span>
+    <div class="barra-inferior">
+        <span>Vista: Perspectiva | Vértices: 0 | Caras: 0</span>
+        <span>Escala: 1.0 | Unidades: Godot</span>
+    </div>
+</div>
+
+<!-- ==============================================
+    INTERFAZ DEL EDITOR 2D
+============================================== -->
+<div id="interfaz2D" class="interfaz-editor oculto">
+    <div class="barra-superior barra-2d">
+        <button class="boton-volver" onclick="volverAlInicio()">← Volver</button>
+        <span class="logo">🖌️ Editor 2D — Krhorkos3Dand2DCreator</span>
+        <div class="botones">
+            <button class="boton-barra">📁 Nuevo</button>
+            <button class="boton-barra">💾 Guardar</button>
+            <button class="boton-barra">⬇️ Exportar</button>
+            <button class="boton-barra primario">🚀 Enviar a Godot</button>
+        </div>
+    </div>
+
+    <div class="area-principal">
+        <div class="barra-lateral">
+            <h3>🛠️ Herramientas de Dibujo</h3>
+            <div class="herramienta activa" onclick="seleccionarHerramienta(this)">✏️ Pincel</div>
+            <div class="herramienta" onclick="seleccionarHerramienta(this)">🧹 Borrador</div>
+            <div class="herramienta" onclick="seleccionarHerramienta(this)">🪣 Relleno</div>
+            <div class="herramienta" onclick="seleccionarHerramienta(this)">💧 Cuentagotas</div>
+            <div class="herramienta" onclick="seleccionarHerramienta(this)">📏 Línea</div>
+            <div class="herramienta" onclick="seleccionarHerramienta(this)">⬜ Rectángulo</div>
+            <div class="herramienta" onclick="seleccionarHerramienta(this)">⭕ Círculo</div>
+            <div class="herramienta" onclick="seleccionarHerramienta(this)">✂️ Selección</div>
+
+            <h3 style="margin-top:1.5rem;">🎨 Tamaño y Forma</h3>
+            <div class="grupo-prop">
+                <label>Tamaño del pincel</label>
+                <input type="range" min="1" max="32" value="3">
+            </div>
+            <div class="grupo-prop">
+                <label>Opacidad</label>
+                <input type="range" min="0" max="100" value="100">
+            </div>
+
+            <h3 style="margin-top:1.5rem;">📐 Tamaño de Lienzo</h3>
+            <div class="grupo-prop">
+                <label>Ancho x Alto</label>
+                <select>
+                    <option>32 × 32 px</option>
+                    <option>64 × 64 px</option>
+                    <option selected>128 × 128 px</option>
+                    <option>256 × 256 px</option>
+                    <option>512 × 512 px</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="vista-escena">
+            <div class="mensaje">
+                <div class="icono">🖼️</div>
+                <h2>Lienzo de Dibujo</h2>
+                <p>Aquí dibujarás tu textura o sprite. Cuadrícula activada automáticamente.</p>
+            </div>
+        </div>
+
+        <div class="panel-propiedades">
+            <h3 style="color:var(--acento-2d); margin-bottom:1rem;">🎨 Capas y Animación</h3>
+
+            <div class="grupo-prop">
+                <label>Capas (Fondo → Arriba)</label>
+                <div style="background:var(--fondo-oscuro); border:1px solid var(--borde); border-radius:4px; padding:0.5rem;">
+                    <div style="padding:0.3rem; background:var(--acento-2d); color:white; border-radius:4px; margin-bottom:0.2rem;">🖼️ Personaje / Principal</div>
+                    <div style="padding:0.3rem; color:var(--texto-claro);">👤 Sombra</div>
+                    <div style="padding:0.3rem; color:var(--texto-claro);">🌫️ Fondo</div>
+                    <div style="padding:0.3rem; color:var(--texto-claro);">📜 Interfaz</div>
                 </div>
-                <p style="margin-top:1rem;"><strong>★ Recomendado para Godot:</strong> optimizado, ligero y sin errores de importación.</p>
             </div>
-            <div class="tarjeta tarjeta-exp">
-                <h3>🖼️ Imágenes y Texturas</h3>
-                <div class="formatos">
-                    <span class="formato">.png ★</span>
-                    <span class="formato">.jpg / .jpeg</span>
-                    <span class="formato">.webp</span>
-                    <span class="formato">.tga</span>
-                    <span class="formato">.aseprite</span>
-                    <span class="formato">Atlas .tscn</span>
-                </div>
+
+            <div class="grupo-prop">
+                <label>Paleta de Colores</label>
+                <input type="color" value="#00b894" style="width:100%; height:40px; border:none; cursor:pointer;">
             </div>
-            <div class="tarjeta tarjeta-exp">
-                <h3>🚀 Envío Directo a Godot</h3>
-                <ul class="lista-caracteristicas">
-                    <li>Genera archivos listos para pegar en tu proyecto</li>
-                    <li>Escalas y ejes ya configurados correctamente</li>
-                    <li>Materiales y colisiones preconfigurados</li>
-                    <li>Reduce peso automáticamente al exportar</li>
-                    <li>Opción "Baja RAM" para equipos modestos 💻</li>
-                </ul>
+
+            <div class="grupo-prop">
+                <label>Animación — Fotograma</label>
+                <select>
+                    <option>1 — Reposo</option>
+                    <option>2 — Caminando</option>
+                    <option>3 — Acción</option>
+                    <option>4 — Salto</option>
+                </select>
+            </div>
+
+            <div class="grupo-prop" style="margin-top:1.2rem; padding-top:1rem; border-top:1px solid var(--borde);">
+                <label>✨ Generar sombras automáticas</label>
+                <input type="checkbox" checked style="width:auto;">
+            </div>
+            <div class="grupo-prop">
+                <label>🧩 Textura sin fisuras (repetible)</label>
+                <input type="checkbox" style="width:auto;">
+            </div>
+            <div class="grupo-prop">
+                <label>📦 Exportar como hoja de sprites</label>
+                <input type="checkbox" checked style="width:auto;">
+            </div>
+            <div class="grupo-prop">
+                <label>Formato de exportación</label>
+                <select>
+                    <option selected>.PNG (con transparencia)</option>
+                    <option>.WEBP (ligero)</option>
+                    <option>.ASEPRITE</option>
+                    <option>Atlas .TSCN (Godot)</option>
+                </select>
             </div>
         </div>
-    </section>
+    </div>
 
-    <section class="seccion" id="estado">
-        <div class="estado-proyecto">
-            <h3>🚧 Estado del Proyecto: EN DESARROLLO</h3>
-            <p>Actualmente en fase de diseño y planificación. Pronto empezaré a construir cada herramienta paso a paso. ¡Sígueme para ser el primero en probarlo cuando esté listo!</p>
-        </div>
-    </section>
+    <div class="barra-inferior">
+        <span>Coordenadas: 0, 0 | Lienzo: 128 × 128 px | Capas: 4</span>
+        <span>Vista: 100% | Fotograma 1 de 4</span>
+    </div>
+</div>
 
-    <footer>
-        <p>© 2026 Krhorkos3Dand2DCreator — Un proyecto de Krhorkos3DStudioAnd2D</p>
-        <p style="margin-top:0.5rem;">Creado por un desarrollador indie, para desarrolladores indies 💜 — Todo en uno, sin programas pesados.</p>
-    </footer>
+<!-- ==============================================
+    SCRIPT DE NAVEGACIÓN
+============================================== -->
+<script>
+function abrirEditor(tipo) {
+    document.getElementById('pantallaInicio').classList.add('oculto');
+    if (tipo === '3d') {
+        document.getElementById('interfaz3D').classList.remove('oculto');
+        document.getElementById('interfaz3D').classList.add('activa');
+    } else {
+        document.getElementById('interfaz2D').classList.remove('oculto');
+        document.getElementById('interfaz2D').classList.add('activa');
+    }
+}
 
-    <script>
-        function proximamente() {
-            alert("🚧 ¡Próximamente! El editor está en construcción. Sígueme para saber cuándo estará listo 💜");
-        }
-    </script>
+function volverAlInicio() {
+    document.getElementById('interfaz3D').classList.add('oculto');
+    document.getElementById('interfaz2D').classList.add('oculto');
+    document.getElementById('pantallaInicio').classList.remove('oculto');
+}
+
+function seleccionarHerramienta(elemento) {
+    const padre = elemento.parentElement;
+    padre.querySelectorAll('.herramienta').forEach(h => h.classList.remove('activa'));
+    elemento.classList.add('activa');
+}
+</script>
 
 </body>
 </html>
