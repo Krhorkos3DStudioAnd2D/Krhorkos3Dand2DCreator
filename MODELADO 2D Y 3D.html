@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Krhorkos3Dand2DCreator — Crea Assets sin límites</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        :root {
+            --fondo-oscuro: #0f0f1a;
+            --fondo-card: #1a1a2e;
+            --primario: #6c5ce7;
+            --secundario: #00cec9;
+            --acento-3d: #ff7675;
+            --acento-2d: #00b894;
+            --texto: #f0f0f5;
+            --texto-claro: #b2bec3;
+            --borde: #2d2d44;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--fondo-oscuro), #16162a);
+            color: var(--texto);
+            min-height: 100vh;
+        }
+
+        header {
+            background: rgba(26, 26, 46, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 1.2rem 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--borde);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--acento-3d), var(--primario), var(--acento-2d));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        nav a {
+            color: var(--texto-claro);
+            text-decoration: none;
+            margin-left: 2rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--secundario);
+        }
+
+        .hero {
+            padding: 5rem 2.5rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--acento-3d), var(--primario), var(--acento-2d));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: var(--texto-claro);
+            max-width: 900px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.6;
+        }
+
+        .boton-principal {
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            background: linear-gradient(90deg, var(--primario), var(--secundario));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.4);
+        }
+
+        .boton-principal:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(108, 92, 231, 0.5);
+        }
+
+        .seccion {
+            padding: 4rem 2.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .seccion h2 {
+            font-size: 2.2rem;
+            margin-bottom: 2.5rem;
+            text-align: center;
+            color: var(--secundario);
+        }
+
+        .tarjetas {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .tarjeta {
+            background: var(--fondo-card);
+            border: 1px solid var(--borde);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .tarjeta:hover {
+            transform: translateY(-8px);
+            border-color: var(--primario);
+            box-shadow: 0 10px 40px rgba(108, 92, 231, 0.15);
+        }
+
+        .tarjeta h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tarjeta-3d h3 { color: var(--acento-3d); }
+        .tarjeta-2d h3 { color: var(--acento-2d); }
+        .tarjeta-exp h3 { color: var(--primario); }
+
+        .tarjeta p {
+            color: var(--texto-claro);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .lista-caracteristicas {
+            list-style: none;
+        }
+
+        .lista-caracteristicas li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--borde);
+            color: #dfe6e9;
+        }
+
+        .lista-caracteristicas li::before {
+            content: "✅ ";
+            color: var(--secundario);
+            font-weight: bold;
+        }
+
+        .formatos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .formato {
+            background: rgba(108, 92, 231, 0.15);
+            color: var(--secundario);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .estado-proyecto {
+            background: rgba(255, 118, 117, 0.1);
+            border: 1px solid var(--acento-3d);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .estado-proyecto h3 { color: var(--acento-3d); margin-bottom: 0.5rem; }
+        .estado-proyecto p { color: var(--texto-claro); }
+
+        footer {
+            text-align: center;
+            padding: 2.5rem;
+            border-top: 1px solid var(--borde);
+            color: var(--texto-claro);
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">Krhorkos3Dand2DCreator</div>
+        <nav>
+            <a href="#acerca">Acerca</a>
+            <a href="#editor3d">Editor 3D</a>
+            <a href="#editor2d">Editor 2D</a>
+            <a href="#exportar">Exportación</a>
+            <a href="#estado">Estado</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Crea Assets 3D y 2D sin límites</h1>
+        <p>Una herramienta completa, todo en un solo lugar. Más potente que Blender y más versátil que Aseprite. Diseñado especialmente para desarrolladores de juegos indies que buscan rendimiento y simplicidad.</p>
+        <button class="boton-principal" onclick="proximamente()">🚀 Abrir Editor (Próximamente)</button>
+    </section>
+
+    <section class="seccion" id="acerca">
+        <h2>¿Qué es Krhorkos3Dand2DCreator?</h2>
+        <p style="text-align:center; max-width:800px; margin:0 auto; color:var(--texto-claro); font-size:1.1rem; line-height:1.7;">
+            Es una plataforma web diseñada para crear recursos para juegos sin necesidad de programas pesados. Funciona en tu navegador, no consume tu RAM, y está optimizada para exportar directamente a Godot y cualquier motor de juego. Todo en uno: modelado 3D + edición 2D + texturizado + animación + exportación universal.
+        </p>
+    </section>
+
+    <section class="seccion" id="editor3d">
+        <h2>🧊 Editor 3D — Más que Blender</h2>
+        <div class="tarjetas">
+            <div class="tarjeta tarjeta-3d">
+                <h3>Herramientas de Modelado</h3>
+                <ul class="lista-caracteristicas">
+                    <li>Extruir, cortar, unir y suavizar mallas</li>
+                    <li>Edición por vértices, aristas y caras</li>
+                    <li>Formas base listas para usar</li>
+                    <li>Escala, rotación y posición precisa</li>
+                    <li>Optimización automática de polígonos</li>
+                </ul>
+            </div>
+            <div class="tarjeta tarjeta-3d">
+                <h3>Materiales y Luces</h3>
+                <ul class="lista-caracteristicas">
+                    <li>Color, rugosidad, metálico y normales</li>
+                    <li>Vista previa con iluminación en tiempo real</li>
+                    <li>Generación automática de colisiones</li>
+                    <li>Preajustes optimizados para Godot</li>
+                    <li>Texturizado directo desde el editor 2D</li>
+                </ul>
+            </div>
+            <div class="tarjeta tarjeta-3d">
+                <h3>Ventajas Exclusivas</h3>
+                <ul class="lista-caracteristicas">
+                    <li>Interfaz simple, sin opciones confusas</li>
+                    <li>No consume tu RAM — funciona en navegador</li>
+                    <li>Vista previa exacta en Godot con 1 clic</li>
+                    <li>Reduce peso automáticamente al guardar</li>
+                    <li>Colisión generada sin trabajo extra</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="seccion" id="editor2d">
+        <h2>🖌️ Editor 2D — Más que Aseprite</h2>
+        <div class="tarjetas">
+            <div class="tarjeta tarjeta-2d">
+                <h3>Dibujo y Animación</h3>
+                <ul class="lista-caracteristicas">
+                    <li>Pinceles, borrador, relleno y cuentagotas</li>
+                    <li>Edición por capas con nombres personalizados</li>
+                    <li>Línea de tiempo para animación por fotogramas</li>
+                    <li>Cuadrícula y guías de alineación</li>
+                    <li>Paleta de colores unificada por proyecto</li>
+                </ul>
+            </div>
+            <div class="tarjeta tarjeta-2d">
+                <h3>Funciones Avanzadas</h3>
+                <ul class="lista-caracteristicas">
+                    <li>Generador de sombras y luces automáticas</li>
+                    <li>Texturas sin fisuras con 1 clic</li>
+                    <li>Escala inteligente sin perder calidad</li>
+                    <li>Vista previa pegada al modelo 3D en tiempo real</li>
+                    <li>Generación automática de hojas de sprites</li>
+                </ul>
+            </div>
+            <div class="tarjeta tarjeta-2d">
+                <h3>Integración Total</h3>
+                <ul class="lista-caracteristicas">
+                    <li>Dibujas → se ve en tu modelo 3D al instante</li>
+                    <li>Exporta atlas listos para Godot (.tscn)</li>
+                    <li>Paletas compatibles con tu estilo visual</li>
+                    <li>Capas etiquetadas: fondo, personaje, UI, sombras</li>
+                    <li>Exporta también en formato .aseprite</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="seccion" id="exportar">
+        <h2>📦 Exportación a CUALQUIER Formato</h2>
+        <div class="tarjetas">
+            <div class="tarjeta tarjeta-exp">
+                <h3>🧊 Modelos 3D</h3>
+                <div class="formatos">
+                    <span class="formato">.glb / .gltf ★</span>
+                    <span class="formato">.obj + .mtl</span>
+                    <span class="formato">.fbx</span>
+                    <span class="formato">.dae (Collada)</span>
+                    <span class="formato">.stl (Impresión 3D)</span>
+                </div>
+                <p style="margin-top:1rem;"><strong>★ Recomendado para Godot:</strong> optimizado, ligero y sin errores de importación.</p>
+            </div>
+            <div class="tarjeta tarjeta-exp">
+                <h3>🖼️ Imágenes y Texturas</h3>
+                <div class="formatos">
+                    <span class="formato">.png ★</span>
+                    <span class="formato">.jpg / .jpeg</span>
+                    <span class="formato">.webp</span>
+                    <span class="formato">.tga</span>
+                    <span class="formato">.aseprite</span>
+                    <span class="formato">Atlas .tscn</span>
+                </div>
+            </div>
+            <div class="tarjeta tarjeta-exp">
+                <h3>🚀 Envío Directo a Godot</h3>
+                <ul class="lista-caracteristicas">
+                    <li>Genera archivos listos para pegar en tu proyecto</li>
+                    <li>Escalas y ejes ya configurados correctamente</li>
+                    <li>Materiales y colisiones preconfigurados</li>
+                    <li>Reduce peso automáticamente al exportar</li>
+                    <li>Opción "Baja RAM" para equipos modestos 💻</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="seccion" id="estado">
+        <div class="estado-proyecto">
+            <h3>🚧 Estado del Proyecto: EN DESARROLLO</h3>
+            <p>Actualmente en fase de diseño y planificación. Pronto empezaré a construir cada herramienta paso a paso. ¡Sígueme para ser el primero en probarlo cuando esté listo!</p>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2026 Krhorkos3Dand2DCreator — Un proyecto de Krhorkos3DStudioAnd2D</p>
+        <p style="margin-top:0.5rem;">Creado por un desarrollador indie, para desarrolladores indies 💜 — Todo en uno, sin programas pesados.</p>
+    </footer>
+
+    <script>
+        function proximamente() {
+            alert("🚧 ¡Próximamente! El editor está en construcción. Sígueme para saber cuándo estará listo 💜");
+        }
+    </script>
+
+</body>
+</html>
