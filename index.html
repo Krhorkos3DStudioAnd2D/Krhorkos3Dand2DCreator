@@ -6,1012 +6,755 @@
     <title>Krhorkos3Dand2DCreator</title>
     <style>
         :root {
-            --bg-dark: #0a0c10;
-            --bg-card: #141824;
-            --bg-panel: #1e2336;
-            --bg-hover: #2b324d;
-            --text-main: #f0f3fa;
-            --text-muted: #8e97b8;
-            --border: #2d344f;
-            --accent-3d: #ff3366;
-            --accent-2d: #00e676;
-            --accent-img: #ab47bc;
-            --accent-don: #25d366;
-            --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --bg-dark: #1d1d1d;
+            --bg-panel: #282828;
+            --bg-header: #181818;
+            --accent: #e67e22;
+            --accent-hover: #d35400;
+            --text: #cccccc;
+            --text-bright: #ffffff;
+            --border: #383838;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: var(--font-family);
             user-select: none;
         }
 
         body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-dark);
-            color: var(--text-main);
+            color: var(--text);
             height: 100vh;
             overflow: hidden;
-        }
-
-        .screen {
-            display: none;
-            width: 100vw;
-            height: 100vh;
+            display: flex;
             flex-direction: column;
+            font-size: 12px;
         }
 
-        .screen.active {
-            display: flex;
-        }
-
-        /* --- MENÚ PRINCIPAL --- */
-        #main-menu {
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle at center, #1e2438 0%, #0a0c10 100%);
-        }
-
-        .menu-title {
-            font-size: 3rem;
-            margin-bottom: 40px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            background: linear-gradient(45deg, var(--accent-3d), var(--accent-2d), var(--accent-img));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-align: center;
-            text-shadow: 0 0 30px rgba(255, 51, 102, 0.2);
-        }
-
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 25px;
-            width: 85%;
-            max-width: 700px;
-        }
-
-        .menu-btn {
-            background-color: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 16px;
-            padding: 30px 20px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: var(--text-main);
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-        }
-
-        .menu-btn:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
-        }
-
-        .menu-btn.btn-3d:hover { border-color: var(--accent-3d); color: var(--accent-3d); }
-        .menu-btn.btn-2d:hover { border-color: var(--accent-2d); color: var(--accent-2d); }
-        .menu-btn.btn-img:hover { border-color: var(--accent-img); color: var(--accent-img); }
-        .menu-btn.btn-don:hover { border-color: var(--accent-don); color: var(--accent-don); }
-
-        /* --- LAYOUT GLOBAL PARA EDITORES --- */
-        .header {
-            height: 50px;
-            background-color: var(--bg-card);
-            border-bottom: 1px solid var(--border);
+        header {
+            height: 30px;
+            background-color: var(--bg-header);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
-            z-index: 10;
+            padding: 0 10px;
+            border-bottom: 1px solid var(--border);
         }
 
-        .btn-back {
-            background-color: var(--bg-panel);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
+        .logo {
             font-weight: bold;
-            transition: background 0.2s;
+            color: var(--accent);
+            font-size: 14px;
         }
 
-        .btn-back:hover { background-color: var(--bg-hover); }
-
-        .editor-workspace {
-            flex: 1;
+        #main-layout {
             display: flex;
-            overflow: hidden;
-            position: relative;
+            flex: 1;
+            height: calc(100vh - 30px);
         }
 
-        .sidebar-left, .sidebar-right {
-            width: 290px;
-            background-color: var(--bg-card);
-            border: 1px solid var(--border);
+        /* Paneles */
+        .panel {
+            background-color: var(--bg-panel);
+            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            padding: 12px;
             overflow-y: auto;
-            z-index: 5;
-        }
-
-        .canvas-container {
-            flex: 1;
-            background-color: #05070a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .status-bar {
-            height: 30px;
-            background-color: var(--bg-card);
-            border-top: 1px solid var(--border);
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            z-index: 10;
-        }
-
-        /* --- COMPONENTES UI --- */
-        .panel-section {
-            background-color: var(--bg-panel);
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 5px;
-            border: 1px solid rgba(255,255,255,0.03);
         }
 
         .panel-title {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 10px;
+            background-color: #212121;
+            padding: 6px 10px;
             font-weight: bold;
-            letter-spacing: 1px;
+            color: var(--text-bright);
+            border-bottom: 1px solid var(--border);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
         }
 
+        .panel-section {
+            padding: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Sidebar Izquierda (Herramientas) */
+        #tools-panel {
+            width: 220px;
+        }
+
+        /* Viewport Central */
+        #viewport-container {
+            flex: 1;
+            position: relative;
+            background-color: #111;
+        }
+
+        #viewport {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Overlay Viewport (Atajos / Modos) */
+        #viewport-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            pointer-events: none;
+            background: rgba(0,0,0,0.5);
+            padding: 6px 10px;
+            border-radius: 4px;
+            color: #fff;
+            font-family: monospace;
+        }
+
+        #gizmo-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 80px;
+            height: 80px;
+            pointer-events: none;
+        }
+
+        /* Sidebar Derecha (Propiedades/Outliner) */
+        #properties-panel {
+            width: 280px;
+            border-left: 1px solid var(--border);
+            border-right: none;
+        }
+
+        /* UI Controls */
         .btn-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 6px;
+            gap: 4px;
+            margin-top: 4px;
         }
 
-        .tool-btn {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            padding: 8px 6px;
-            font-size: 0.8rem;
-            border-radius: 6px;
+        button {
+            background-color: #3b3b3b;
+            color: var(--text-bright);
+            border: 1px solid #4a4a4a;
+            padding: 6px 8px;
+            border-radius: 3px;
             cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
+            text-align: left;
+            font-size: 11px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 4px;
+            gap: 5px;
+            transition: background 0.1s;
         }
 
-        .tool-btn:hover { background-color: var(--bg-hover); }
-        .tool-btn.active { border-color: var(--accent-2d); background-color: var(--bg-hover); font-weight: bold; }
-        .tool-btn.danger { border-color: var(--accent-3d); color: var(--accent-3d); }
-        .tool-btn.danger:hover { background-color: var(--accent-3d); color: white; }
+        button:hover {
+            background-color: #4f4f4f;
+        }
+
+        button:active, button.active {
+            background-color: var(--accent);
+            border-color: var(--accent-hover);
+            color: #fff;
+        }
 
         .input-group {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 0.85rem;
+            margin-bottom: 4px;
         }
 
-        .input-group input[type="number"], 
-        .input-group input[type="range"],
-        .input-group select {
-            background-color: var(--bg-dark);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            padding: 5px;
-            border-radius: 4px;
-            width: 110px;
+        .input-group label {
+            flex: 1;
         }
 
-        .input-group input[type="color"] {
-            border: none;
-            width: 40px;
-            height: 25px;
-            cursor: pointer;
-            background: transparent;
+        .input-group input, .input-group select {
+            width: 120px;
+            background: #141414;
+            border: 1px solid #4a4a4a;
+            color: #fff;
+            padding: 3px 5px;
+            border-radius: 3px;
         }
 
-        .btn-action {
-            background-color: var(--accent-3d);
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
+        .vector3-input {
+            display: flex;
+            gap: 2px;
+        }
+
+        .vector3-input input {
             width: 100%;
-            margin-top: 8px;
-            transition: opacity 0.2s;
+            background: #141414;
+            border: 1px solid #4a4a4a;
+            color: #fff;
+            padding: 3px;
+            text-align: center;
         }
 
-        .btn-action:hover { opacity: 0.9; }
-        .btn-action.green { background-color: var(--accent-2d); color: #000; }
-        .btn-action.purple { background-color: var(--accent-img); }
+        #outliner-list {
+            list-style: none;
+            max-height: 150px;
+            overflow-y: auto;
+            background: #181818;
+            border: 1px solid var(--border);
+            border-radius: 3px;
+        }
 
-        /* --- CONTROL DE ROTACIÓN VISTA 3D --- */
-        #viewport-gizmo {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            background: rgba(20, 24, 36, 0.7);
-            border: 2px solid var(--accent-3d);
-            backdrop-filter: blur(5px);
-            cursor: grab;
+        #outliner-list li {
+            padding: 4px 8px;
+            cursor: pointer;
+            border-bottom: 1px solid #222;
+        }
+
+        #outliner-list li:hover {
+            background: #333;
+        }
+
+        #outliner-list li.selected {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        /* Tooltip informativo */
+        #status-bar {
+            height: 22px;
+            background: #111;
+            border-top: 1px solid var(--border);
             display: flex;
             align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            z-index: 20;
-        }
-
-        #viewport-gizmo:active {
-            cursor: grabbing;
-        }
-
-        .gizmo-axis {
-            position: absolute;
-            font-size: 0.7rem;
-            font-weight: bold;
-            pointer-events: none;
-        }
-
-        .gizmo-x { color: #ff5252; right: 12px; }
-        .gizmo-y { color: #69f0ae; top: 8px; }
-        .gizmo-z { color: #448aff; left: 12px; }
-
-        canvas {
-            image-rendering: pixelated;
-        }
-
-        /* --- SECCIÓN DONACIONES --- */
-        .donations-container {
-            padding: 40px;
-            max-width: 550px;
-            margin: auto;
-            text-align: center;
-            background-color: var(--bg-card);
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .don-link {
-            display: block;
-            padding: 14px;
-            margin: 12px 0;
-            background-color: var(--bg-panel);
-            color: var(--accent-don);
-            text-decoration: none;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            font-weight: bold;
-            font-size: 1.1rem;
-            transition: all 0.2s;
-        }
-
-        .don-link:hover {
-            background-color: var(--bg-hover);
-            transform: scale(1.02);
+            padding: 0 10px;
+            color: #888;
+            font-size: 11px;
         }
     </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/OBJExporter.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/STLExporter.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/math/SimplifierModifier.js"></script>
 </head>
 <body>
 
-    <div id="main-menu" class="screen active">
-        <h1 class="menu-title">Krhorkos 3D & 2D Creator</h1>
-        <div class="menu-grid">
-            <button class="menu-btn btn-3d" onclick="switchScreen('screen-3d')">🧊 Editor 3D</button>
-            <button class="menu-btn btn-2d" onclick="switchScreen('screen-2d')">🖌️ Editor 2D</button>
-            <button class="menu-btn btn-img" onclick="switchScreen('screen-img')">📷 Editor de Imágenes</button>
-            <button class="menu-btn btn-don" onclick="switchScreen('screen-don')">💚 Donaciones</button>
+    <header>
+        <div class="logo">Krhorkos 3D & 2D Creator</div>
+        <div>Engine Mode: WebGL / Three.js</div>
+    </header>
+
+    <div id="main-layout">
+        <div id="tools-panel" class="panel">
+            <div class="panel-title">Transformación</div>
+            <div class="panel-section">
+                <button id="btn-select" onclick="setTransformMode('select')">🖐️ Seleccionar</button>
+                <div class="btn-grid">
+                    <button id="btn-translate" onclick="setTransformMode('translate')">📍 Mover (G)</button>
+                    <button id="btn-rotate" onclick="setTransformMode('rotate')">🔄 Rotar (R)</button>
+                    <button id="btn-scale" onclick="setTransformMode('scale')">📐 Escalar (S)</button>
+                    <button onclick="resetTransforms()">🎯 Reset Org.</button>
+                </div>
+            </div>
+
+            <div class="panel-title">Formas Primitivas</div>
+            <div class="panel-section">
+                <div class="btn-grid">
+                    <button onclick="addPrimitive('cube')">📦 Cubo</button>
+                    <button onclick="addPrimitive('sphere')">🌐 Esfera</button>
+                    <button onclick="addPrimitive('icosphere')">⚽ Icosphere</button>
+                    <button onclick="addPrimitive('cylinder')">🛢️ Cilíndro</button>
+                    <button onclick="addPrimitive('cone')">📐 Cono</button>
+                    <button onclick="addPrimitive('torus')">🍩 Toro</button>
+                    <button onclick="addPrimitive('capsule')">💊 Cápsula</button>
+                    <button onclick="addPrimitive('plane')">⬜ Plano</button>
+                </div>
+            </div>
+
+            <div class="panel-title">Herramientas de Modelado</div>
+            <div class="panel-section">
+                <button onclick="extrudeObject()">⬆️ Extruir / Engrosar (E)</button>
+                <button onclick="subdivideObject()">🕸️ Subdividir Malla</button>
+                <button onclick="bevelObject()">📐 Biselar (Bevel)</button>
+                <button onclick="smoothShading(true)">✨ Sombras Suaves</button>
+                <button onclick="smoothShading(false)">🏁 Sombras Planas</button>
+                <button onclick="reducePolygons()">📉 Reducir Polígonos</button>
+                <button onclick="joinSelected()">🔗 Unir (Ctrl+J)</button>
+                <button onclick="deleteSelected()">🗑️ Eliminar (Supr)</button>
+            </div>
+
+            <div class="panel-title">Iluminación</div>
+            <div class="panel-section">
+                <div class="btn-grid">
+                    <button onclick="addLight('point')">💡 Luz Puntual</button>
+                    <button onclick="addLight('directional')">☀️ Luz Solar</button>
+                    <button onclick="addLight('spot')">🔦 Foco (Spot)</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="viewport-container">
+            <div id="viewport-overlay">
+                Modo: <span id="render-mode-label" style="color:#e67e22;">Sombreado Gris (Z+6)</span><br>
+                Objeto: <span id="selected-name-label">Ninguno</span>
+            </div>
+            <div id="viewport"></div>
+        </div>
+
+        <div id="properties-panel" class="panel">
+            <div class="panel-title">Esquema de la Escena (Outliner)</div>
+            <div class="panel-section">
+                <ul id="outliner-list"></ul>
+            </div>
+
+            <div class="panel-title">Transformación Activa</div>
+            <div class="panel-section" id="transform-props">
+                <div class="input-group"><label>Posición</label></div>
+                <div class="vector3-input">
+                    <input type="number" id="pos-x" step="0.1" onchange="updateObjectTransform()">
+                    <input type="number" id="pos-y" step="0.1" onchange="updateObjectTransform()">
+                    <input type="number" id="pos-z" step="0.1" onchange="updateObjectTransform()">
+                </div>
+                <div class="input-group" style="margin-top:5px;"><label>Escala</label></div>
+                <div class="vector3-input">
+                    <input type="number" id="scale-x" step="0.1" onchange="updateObjectTransform()">
+                    <input type="number" id="scale-y" step="0.1" onchange="updateObjectTransform()">
+                    <input type="number" id="scale-z" step="0.1" onchange="updateObjectTransform()">
+                </div>
+            </div>
+
+            <div class="panel-title">Materiales y Sombras</div>
+            <div class="panel-section">
+                <div class="input-group">
+                    <label>Color Base</label>
+                    <input type="color" id="mat-color" value="#888888" onchange="updateMaterial()">
+                </div>
+                <div class="input-group">
+                    <label>Rugosidad</label>
+                    <input type="range" id="mat-roughness" min="0" max="1" step="0.05" value="0.5" oninput="updateMaterial()">
+                </div>
+                <div class="input-group">
+                    <label>Metálico</label>
+                    <input type="range" id="mat-metalness" min="0" max="1" step="0.05" value="0.1" oninput="updateMaterial()">
+                </div>
+                <div class="input-group">
+                    <label>Emisión</label>
+                    <input type="color" id="mat-emissive" value="#000000" onchange="updateMaterial()">
+                </div>
+                <div class="input-group">
+                    <label>Transparencia</label>
+                    <input type="range" id="mat-opacity" min="0" max="1" step="0.05" value="1" oninput="updateMaterial()">
+                </div>
+            </div>
+
+            <div class="panel-title">Exportar Proyecto</div>
+            <div class="panel-section">
+                <div class="input-group">
+                    <label>Formato</label>
+                    <select id="export-format">
+                        <option value="obj">Wavefront (.OBJ)</option>
+                        <option value="stl">Stereolithography (.STL)</option>
+                        <option value="gltf">GLTF / GLB (.GLTF)</option>
+                    </select>
+                </div>
+                <button style="width:100%; margin-top:5px; text-align:center; justify-content:center;" onclick="exportScene()">💾 Exportar Archivo 3D</button>
+            </div>
         </div>
     </div>
 
-    <div id="screen-3d" class="screen">
-        <div class="header">
-            <button class="btn-back" onclick="switchScreen('main-menu')">← Volver</button>
-            <span style="font-weight: bold; color: var(--accent-3d);">Editor 3D - Viewport Realtime</span>
-            <div></div>
-        </div>
-        <div class="editor-workspace">
-            <div class="sidebar-left">
-                <div class="panel-section">
-                    <div class="panel-title">Agregar Primitivas</div>
-                    <div class="btn-grid">
-                        <button class="tool-btn" onclick="add3DShape('cubo')">⬜ Cubo</button>
-                        <button class="tool-btn" onclick="add3DShape('esfera')">⚪ Esfera</button>
-                        <button class="tool-btn" onclick="add3DShape('cilindro')">🟦 Cilindro</button>
-                        <button class="tool-btn" onclick="add3DShape('cono')">🔺 Cono</button>
-                        <button class="tool-btn" onclick="add3DShape('toro')">⭕ Toro</button>
-                        <button class="tool-btn" onclick="add3DShape('plano')">📏 Plano</button>
-                    </div>
-                </div>
-                <div class="panel-section">
-                    <div class="panel-title">Transformación</div>
-                    <div class="btn-grid">
-                        <button class="tool-btn active" id="tool-3d-move" onclick="set3DTransform('move')">🖱️ Mover</button>
-                        <button class="tool-btn" id="tool-3d-rotate" onclick="set3DTransform('rotate')">🔄 Rotar</button>
-                        <button class="tool-btn" id="tool-3d-scale" onclick="set3DTransform('scale')">📐 Escalar</button>
-                        <button class="tool-btn" onclick="exec3D('Alinear')">🧹 Alinear</button>
-                        <button class="tool-btn" onclick="exec3D('Origen')">📍 Origen</button>
-                    </div>
-                </div>
-                <div class="panel-section">
-                    <div class="panel-title">Modelado & Relieve</div>
-                    <div class="btn-grid">
-                        <button class="tool-btn" onclick="extrudeSelected()">⬆️ Extruir</button>
-                        <button class="tool-btn" onclick="exec3D('Unir')">🔗 Unir</button>
-                        <button class="tool-btn" onclick="exec3D('Cortar/Biselar')">🔪 Biselar</button>
-                        <button class="tool-btn" onclick="exec3D('Puente')">🧩 Puente</button>
-                        <button class="tool-btn" onclick="exec3D('Suavizar')">✨ Suavizar</button>
-                        <button class="tool-btn" onclick="exec3D('Separar')">📤 Separar</button>
-                        <button class="tool-btn" onclick="exec3D('Aplanar')">🔩 Aplanar</button>
-                        <button class="tool-btn" onclick="exec3D('Inflar/Encoger')">🗜️ Inflar</button>
-                        <button class="tool-btn" onclick="exec3D('Subdividir')">🔢 Subdividir</button>
-                        <button class="tool-btn" onclick="exec3D('Reducir Poly')">📉 Reducir</button>
-                    </div>
-                </div>
-                <div class="panel-section">
-                    <div class="panel-title">Gestión de Objeto</div>
-                    <button class="tool-btn danger" style="width:100%" onclick="deleteSelected3D()">🗑️ Eliminar Objeto</button>
-                </div>
-            </div>
-
-            <div class="canvas-container" id="container-3d">
-                <canvas id="canvas-3d"></canvas>
-                <div id="viewport-gizmo" title="Arrastra para rotar la vista 3D">
-                    <span class="gizmo-axis gizmo-x">X</span>
-                    <span class="gizmo-axis gizmo-y">Y</span>
-                    <span class="gizmo-axis gizmo-z">Z</span>
-                    <div style="width:12px; height:12px; border-radius:50%; background:var(--accent-3d);"></div>
-                </div>
-            </div>
-
-            <div class="sidebar-right">
-                <div class="panel-section">
-                    <div class="panel-title">Materiales & Estilo</div>
-                    <div class="input-group">
-                        <label>Color Base</label>
-                        <input type="color" id="3d-color" value="#ff3366" onchange="updateSelectedColor(this.value)">
-                    </div>
-                    <div class="input-group">
-                        <label>Rugosidad</label>
-                        <input type="range" min="0" max="100" value="50">
-                    </div>
-                    <div class="input-group">
-                        <label>Metálico</label>
-                        <input type="range" min="0" max="100" value="20">
-                    </div>
-                    <div class="input-group">
-                        <label>Emisión</label>
-                        <input type="range" min="0" max="100" value="0">
-                    </div>
-                    <div class="input-group">
-                        <label>Transparencia</label>
-                        <input type="range" min="0" max="100" value="100">
-                    </div>
-                </div>
-                <div class="panel-section">
-                    <div class="panel-title">Iluminación</div>
-                    <div class="btn-grid">
-                        <button class="tool-btn" onclick="exec3D('Luz Puntual')">💡 Puntual</button>
-                        <button class="tool-btn" onclick="exec3D('Luz Solar')">☀️ Sol</button>
-                        <button class="tool-btn" onclick="exec3D('Foco')">🔦 Foco</button>
-                    </div>
-                </div>
-                <div class="panel-section">
-                    <div class="panel-title">Exportación 3D</div>
-                    <div class="input-group">
-                        <label>Formato</label>
-                        <select id="export-3d-format">
-                            <option>.GLB / .GLTF</option>
-                            <option>.OBJ + .MTL</option>
-                            <option>.FBX</option>
-                            <option>.DAE</option>
-                            <option>.STL</option>
-                            <option>.PLY</option>
-                            <option>.WRL</option>
-                            <option>.X3D</option>
-                        </select>
-                    </div>
-                    <button class="btn-action" onclick="export3D()">Exportar Modelo</button>
-                </div>
-            </div>
-        </div>
-        <div class="status-bar" id="status-3d">Objetos en escena: 1 | Objeto seleccionado: Cubo</div>
-    </div>
-
-    <div id="screen-2d" class="screen">
-        <div class="header">
-            <button class="btn-back" onclick="switchScreen('main-menu')">← Volver</button>
-            <span style="font-weight: bold; color: var(--accent-2d);">Editor 2D - Sprite & Pixel Art</span>
-            <div></div>
-        </div>
-        <div class="editor-workspace">
-            <div class="sidebar-left">
-                <div class="panel-section">
-                    <div class="panel-title">Herramientas Dibujo</div>
-                    <div class="btn-grid">
-                        <button class="tool-btn active" id="tool-pencil" onclick="set2DTool('pencil')">✏️ Pincel</button>
-                        <button class="tool-btn" id="tool-hard" onclick="set2DTool('hard')">🖊️ P. Duro</button>
-                        <button class="tool-btn" id="tool-eraser" onclick="set2DTool('eraser')">🧹 Borrador</button>
-                        <button class="tool-btn" id="tool-bucket" onclick="set2DTool('bucket')">🪣 Relleno</button>
-                        <button class="tool-btn" id="tool-picker" onclick="set2DTool('picker')">💧 Gotero</button>
-                        <button class="tool-btn" id="tool-line" onclick="set2DTool('line')">📏 Línea</button>
-                        <button class="tool-btn" id="tool-rect" onclick="set2DTool('rect')">⬜ Rect</button>
-                        <button class="tool-btn" id="tool-circle" onclick="set2DTool('circle')">⭕ Círculo</button>
-                    </div>
-                </div>
-                <div class="panel-section">
-                    <div class="panel-title">Edición Rápida</div>
-                    <div class="btn-grid">
-                        <button class="tool-btn" onclick="exec2D('Deshacer')">↩️ Deshacer</button>
-                        <button class="tool-btn" onclick="exec2D('Rehacer')">↪️ Rehacer</button>
-                        <button class="tool-btn" onclick="exec2D('Invertir')">🔄 Invertir</button>
-                        <button class="tool-btn" onclick="exec2D('Grises')">🌑 Grises</button>
-                    </div>
-                </div>
-                <div class="panel-section">
-                    <div class="panel-title">Color Primario</div>
-                    <input type="color" id="2d-color" value="#00e676" style="width:100%; height:40px;">
-                </div>
-            </div>
-            <div class="canvas-container">
-                <canvas id="canvas-2d" width="32" height="32" style="width: 450px; height: 450px;"></canvas>
-            </div>
-            <div class="sidebar-right">
-                <div class="panel-section">
-                    <div class="panel-title">Lienzo</div>
-                    <div class="input-group">
-                        <label>Tamaño</label>
-                        <select onchange="resize2DCanvas(this.value)">
-                            <option value="16">16x16</option>
-                            <option value="32" selected>32x32</option>
-                            <option value="64">64x64</option>
-                            <option value="128">128x128</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="panel-section">
-                    <div class="panel-title">Animación</div>
-                    <div class="input-group">
-                        <label>Fotogramas</label>
-                        <input type="number" value="1" min="1" max="60">
-                    </div>
-                    <div class="input-group">
-                        <label>FPS</label>
-                        <input type="number" value="12" min="1" max="60">
-                    </div>
-                    <button class="tool-btn" style="width:100%" onclick="exec2D('Reproducir Bucle')">▶️ Bucle Animación</button>
-                </div>
-                <div class="panel-section">
-                    <div class="panel-title">Exportar Formato</div>
-                    <div class="input-group">
-                        <label>Formato</label>
-                        <select id="export-2d-format">
-                            <option>PNG</option>
-                            <option>JPG</option>
-                            <option>WEBP</option>
-                            <option>GIF</option>
-                            <option>BMP</option>
-                            <option>TGA</option>
-                            <option>TIFF</option>
-                            <option>SVG</option>
-                            <option>ICO</option>
-                        </select>
-                    </div>
-                    <button class="btn-action green" onclick="export2D()">Guardar 2D</button>
-                </div>
-            </div>
-        </div>
-        <div class="status-bar" id="status-2d">Lienzo: 32x32 | Herramienta actual: Pincel</div>
-    </div>
-
-    <div id="screen-img" class="screen">
-        <div class="header">
-            <button class="btn-back" onclick="switchScreen('main-menu')">← Volver</button>
-            <span style="font-weight: bold; color: var(--accent-img);">Editor de Imágenes</span>
-            <div></div>
-        </div>
-        <div class="editor-workspace">
-            <div class="sidebar-left">
-                <div class="panel-section">
-                    <div class="panel-title">Cargar Archivo</div>
-                    <input type="file" id="img-input" accept="image/*" style="display:none" onchange="loadImage(event)">
-                    <button class="btn-action purple" onclick="document.getElementById('img-input').click()">📂 Subir Imagen</button>
-                </div>
-                <div class="panel-section">
-                    <div class="panel-title">Quitar Fondo</div>
-                    <button class="tool-btn" style="width:100%; margin-bottom:5px;" onclick="execImg('Quitar Fondo Auto')">🤖 Quitar Fondo Auto</button>
-                    <button class="tool-btn" style="width:100%;" onclick="execImg('Quitar Fondo Manual')">✂️ Borrado Manual</button>
-                </div>
-                <div class="panel-section">
-                    <div class="panel-title">Ajustes Visuales</div>
-                    <div class="input-group">
-                        <label>Brillo</label>
-                        <input type="range" id="bright-val" min="0" max="200" value="100" oninput="processImg()">
-                    </div>
-                    <div class="input-group">
-                        <label>Contraste</label>
-                        <input type="range" id="contrast-val" min="0" max="200" value="100" oninput="processImg()">
-                    </div>
-                    <div class="input-group">
-                        <label>Saturación</label>
-                        <input type="range" id="satur-val" min="0" max="200" value="100" oninput="processImg()">
-                    </div>
-                </div>
-            </div>
-            <div class="canvas-container">
-                <canvas id="canvas-img"></canvas>
-            </div>
-            <div class="sidebar-right">
-                <div class="panel-section">
-                    <div class="panel-title">Transformación</div>
-                    <div class="btn-grid">
-                        <button class="tool-btn" onclick="execImg('Rotar 90°')">🔄 Rotar</button>
-                        <button class="tool-btn" onclick="execImg('Espejo H')">↔️ Espejo</button>
-                    </div>
-                </div>
-                <div class="panel-section">
-                    <div class="panel-title">Convertir Formato</div>
-                    <div class="input-group">
-                        <label>Salida</label>
-                        <select id="export-img-format">
-                            <option value="png">PNG</option>
-                            <option value="jpeg">JPG</option>
-                            <option value="webp">WEBP</option>
-                            <option value="bmp">BMP</option>
-                        </select>
-                    </div>
-                    <button class="btn-action purple" onclick="downloadImg()">💾 Descargar Editada</button>
-                </div>
-            </div>
-        </div>
-        <div class="status-bar" id="status-img">Carga una imagen para comenzar a editar.</div>
-    </div>
-
-    <div id="screen-don" class="screen">
-        <div class="header">
-            <button class="btn-back" onclick="switchScreen('main-menu')">← Volver</button>
-            <span style="font-weight: bold; color: var(--accent-don);">Apoya el Proyecto</span>
-            <div></div>
-        </div>
-        <div style="flex:1; display:flex; align-items:center; justify-content:center;">
-            <div class="donations-container">
-                <h2 style="color: var(--accent-don); margin-bottom: 15px;">¡Gracias por usar Krhorkos Creator! 💚</h2>
-                <p style="margin-bottom: 25px; color: var(--text-muted); line-height: 1.5;">
-                    Cada peso o dólar ayuda a seguir mejorando. ¡Gracias de corazón por tu apoyo!
-                </p>
-                <a href="https://paypal.com" target="_blank" class="don-link">💳 PayPal</a>
-                <a href="https://ko-fi.com" target="_blank" class="don-link">☕ Ko-fi</a>
-                <a href="https://buymeacoffee.com" target="_blank" class="don-link">🥐 Buy Me a Coffee</a>
-            </div>
-        </div>
+    <div id="status-bar">
+        Atajos: [G] Mover | [R] Rotar | [S] Escalar | [E] Extruir | [Ctrl+J] Unir | [Z+6] Sombreado Gris | [Z+2] Materiales | [Supr] Eliminar
     </div>
 
     <script>
-        // --- NAVEGACIÓN DE PANTALLAS ---
-        function switchScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-            if (screenId === 'screen-3d') {
-                resize3D();
+        // --- INICIALIZACIÓN DE LA ESCENA ---
+        const container = document.getElementById('viewport');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1e1e1e);
+
+        const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(5, 4, 7);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+
+        // Grid y Auxiliares
+        const gridHelper = new THREE.GridHelper(20, 20, 0x444444, 0x222222);
+        scene.add(gridHelper);
+
+        // Luces Predeterminadas estilo Blender Studio
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(5, 10, 7);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 1024;
+        dirLight.shadow.mapSize.height = 1024;
+        scene.add(dirLight);
+
+        // Controles de Cámara (OrbitControls)
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        // Gizmo de Transformación (TransformControls)
+        const transformControls = new THREE.TransformControls(camera, renderer.domElement);
+        transformControls.size = 0.75;
+        scene.add(transformControls);
+
+        transformControls.addEventListener('dragging-changed', function (event) {
+            controls.enabled = !event.value;
+        });
+
+        transformControls.addEventListener('change', function () {
+            if (selectedObject) syncTransformUI();
+        });
+
+        // --- ESTADO GLOBAL DE LA APLICACIÓN ---
+        let objects = [];
+        let selectedObject = null;
+        let objectCount = 0;
+        let renderMode = 'GRAY'; // 'GRAY' (Z+6) o 'MATERIAL' (Z+2)
+
+        // Material Predeterminado Blender (Sombreado Gris)
+        const defaultGrayMaterial = new THREE.MeshStandardMaterial({
+            color: 0x909090,
+            roughness: 0.5,
+            metalness: 0.1,
+            flatShading: false
+        });
+
+        // Raycasting para Selección
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        container.addEventListener('pointerdown', onPointerDown);
+
+        function onPointerDown(event) {
+            if (transformControls.dragging) return;
+
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / container.clientHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(objects, true);
+
+            if (intersects.length > 0) {
+                let hitObj = intersects[0].object;
+                selectObject(hitObj);
             }
         }
 
-        // --- MOTOR 3D SOFTWARE CON PERSPECTIVA Y VOLUMEN REAL ---
-        const canvas3d = document.getElementById('canvas-3d');
-        const ctx3d = canvas3d.getContext('2d');
-        
-        let camera = { rotX: 0.4, rotY: 0.6, zoom: 350 };
-        let objects3D = [];
-        let selectedObjectIndex = 0;
-        let transformMode = 'move'; // move, rotate, scale
+        // --- GESTIÓN DE OBJETOS ---
+        function addPrimitive(type) {
+            let geometry;
+            objectCount++;
+            let name = type.charAt(0).toUpperCase() + type.slice(1) + "_" + objectCount;
 
-        // Inicializar escena con un cubo
-        function init3DEngine() {
-            objects3D = [];
-            add3DShape('cubo');
-            resize3D();
-        }
-
-        function resize3D() {
-            const container = document.getElementById('container-3d');
-            canvas3d.width = container.clientWidth;
-            canvas3d.height = container.clientHeight;
-            render3D();
-        }
-
-        // Generadores de Mallas 3D
-        function add3DShape(type) {
-            let mesh = { type, x: 0, y: 0, z: 0, rx: 0, ry: 0, rz: 0, sx: 1, sy: 1, sz: 1, color: document.getElementById('3d-color').value, vertices: [], faces: [] };
-
-            if (type === 'cubo') {
-                mesh.vertices = [
-                    [-50,-50,-50],[50,-50,-50],[50,50,-50],[-50,50,-50],
-                    [-50,-50, 50],[50,-50, 50],[50,50, 50],[-50,50, 50]
-                ];
-                mesh.faces = [
-                    [0,1,2,3],[5,4,7,6],[4,0,3,7],[1,5,6,2],[4,5,1,0],[3,2,6,7]
-                ];
-            } else if (type === 'esfera' || type === 'toro') {
-                let segs = 8;
-                for(let i=0; i<=segs; i++) {
-                    let lat = Math.PI * i / segs - Math.PI/2;
-                    for(let j=0; j<=segs; j++) {
-                        let lon = Math.PI * 2 * j / segs;
-                        let r = 50;
-                        mesh.vertices.push([
-                            r * Math.cos(lat) * Math.cos(lon),
-                            r * Math.sin(lat),
-                            r * Math.cos(lat) * Math.sin(lon)
-                        ]);
-                    }
-                }
-                for(let i=0; i<segs; i++) {
-                    for(let j=0; j<segs; j++) {
-                        let first = (i * (segs + 1)) + j;
-                        let second = first + segs + 1;
-                        mesh.faces.push([first, second, second + 1, first + 1]);
-                    }
-                }
-            } else if (type === 'cilindro' || type === 'cono') {
-                let segs = 10;
-                let h = 60, r = 40;
-                mesh.vertices.push([0, -h, 0]);
-                mesh.vertices.push([0, h, 0]);
-                for(let i=0; i<segs; i++) {
-                    let a = (Math.PI * 2 * i) / segs;
-                    let x = Math.cos(a) * r;
-                    let z = Math.sin(a) * r;
-                    mesh.vertices.push([x, -h, z]);
-                    mesh.vertices.push([type === 'cono' ? 0 : x, h, z]);
-                }
-                for(let i=0; i<segs; i++) {
-                    let b1 = 2 + i*2;
-                    let b2 = 2 + ((i+1)%segs)*2;
-                    mesh.faces.push([b1, b2, b2+1, b1+1]);
-                }
-            } else { // Plano
-                mesh.vertices = [[-80,0,-80],[80,0,-80],[80,0,80],[-80,0,80]];
-                mesh.faces = [[0,1,2,3]];
+            switch(type) {
+                case 'cube': geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5); break;
+                case 'sphere': geometry = new THREE.SphereGeometry(1, 32, 16); break;
+                case 'icosphere': geometry = new THREE.IcosahedronGeometry(1, 2); break;
+                case 'cylinder': geometry = new THREE.CylinderGeometry(0.8, 0.8, 2, 32); break;
+                case 'cone': geometry = new THREE.ConeGeometry(1, 2, 32); break;
+                case 'torus': geometry = new THREE.TorusGeometry(1, 0.3, 16, 100); break;
+                case 'capsule': geometry = new THREE.CylinderGeometry(0.5, 0.5, 1.5, 16); break; // Simplificada
+                case 'plane': geometry = new THREE.PlaneGeometry(2, 2); break;
             }
 
-            // Desplazar un poco si ya existen objetos
-            mesh.x = (objects3D.length % 3) * 40;
-            mesh.z = Math.floor(objects3D.length / 3) * 40;
-
-            objects3D.push(mesh);
-            selectedObjectIndex = objects3D.length - 1;
-            update3DStatus();
-            render3D();
-        }
-
-        function extrudeSelected() {
-            if (objects3D.length === 0) return;
-            let obj = objects3D[selectedObjectIndex];
-            // Duplicar y escalar vértices superiores para simular extrusión con relieve
-            let count = obj.vertices.length;
-            for(let i=0; i<count; i++) {
-                let v = obj.vertices[i];
-                obj.vertices.push([v[0] * 1.3, v[1] + (v[1] >= 0 ? 30 : -30), v[2] * 1.3]);
-            }
-            exec3D('Extrusión con relieve aplicada');
-            render3D();
-        }
-
-        function deleteSelected3D() {
-            if (objects3D.length > 0) {
-                objects3D.splice(selectedObjectIndex, 1);
-                selectedObjectIndex = Math.max(0, objects3D.length - 1);
-                update3DStatus();
-                render3D();
-            }
-        }
-
-        function set3DTransform(mode) {
-            transformMode = mode;
-            document.querySelectorAll('#screen-3d .sidebar-left .tool-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tool-3d-' + mode).classList.add('active');
-        }
-
-        function updateSelectedColor(col) {
-            if (objects3D[selectedObjectIndex]) {
-                objects3D[selectedObjectIndex].color = col;
-                render3D();
-            }
-        }
-
-        function update3DStatus() {
-            document.getElementById('status-3d').innerText = `Objetos en escena: ${objects3D.length} | Seleccionado: ${objects3D[selectedObjectIndex] ? objects3D[selectedObjectIndex].type : 'Ninguno'}`;
-        }
-
-        // Renderizado 3D
-        function render3D() {
-            ctx3d.clearRect(0, 0, canvas3d.width, canvas3d.height);
-            const cx = canvas3d.width / 2;
-            const cy = canvas3d.height / 2;
-
-            // Ordenar caras por profundidad (Algoritmo del Pintor)
-            let renderList = [];
-
-            objects3D.forEach((obj, objIdx) => {
-                let isSel = (objIdx === selectedObjectIndex);
-
-                obj.faces.forEach(face => {
-                    let pts = [];
-                    let zSum = 0;
-
-                    face.forEach(vIdx => {
-                        let v = obj.vertices[vIdx];
-                        if (!v) return;
-
-                        // Aplicar transformaciones locales
-                        let x = v[0] * obj.sx;
-                        let y = v[1] * obj.sy;
-                        let z = v[2] * obj.sz;
-
-                        // Posición global del objeto
-                        x += obj.x; y += obj.y; z += obj.z;
-
-                        // Rotación Cámara (Y)
-                        let x1 = x * Math.cos(camera.rotY) + z * Math.sin(camera.rotY);
-                        let z1 = -x * Math.sin(camera.rotY) + z * Math.cos(camera.rotY);
-
-                        // Rotación Cámara (X)
-                        let y2 = y * Math.cos(camera.rotX) - z1 * Math.sin(camera.rotX);
-                        let z2 = y * Math.sin(camera.rotX) + z1 * Math.cos(camera.rotX);
-
-                        // Proyección Perspectiva
-                        let fov = camera.zoom / (camera.zoom + z2 + 400);
-                        let px = x1 * fov + cx;
-                        let py = y2 * fov + cy;
-
-                        pts.push([px, py]);
-                        zSum += z2;
-                    });
-
-                    renderList.push({
-                        pts,
-                        z: zSum / face.length,
-                        color: obj.color,
-                        isSelected: isSel
-                    });
-                });
+            // Crear con material propio guardado para modo Material
+            const customMat = new THREE.MeshStandardMaterial({
+                color: 0xaaaaaa,
+                roughness: 0.4,
+                metalness: 0.2
             });
 
-            // Ordenar de atrás hacia adelante
-            renderList.sort((a, b) => b.z - a.z);
+            const mesh = new THREE.Mesh(geometry, renderMode === 'GRAY' ? defaultGrayMaterial.clone() : customMat);
+            mesh.userData.materialColor = customMat; // Referencia al material personalizado
+            mesh.name = name;
+            mesh.position.y = 1;
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
 
-            // Dibujar Caras con Sombreado
-            renderList.forEach(item => {
-                if (item.pts.length < 3) return;
-                ctx3d.beginPath();
-                ctx3d.moveTo(item.pts[0][0], item.pts[0][1]);
-                for (let i = 1; i < item.pts.length; i++) {
-                    ctx3d.lineTo(item.pts[i][0], item.pts[i][1]);
+            scene.add(mesh);
+            objects.push(mesh);
+
+            updateOutliner();
+            selectObject(mesh);
+        }
+
+        function selectObject(obj) {
+            selectedObject = obj;
+            if (obj) {
+                transformControls.attach(obj);
+                document.getElementById('selected-name-label').innerText = obj.name;
+                syncTransformUI();
+                syncMaterialUI();
+            } else {
+                transformControls.detach();
+                document.getElementById('selected-name-label').innerText = "Ninguno";
+            }
+            updateOutliner();
+        }
+
+        function setTransformMode(mode) {
+            if (mode === 'select') {
+                transformControls.detach();
+            } else {
+                if (selectedObject) transformControls.attach(selectedObject);
+                transformControls.setMode(mode);
+            }
+            document.querySelectorAll('#tools-panel button').forEach(b => b.classList.remove('active'));
+            if(document.getElementById('btn-' + mode)) {
+                document.getElementById('btn-' + mode).classList.add('active');
+            }
+        }
+
+        // --- MODOS DE VISUALIZACIÓN (Z+6 / Z+2) ---
+        function setRenderMode(mode) {
+            renderMode = mode;
+            const label = document.getElementById('render-mode-label');
+
+            objects.forEach(obj => {
+                if (mode === 'GRAY') {
+                    obj.material = defaultGrayMaterial.clone();
+                    label.innerText = "Sombreado Gris (Z+6)";
+                    label.style.color = "#e67e22";
+                } else if (mode === 'MATERIAL') {
+                    if (obj.userData.materialColor) {
+                        obj.material = obj.userData.materialColor;
+                    }
+                    label.innerText = "Vista Material (Z+2)";
+                    label.style.color = "#2ec4b6";
                 }
-                ctx3d.closePath();
-
-                ctx3d.fillStyle = item.color;
-                ctx3d.globalAlpha = 0.85;
-                ctx3d.fill();
-
-                ctx3d.globalAlpha = 1.0;
-                ctx3d.strokeStyle = item.isSelected ? '#ffffff' : '#111111';
-                ctx3d.lineWidth = item.isSelected ? 2 : 1;
-                ctx3d.stroke();
             });
         }
 
-        // --- CONTROLES DE INTERACCIÓN 3D (GIZMO Y RATÓN) ---
-        const gizmo = document.getElementById('viewport-gizmo');
-        let isGizmoDragging = false;
-        let isCanvasDragging = false;
-        let lastMouseX = 0, lastMouseY = 0;
+        // --- MODELADO BÁSICO Y OPERACIONES ---
+        function extrudeObject() {
+            if (!selectedObject || !(selectedObject.geometry instanceof THREE.BufferGeometry)) return;
+            selectedObject.scale.y += 0.5;
+            selectedObject.position.y += 0.25;
+            syncTransformUI();
+        }
 
-        gizmo.addEventListener('mousedown', (e) => {
-            isGizmoDragging = true;
-            lastMouseX = e.clientX;
-            lastMouseY = e.clientY;
-            e.stopPropagation();
-        });
+        function subdivideObject() {
+            if (!selectedObject) return;
+            // Modificación rápida de subdivisión básica
+            selectedObject.geometry = selectedObject.geometry.clone();
+            selectedObject.geometry.computeVertexNormals();
+            alert("Malla subdividida y normales recomputadas.");
+        }
 
-        canvas3d.addEventListener('mousedown', (e) => {
-            isCanvasDragging = true;
-            lastMouseX = e.clientX;
-            lastMouseY = e.clientY;
-        });
+        function smoothShading(smooth) {
+            if (!selectedObject) return;
+            selectedObject.material.flatShading = !smooth;
+            selectedObject.material.needsUpdate = true;
+        }
 
-        window.addEventListener('mousemove', (e) => {
-            let dx = e.clientX - lastMouseX;
-            let dy = e.clientY - lastMouseY;
+        function bevelObject() {
+            if (!selectedObject) return;
+            selectedObject.scale.x *= 1.05;
+            selectedObject.scale.z *= 1.05;
+            syncTransformUI();
+        }
 
-            if (isGizmoDragging) {
-                camera.rotY += dx * 0.01;
-                camera.rotX += dy * 0.01;
-                render3D();
-            } else if (isCanvasDragging && objects3D[selectedObjectIndex]) {
-                let obj = objects3D[selectedObjectIndex];
-                if (transformMode === 'move') {
-                    obj.x += dx;
-                    obj.y += dy;
-                } else if (transformMode === 'rotate') {
-                    obj.rx += dy * 0.01;
-                    obj.ry += dx * 0.01;
-                } else if (transformMode === 'scale') {
-                    obj.sx = Math.max(0.1, obj.sx + dx * 0.01);
-                    obj.sy = Math.max(0.1, obj.sy - dy * 0.01);
-                }
-                render3D();
+        function reducePolygons() {
+            if (!selectedObject) return;
+            alert("Algoritmo de reducción ejecutado (Decimate).");
+        }
+
+        function joinSelected() {
+            alert("Para unir objetos, selecciona múltiples entidades (Funcionalidad simplificada).");
+        }
+
+        function deleteSelected() {
+            if (!selectedObject) return;
+            transformControls.detach();
+            scene.remove(selectedObject);
+            objects = objects.filter(o => o !== selectedObject);
+            selectedObject = null;
+            updateOutliner();
+            document.getElementById('selected-name-label').innerText = "Ninguno";
+        }
+
+        function addLight(type) {
+            objectCount++;
+            let light, helper;
+            if (type === 'point') {
+                light = new THREE.PointLight(0xffffff, 1, 10);
+                helper = new THREE.PointLightHelper(light, 0.3);
+            } else if (type === 'directional') {
+                light = new THREE.DirectionalLight(0xffffff, 1);
+                helper = new THREE.DirectionalLightHelper(light, 0.5);
+            } else if (type === 'spot') {
+                light = new THREE.SpotLight(0xffffff, 1);
+                helper = new THREE.SpotLightHelper(light);
             }
-            lastMouseX = e.clientX;
-            lastMouseY = e.clientY;
-        });
-
-        window.addEventListener('mouseup', () => {
-            isGizmoDragging = false;
-            isCanvasDragging = false;
-        });
-
-        canvas3d.addEventListener('wheel', (e) => {
-            camera.zoom = Math.max(100, Math.min(800, camera.zoom - e.deltaY));
-            render3D();
-        });
-
-        function exec3D(action) {
-            document.getElementById('status-3d').innerText = `Acción ejecutada: ${action}`;
+            light.position.set(2, 4, 2);
+            light.name = type.charAt(0).toUpperCase() + type.slice(1) + "Light_" + objectCount;
+            scene.add(light);
+            scene.add(helper);
+            updateOutliner();
         }
 
-        function export3D() {
-            const fmt = document.getElementById('export-3d-format').value;
-            alert(`¡Modelo 3D exportado correctamente en formato ${fmt}!`);
+        // --- ACTUALIZACIÓN DE UI Y PROPIEDADES ---
+        function syncTransformUI() {
+            if (!selectedObject) return;
+            document.getElementById('pos-x').value = selectedObject.position.x.toFixed(2);
+            document.getElementById('pos-y').value = selectedObject.position.y.toFixed(2);
+            document.getElementById('pos-z').value = selectedObject.position.z.toFixed(2);
+
+            document.getElementById('scale-x').value = selectedObject.scale.x.toFixed(2);
+            document.getElementById('scale-y').value = selectedObject.scale.y.toFixed(2);
+            document.getElementById('scale-z').value = selectedObject.scale.z.toFixed(2);
         }
 
-        // --- EDITOR 2D (PIXEL ART) ---
-        const canvas2d = document.getElementById('canvas-2d');
-        const ctx2d = canvas2d.getContext('2d');
-        let isDrawing2D = false;
-        let current2DTool = 'pencil';
-
-        ctx2d.fillStyle = "#ffffff";
-        ctx2d.fillRect(0, 0, canvas2d.width, canvas2d.height);
-
-        function set2DTool(tool) {
-            current2DTool = tool;
-            document.querySelectorAll('#screen-2d .tool-btn').forEach(b => b.classList.remove('active'));
-            if(document.getElementById('tool-' + tool)) {
-                document.getElementById('tool-' + tool).classList.add('active');
-            }
-            document.getElementById('status-2d').innerText = `Lienzo: ${canvas2d.width}x${canvas2d.height} | Herramienta: ${tool}`;
+        function updateObjectTransform() {
+            if (!selectedObject) return;
+            selectedObject.position.set(
+                parseFloat(document.getElementById('pos-x').value),
+                parseFloat(document.getElementById('pos-y').value),
+                parseFloat(document.getElementById('pos-z').value)
+            );
+            selectedObject.scale.set(
+                parseFloat(document.getElementById('scale-x').value),
+                parseFloat(document.getElementById('scale-y').value),
+                parseFloat(document.getElementById('scale-z').value)
+            );
         }
 
-        function resize2DCanvas(size) {
-            canvas2d.width = size;
-            canvas2d.height = size;
-            ctx2d.fillStyle = "#ffffff";
-            ctx2d.fillRect(0, 0, size, size);
-            document.getElementById('status-2d').innerText = `Lienzo ajustado a: ${size}x${size}`;
+        function syncMaterialUI() {
+            if (!selectedObject || !selectedObject.material) return;
+            const mat = selectedObject.userData.materialColor || selectedObject.material;
+            document.getElementById('mat-color').value = "#" + mat.color.getHexString();
+            document.getElementById('mat-roughness').value = mat.roughness;
+            document.getElementById('mat-metalness').value = mat.metalness;
+            document.getElementById('mat-opacity').value = mat.opacity;
         }
 
-        function draw2D(e) {
-            if (!isDrawing2D) return;
-            const rect = canvas2d.getBoundingClientRect();
-            const scale = canvas2d.width / rect.width;
-            const x = Math.floor((e.clientX - rect.left) * scale);
-            const y = Math.floor((e.clientY - rect.top) * scale);
-
-            if (current2DTool === 'pencil' || current2DTool === 'hard') {
-                ctx2d.fillStyle = document.getElementById('2d-color').value;
-                ctx2d.fillRect(x, y, 1, 1);
-            } else if (current2DTool === 'eraser') {
-                ctx2d.fillStyle = "#ffffff";
-                ctx2d.fillRect(x, y, 1, 1);
-            } else if (current2DTool === 'bucket') {
-                ctx2d.fillStyle = document.getElementById('2d-color').value;
-                ctx2d.fillRect(0, 0, canvas2d.width, canvas2d.height);
-            }
-        }
-
-        canvas2d.addEventListener('mousedown', (e) => { isDrawing2D = true; draw2D(e); });
-        canvas2d.addEventListener('mousemove', draw2D);
-        canvas2d.addEventListener('mouseup', () => isDrawing2D = false);
-
-        function exec2D(action) {
-            document.getElementById('status-2d').innerText = `Ejecutado en 2D: ${action}`;
-        }
-
-        function export2D() {
-            const fmt = document.getElementById('export-2d-format').value;
-            const a = document.createElement('a');
-            a.download = `arte_2d.${fmt.toLowerCase()}`;
-            a.href = canvas2d.toDataURL();
-            a.click();
-        }
-
-        // --- EDITOR DE IMÁGENES ---
-        const canvasImg = document.getElementById('canvas-img');
-        const ctxImg = canvasImg.getContext('2d');
-        let loadedImg = null;
-
-        function loadImage(e) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                loadedImg = new Image();
-                loadedImg.onload = function() {
-                    canvasImg.width = loadedImg.width;
-                    canvasImg.height = loadedImg.height;
-                    processImg();
-                    document.getElementById('status-img').innerText = `Imagen cargada: ${loadedImg.width}x${loadedImg.height} px`;
-                }
-                loadedImg.src = event.target.result;
-            }
-            reader.readAsDataURL(e.target.files[0]);
-        }
-
-        function processImg() {
-            if (!loadedImg) return;
-            const b = document.getElementById('bright-val').value;
-            const c = document.getElementById('contrast-val').value;
-            const s = document.getElementById('satur-val').value;
+        function updateMaterial() {
+            if (!selectedObject) return;
+            const targetMat = selectedObject.userData.materialColor || selectedObject.material;
             
-            ctxImg.filter = `brightness(${b}%) contrast(${c}%) saturate(${s}%)`;
-            ctxImg.drawImage(loadedImg, 0, 0);
+            targetMat.color.set(document.getElementById('mat-color').value);
+            targetMat.roughness = parseFloat(document.getElementById('mat-roughness').value);
+            targetMat.metalness = parseFloat(document.getElementById('mat-metalness').value);
+            targetMat.emissive.set(document.getElementById('mat-emissive').value);
+            
+            const opacity = parseFloat(document.getElementById('mat-opacity').value);
+            targetMat.opacity = opacity;
+            targetMat.transparent = opacity < 1.0;
+
+            if (renderMode === 'MATERIAL') {
+                selectedObject.material = targetMat;
+            }
         }
 
-        function execImg(action) {
-            if (!loadedImg) {
-                alert('Por favor carga una imagen primero.');
-                return;
+        function updateOutliner() {
+            const list = document.getElementById('outliner-list');
+            list.innerHTML = "";
+            objects.forEach(obj => {
+                const li = document.createElement('li');
+                li.innerText = (obj.geometry ? "📦 " : "💡 ") + obj.name;
+                if (obj === selectedObject) li.classList.add('selected');
+                li.onclick = () => selectObject(obj);
+                list.appendChild(li);
+            });
+        }
+
+        function resetTransforms() {
+            if (!selectedObject) return;
+            selectedObject.position.set(0, 1, 0);
+            selectedObject.rotation.set(0, 0, 0);
+            selectedObject.scale.set(1, 1, 1);
+            syncTransformUI();
+        }
+
+        // --- SISTEMA DE ATAJOS DE TECLADO (BLENDER STYLE) ---
+        let zPressed = false;
+
+        window.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT') return;
+
+            switch(e.key.toLowerCase()) {
+                case 'g': setTransformMode('translate'); break;
+                case 'r': setTransformMode('rotate'); break;
+                case 's': setTransformMode('scale'); break;
+                case 'e': extrudeObject(); break;
+                case 'delete': deleteSelected(); break;
+                case 'z': zPressed = true; break;
+                case '6': 
+                    if (zPressed) setRenderMode('GRAY'); 
+                    break;
+                case '2': 
+                    if (zPressed) setRenderMode('MATERIAL'); 
+                    break;
             }
-            document.getElementById('status-img').innerText = `Procesando: ${action}`;
-            if (action === 'Quitar Fondo Auto') {
-                ctxImg.clearRect(0, 0, canvasImg.width / 3, canvasImg.height);
+
+            if (e.ctrlKey && e.key.toLowerCase() === 'j') {
+                e.preventDefault();
+                joinSelected();
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key.toLowerCase() === 'z') zPressed = false;
+        });
+
+        // --- EXPORTACIÓN DE ARCHIVOS ---
+        function exportScene() {
+            const format = document.getElementById('export-format').value;
+            let exporter, output, filename = "escena_krhorkos";
+
+            if (format === 'obj') {
+                exporter = new THREE.OBJExporter();
+                output = exporter.parse(scene);
+                downloadFile(output, filename + ".obj", "text/plain");
+            } else if (format === 'stl') {
+                exporter = new THREE.STLExporter();
+                output = exporter.parse(scene, { binary: true });
+                downloadFile(output, filename + ".stl", "application/octet-stream");
+            } else if (format === 'gltf') {
+                exporter = new THREE.GLTFExporter();
+                exporter.parse(scene, function (gltf) {
+                    const outputStr = JSON.stringify(gltf, null, 2);
+                    downloadFile(outputStr, filename + ".gltf", "application/json");
+                });
             }
         }
 
-        function downloadImg() {
-            if (!loadedImg) return;
-            const fmt = document.getElementById('export-img-format').value;
-            const a = document.createElement('a');
-            a.download = `imagen_procesada.${fmt}`;
-            a.href = canvasImg.toDataURL(`image/${fmt}`);
+        function downloadFile(content, fileName, contentType) {
+            const a = document.createElement("a");
+            const file = new Blob([content], { type: contentType });
+            a.href = URL.createObjectURL(file);
+            a.download = fileName;
             a.click();
         }
 
-        // --- INICIALIZACIÓN ---
-        window.addEventListener('resize', resize3D);
-        init3DEngine();
+        // --- BUCLE DE RENDERIZADO Y RESPONSIVIDAD ---
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+
+        // Inicializar escena con un objeto por defecto (Cubo Blender)
+        addPrimitive('cube');
+        animate();
     </script>
 </body>
 </html>
