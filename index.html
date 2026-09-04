@@ -14,6 +14,25 @@
             --text: #cccccc;
             --text-bright: #ffffff;
             --border: #383838;
+            --font-size-base: 12px;
+            --panel-spacing: 8px;
+        }
+
+        /* TEMAS PREDEFINIDOS */
+        body.theme-oscuro {
+            --bg-dark: #1d1d1d; --bg-panel: #282828; --bg-header: #181818; --accent: #e67e22; --accent-hover: #d35400; --text: #cccccc; --text-bright: #ffffff; --border: #383838;
+        }
+        body.theme-gris {
+            --bg-dark: #444444; --bg-panel: #555555; --bg-header: #333333; --accent: #3498db; --accent-hover: #2980b9; --text: #eeeeee; --text-bright: #ffffff; --border: #666666;
+        }
+        body.theme-claro {
+            --bg-dark: #e0e0e0; --bg-panel: #f0f0f0; --bg-header: #d6d6d6; --accent: #d35400; --accent-hover: #e67e22; --text: #333333; --text-bright: #000000; --border: #cccccc;
+        }
+        body.theme-blender {
+            --bg-dark: #191919; --bg-panel: #2d2d2d; --bg-header: #161616; --accent: #ea7600; --accent-hover: #cc6700; --text: #b8b8b8; --text-bright: #ffffff; --border: #3d3d3d;
+        }
+        body.theme-alto-contraste {
+            --bg-dark: #000000; --bg-panel: #111111; --bg-header: #000000; --accent: #ffff00; --accent-hover: #cccc00; --text: #ffffff; --text-bright: #ffffff; --border: #ffffff;
         }
 
         * {
@@ -31,18 +50,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            font-size: 12px;
-        }
-
-        body.light-theme {
-            --bg-dark: #e0e0e0;
-            --bg-panel: #f0f0f0;
-            --bg-header: #d6d6d6;
-            --accent: #d35400;
-            --accent-hover: #e67e22;
-            --text: #333333;
-            --text-bright: #000000;
-            --border: #cccccc;
+            font-size: var(--font-size-base);
         }
 
         header {
@@ -53,6 +61,8 @@
             justify-content: space-between;
             padding: 0 10px;
             border-bottom: 1px solid var(--border);
+            position: relative;
+            z-index: 10;
         }
 
         .logo {
@@ -61,10 +71,38 @@
             font-size: 14px;
         }
 
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* BOTON DONACIONES */
+        .btn-donate {
+            background-color: #27ae60;
+            color: #ffffff;
+            border: 1px solid #2ecc71;
+            padding: 3px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 11px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-donate:hover {
+            background-color: #219150;
+        }
+
         #main-layout {
             display: flex;
             flex: 1;
             height: calc(100vh - 52px);
+            position: relative;
+        }
+
+        body.layout-invertido #main-layout {
+            flex-direction: row-reverse;
         }
 
         .panel {
@@ -73,6 +111,15 @@
             display: flex;
             flex-direction: column;
             overflow-y: auto;
+        }
+
+        body.layout-invertido #tools-panel {
+            border-right: none;
+            border-left: 1px solid var(--border);
+        }
+        body.layout-invertido #properties-panel {
+            border-left: none;
+            border-right: 1px solid var(--border);
         }
 
         .panel-title {
@@ -87,7 +134,7 @@
         }
 
         .panel-section {
-            padding: 8px;
+            padding: var(--panel-spacing);
             border-bottom: 1px solid var(--border);
         }
 
@@ -119,7 +166,6 @@
             z-index: 5;
         }
 
-        /* PANEL INFO ESCENA (ABAJO A LA IZQUIERDA) */
         #scene-stats-panel {
             position: absolute;
             bottom: 10px;
@@ -157,7 +203,7 @@
             border-radius: 3px;
             cursor: pointer;
             text-align: left;
-            font-size: 11px;
+            font-size: var(--font-size-base);
             display: flex;
             align-items: center;
             gap: 5px;
@@ -246,7 +292,6 @@
             font-size: 11px;
         }
 
-        /* VENTANA MODAL DE AJUSTES (F1) */
         .modal {
             display: none;
             position: fixed;
@@ -263,10 +308,13 @@
         .modal-content {
             background-color: var(--bg-panel);
             border: 1px solid var(--border);
-            width: 360px;
+            width: 460px;
+            max-height: 90vh;
+            overflow-y: auto;
             border-radius: 6px;
             box-shadow: 0px 4px 20px rgba(0,0,0,0.5);
             padding: 15px;
+            color: var(--text-bright);
         }
 
         .modal-header {
@@ -278,8 +326,17 @@
             padding-bottom: 6px;
         }
 
+        .modal-section-title {
+            font-weight: bold;
+            font-size: 11px;
+            color: var(--accent);
+            margin: 10px 0 5px 0;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
         .modal-body .input-group {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .modal-footer {
@@ -289,7 +346,6 @@
             gap: 8px;
         }
 
-        /* PREVISUALIZACIÓN DE TEXTURA */
         #texture-preview {
             width: 100%;
             height: 60px;
@@ -303,6 +359,17 @@
             font-size: 10px;
             color: #888;
         }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+            font-size: 11px;
+        }
+        .checkbox-group input {
+            width: auto;
+        }
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -312,58 +379,61 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/STLExporter.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
 </head>
-<body>
+<body class="theme-oscuro">
 
     <header>
         <div class="logo">Krhorkos3Dand2DCreator v1.0</div>
-        <div>Engine Mode: WebGL / Three.js</div>
+        <div class="header-controls">
+            <span>Engine Mode: WebGL / Three.js</span>
+            <a href="https://paypal.com" target="_blank" class="btn-donate">Donaciones</a>
+        </div>
     </header>
 
     <div id="main-layout">
         <div id="tools-panel" class="panel">
-            <div class="panel-title">Transformación</div>
+            <div class="panel-title">Transformacion</div>
             <div class="panel-section">
-                <button id="btn-select" onclick="setTransformMode('select')">🖐️ Seleccionar</button>
+                <button id="btn-select" onclick="setTransformMode('select')">Seleccionar</button>
                 <div class="btn-grid">
-                    <button id="btn-translate" onclick="setTransformMode('translate')">📍 Mover (G)</button>
-                    <button id="btn-rotate" onclick="setTransformMode('rotate')">🔄 Rotar (R)</button>
-                    <button id="btn-scale" onclick="setTransformMode('scale')">📐 Escalar (S)</button>
-                    <button onclick="resetTransforms()">🎯 Reset Org.</button>
+                    <button id="btn-translate" onclick="setTransformMode('translate')">Mover (G)</button>
+                    <button id="btn-rotate" onclick="setTransformMode('rotate')">Rotar (R)</button>
+                    <button id="btn-scale" onclick="setTransformMode('scale')">Escalar (S)</button>
+                    <button onclick="resetTransforms()">Reset Org.</button>
                 </div>
             </div>
 
             <div class="panel-title">Formas Primitivas</div>
             <div class="panel-section">
                 <div class="btn-grid">
-                    <button onclick="addPrimitive('cube')">📦 Cubo</button>
-                    <button onclick="addPrimitive('sphere')">🌐 Esfera</button>
-                    <button onclick="addPrimitive('icosphere')">⚽ Icosphere</button>
-                    <button onclick="addPrimitive('cylinder')">🛢️ Cilíndro</button>
-                    <button onclick="addPrimitive('cone')">📐 Cono</button>
-                    <button onclick="addPrimitive('torus')">🍩 Toro</button>
-                    <button onclick="addPrimitive('capsule')">💊 Cápsula</button>
-                    <button onclick="addPrimitive('plane')">⬜ Plano</button>
+                    <button onclick="addPrimitive('cube')">Cubo</button>
+                    <button onclick="addPrimitive('sphere')">Esfera</button>
+                    <button onclick="addPrimitive('icosphere')">Icosphere</button>
+                    <button onclick="addPrimitive('cylinder')">Cilindro</button>
+                    <button onclick="addPrimitive('cone')">Cono</button>
+                    <button onclick="addPrimitive('torus')">Toro</button>
+                    <button onclick="addPrimitive('capsule')">Capsula</button>
+                    <button onclick="addPrimitive('plane')">Plano</button>
                 </div>
             </div>
 
             <div class="panel-title">Herramientas de Modelado</div>
             <div class="panel-section">
-                <button onclick="extrudeObject()">⬆️ Extruir / Engrosar (E)</button>
-                <button onclick="subdivideObject()">🕸️ Subdividir Malla</button>
-                <button onclick="bevelObject()">📐 Biselar (Bevel)</button>
-                <button onclick="smoothShading(true)">✨ Sombras Suaves</button>
-                <button onclick="smoothShading(false)">🏁 Sombras Planas</button>
-                <button onclick="reducePolygons()">📉 Reducir Polígonos</button>
-                <button onclick="joinSelected()">🔗 Unir (Ctrl+J)</button>
-                <button onclick="deleteSelected()">🗑️ Eliminar (Supr)</button>
+                <button onclick="extrudeObject()">Extruir / Engrosar (E)</button>
+                <button onclick="subdivideObject()">Subdividir Malla</button>
+                <button onclick="bevelObject()">Biselar (Bevel)</button>
+                <button onclick="smoothShading(true)">Sombras Suaves</button>
+                <button onclick="smoothShading(false)">Sombras Planas</button>
+                <button onclick="reducePolygons()">Reducir Poligonos</button>
+                <button onclick="joinSelected()">Unir (Ctrl+J)</button>
+                <button onclick="deleteSelected()">Eliminar (Supr)</button>
             </div>
 
-            <div class="panel-title">Iluminación</div>
+            <div class="panel-title">Iluminacion</div>
             <div class="panel-section">
                 <div class="btn-grid">
-                    <button onclick="addLight('point')">💡 Luz Puntual</button>
-                    <button onclick="addLight('directional')">☀️ Luz Solar</button>
-                    <button onclick="addLight('spot')">🔦 Foco (Spot)</button>
+                    <button onclick="addLight('point')">Luz Puntual</button>
+                    <button onclick="addLight('directional')">Luz Solar</button>
+                    <button onclick="addLight('spot')">Foco (Spot)</button>
                 </div>
             </div>
         </div>
@@ -376,10 +446,10 @@
 
             <div id="scene-stats-panel">
                 <strong>Krhorkos3Dand2DCreator v1.0</strong><br>
-                • Selección: <span id="stat-selected">Ninguno</span><br>
-                • Vértices totales: <span id="stat-verts">0</span><br>
+                • Seleccion: <span id="stat-selected">Ninguno</span><br>
+                • Vertices totales: <span id="stat-verts">0</span><br>
                 • Caras totales: <span id="stat-faces">0</span><br>
-                • Triángulos totales: <span id="stat-tris">0</span><br>
+                • Triangulos totales: <span id="stat-tris">0</span><br>
                 • Objetos en escena: <span id="stat-objs">0</span><br>
                 • Memoria estimada: <span id="stat-mem">0 KB</span>
             </div>
@@ -393,9 +463,9 @@
                 <ul id="outliner-list"></ul>
             </div>
 
-            <div class="panel-title">Transformación Activa</div>
+            <div class="panel-title">Transformacion Activa</div>
             <div class="panel-section" id="transform-props">
-                <div class="input-group"><label>Posición</label></div>
+                <div class="input-group"><label>Posicion</label></div>
                 <div class="vector3-input">
                     <input type="number" id="pos-x" step="0.1" onchange="updateObjectTransform()">
                     <input type="number" id="pos-y" step="0.1" onchange="updateObjectTransform()">
@@ -420,11 +490,11 @@
                     <input type="range" id="mat-roughness" min="0" max="1" step="0.05" value="0.5" oninput="updateMaterial()">
                 </div>
                 <div class="input-group">
-                    <label>Metálico</label>
+                    <label>Metalico</label>
                     <input type="range" id="mat-metalness" min="0" max="1" step="0.05" value="0.1" oninput="updateMaterial()">
                 </div>
                 <div class="input-group">
-                    <label>Emisión</label>
+                    <label>Emision</label>
                     <input type="color" id="mat-emissive" value="#000000" onchange="updateMaterial()">
                 </div>
                 <div class="input-group">
@@ -439,7 +509,7 @@
                     <label>Cargar Textura</label>
                     <input type="file" id="texture-input" accept="image/*" onchange="applyTexture(event)" style="width: 130px;">
                 </div>
-                <button style="width:100%; margin-top:4px;" onclick="removeTexture()">❌ Quitar Textura</button>
+                <button style="width:100%; margin-top:4px;" onclick="removeTexture()">Quitar Textura</button>
                 <div id="texture-preview">Sin Textura Asignada</div>
             </div>
 
@@ -449,9 +519,9 @@
                     <select id="modifier-select" style="width:100%;">
                         <optgroup label="Editar">
                             <option value="data_transfer">Transferir datos</option>
-                            <option value="mesh_cache">Caché de malla</option>
+                            <option value="mesh_cache">Cache de malla</option>
                             <option value="normals">Editar normales</option>
-                            <option value="vertex_weight">Influenciar vértices</option>
+                            <option value="vertex_weight">Influenciar vertices</option>
                             <option value="uv_warp">Deformar UV</option>
                         </optgroup>
                         <optgroup label="Generar">
@@ -467,33 +537,25 @@
                             <option value="displace">Desplazar</option>
                             <option value="smooth">Suavizado</option>
                         </optgroup>
-                        <optgroup label="Simulación">
-                            <option value="collision">Colisión</option>
-                            <option value="dynamic">Dinámica</option>
+                        <optgroup label="Simulacion">
+                            <option value="collision">Colision</option>
+                            <option value="dynamic">Dinamica</option>
                             <option value="fluid">Fluido</option>
-                            <option value="particles">Partículas</option>
+                            <option value="particles">Particulas</option>
                             <option value="soft_body">Cuerpo Blando</option>
                         </optgroup>
                     </select>
                 </div>
                 <div class="btn-grid" style="margin-top:5px;">
-                    <button onclick="addModifier()">➕ Añadir</button>
-                    <button onclick="applyModifier()">✅ Aplicar</button>
+                    <button onclick="addModifier()">Anadir</button>
+                    <button onclick="applyModifier()">Aplicar</button>
                 </div>
                 <div id="active-modifiers" style="margin-top:6px; font-size:11px; color:#aaa;">Modificadores activos: Ninguno</div>
             </div>
 
             <div class="panel-title">Exportar Proyecto</div>
             <div class="panel-section">
-                <div class="input-group">
-                    <label>Formato</label>
-                    <select id="export-format">
-                        <option value="obj">Wavefront (.OBJ)</option>
-                        <option value="stl">Stereolithography (.STL)</option>
-                        <option value="gltf">GLTF / GLB (.GLTF)</option>
-                    </select>
-                </div>
-                <button style="width:100%; margin-top:5px; text-align:center; justify-content:center;" onclick="exportScene()">💾 Exportar Archivo 3D</button>
+                <button style="width:100%; text-align:center; justify-content:center;" onclick="openExportModal()">Exportar Archivo 3D</button>
             </div>
         </div>
     </div>
@@ -504,37 +566,132 @@
 
     <div id="settings-modal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">⚙️ Ajustes del Sitio Web</div>
+            <div class="modal-header">Ajustes del Sitio Web</div>
             <div class="modal-body">
+                <div class="modal-section-title">Temas Predefinidos</div>
                 <div class="input-group">
-                    <label>Tema de Interfaz</label>
-                    <select id="setting-theme">
-                        <option value="dark">Oscuro (Blender Style)</option>
-                        <option value="light">Claro</option>
+                    <label>Seleccionar Tema</label>
+                    <select id="setting-theme" onchange="liveApplySettings()">
+                        <option value="oscuro">Oscuro Profesional</option>
+                        <option value="gris">Gris Medio</option>
+                        <option value="claro">Claro</option>
+                        <option value="blender">Estilo Blender</option>
+                        <option value="alto-contraste">Alto Contraste</option>
                     </select>
                 </div>
+
+                <div class="modal-section-title">Personalizacion Completa</div>
                 <div class="input-group">
-                    <label>Velocidad Movimiento Ratón</label>
-                    <input type="range" id="setting-mouse-speed" min="0.1" max="2" step="0.1" value="1">
+                    <label>Color Fondo Principal</label>
+                    <input type="color" id="setting-bg-dark" value="#1d1d1d" onchange="liveApplySettings()">
                 </div>
                 <div class="input-group">
-                    <label>Sensibilidad Rotación Vista</label>
-                    <input type="range" id="setting-rotate-speed" min="0.1" max="2" step="0.1" value="1">
+                    <label>Color Fondo Paneles</label>
+                    <input type="color" id="setting-bg-panel" value="#282828" onchange="liveApplySettings()">
+                </div>
+                <div class="input-group">
+                    <label>Color Botones / Acento</label>
+                    <input type="color" id="setting-accent" value="#e67e22" onchange="liveApplySettings()">
+                </div>
+                <div class="input-group">
+                    <label>Tamano de Letra (px)</label>
+                    <input type="number" id="setting-font-size" min="10" max="16" value="12" onchange="liveApplySettings()">
+                </div>
+                <div class="input-group">
+                    <label>Espaciado Paneles (px)</label>
+                    <input type="number" id="setting-panel-spacing" min="4" max="20" value="8" onchange="liveApplySettings()">
+                </div>
+                <div class="input-group">
+                    <label>Posicion Barras Herramientas</label>
+                    <select id="setting-layout-pos" onchange="liveApplySettings()">
+                        <option value="normal">Herramientas Izq / Propiedades Der</option>
+                        <option value="invertido">Herramientas Der / Propiedades Izq</option>
+                    </select>
+                </div>
+
+                <div class="modal-section-title">Navegacion y Estadisticas</div>
+                <div class="input-group">
+                    <label>Velocidad Movimiento Raton</label>
+                    <input type="range" id="setting-mouse-speed" min="0.1" max="2" step="0.1" value="1" oninput="liveApplySettings()">
+                </div>
+                <div class="input-group">
+                    <label>Sensibilidad Rotacion Vista</label>
+                    <input type="range" id="setting-rotate-speed" min="0.1" max="2" step="0.1" value="1" oninput="liveApplySettings()">
                 </div>
                 <div class="input-group">
                     <label>Mostrar Panel Info Escena</label>
-                    <input type="checkbox" id="setting-show-stats" checked style="width:auto;">
+                    <input type="checkbox" id="setting-show-stats" checked style="width:auto;" onchange="liveApplySettings()">
                 </div>
             </div>
             <div class="modal-footer">
-                <button onclick="restoreDefaultSettings()">Restaurar</button>
+                <button onclick="restoreDefaultSettings()">Restaurar Valores</button>
                 <button onclick="saveSettings()" style="background:var(--accent);">Guardar Cambios</button>
             </div>
         </div>
     </div>
 
+    <div id="export-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Opciones de Exportacion</div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label>Formato de Exportacion</label>
+                    <select id="exp-format">
+                        <option value="gltf">GLTF / GLB (.GLTF)</option>
+                        <option value="obj">Wavefront (.OBJ)</option>
+                        <option value="stl">Stereolithography (.STL)</option>
+                    </select>
+                </div>
+
+                <div class="modal-section-title">Incluir</div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-inc-selected"><label for="exp-inc-selected">Objetos seleccionados solamente</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-inc-props" checked><label for="exp-inc-props">Propiedades personalizadas</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-inc-cameras"><label for="exp-inc-cameras">Camaras</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-inc-lights"><label for="exp-inc-lights">Luces puntuales</label></div>
+
+                <div class="modal-section-title">Transformacion</div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-trans-y" checked><label for="exp-trans-y">Eje +Y hacia arriba</label></div>
+
+                <div class="modal-section-title">Geometria</div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-geo-modifiers" checked><label for="exp-geo-modifiers">Aplicar modificadores</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-geo-uv" checked><label for="exp-geo-uv">Coordenadas UV</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-geo-normals" checked><label for="exp-geo-normals">Normales</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-geo-tangents" checked><label for="exp-geo-tangents">Tangentes</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-geo-colors" checked><label for="exp-geo-colors">Colores de vertices</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-geo-materials" checked><label for="exp-geo-materials">Materiales</label></div>
+
+                <div class="modal-section-title">Imagenes</div>
+                <div class="input-group">
+                    <label>Modo Imagenes</label>
+                    <select id="exp-img-mode">
+                        <option value="auto">Automatico</option>
+                        <option value="embed">Incrustar en archivo</option>
+                        <option value="copy">Copiar referencias</option>
+                    </select>
+                </div>
+
+                <div class="modal-section-title">Compresion</div>
+                <div class="input-group">
+                    <label>Nivel de Compresion</label>
+                    <input type="range" id="exp-comp-level" min="0" max="10" value="6">
+                </div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-quant-pos" checked><label for="exp-quant-pos">Cuantizar Posicion</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-quant-norm" checked><label for="exp-quant-norm">Cuantizar Normal</label></div>
+
+                <div class="modal-section-title">Animacion</div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-anim-include"><label for="exp-anim-include">Incluir animacion</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-anim-keys"><label for="exp-anim-keys">Formas clave</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-anim-skins"><label for="exp-anim-skins">Deformacion con esqueletos</label></div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeExportModal()">Cancelar</button>
+                <button onclick="executeExport()" style="background:var(--accent);">Exportar Geometria</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // --- INICIALIZACIÓN DE LA ESCENA THREE.JS ---
+        // --- INICIALIZACION DE LA ESCENA THREE.JS ---
         const container = document.getElementById('viewport');
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x1e1e1e);
@@ -582,7 +739,13 @@
         let objectCount = 0;
         let renderMode = 'GRAY'; 
         let settings = {
-            theme: 'dark',
+            theme: 'oscuro',
+            bgDark: '#1d1d1d',
+            bgPanel: '#282828',
+            accent: '#e67e22',
+            fontSize: 12,
+            panelSpacing: 8,
+            layoutPos: 'normal',
             mouseSpeed: 1.0,
             rotateSpeed: 1.0,
             showStats: true
@@ -598,7 +761,7 @@
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
 
-        // --- SISTEMA DE DESHACER Y REHACER (UNDO / REDO) ---
+        // --- SISTEMA DE DESHACER Y REHACER ---
         let undoStack = [];
         let redoStack = [];
 
@@ -647,7 +810,6 @@
         }
 
         function applyState(state) {
-            // Limpiar escena
             objects.forEach(obj => scene.remove(obj));
             objects = [];
             selectObject(null);
@@ -664,7 +826,7 @@
             updateSceneStats();
         }
 
-        // --- SELECCIÓN Y RAYCASTING ---
+        // --- SELECCION Y RAYCASTING ---
         container.addEventListener('pointerdown', onPointerDown);
         container.addEventListener('dblclick', onDoubleClick);
 
@@ -685,7 +847,6 @@
 
         function onDoubleClick(event) {
             if (isGrabbing) {
-                // Doble clic cancela/fija movimiento libre con tecla G
                 stopGrabMove();
                 return;
             }
@@ -701,7 +862,7 @@
             }
         }
 
-        // --- GESTIÓN DE OBJETOS ---
+        // --- GESTION DE OBJETOS ---
         function addPrimitive(type, recordHistory = true) {
             if (recordHistory) saveState();
             let geometry;
@@ -825,7 +986,7 @@
             stopGrabMove();
         }
 
-        // --- TECLAS Z+2 Y Z+6 DETECCIÓN CONJUNTA ---
+        // --- ATAJOS Y VISUALIZACION Z+2 Y Z+6 ---
         let activeKeys = {};
 
         window.addEventListener('keydown', (e) => {
@@ -833,14 +994,12 @@
 
             activeKeys[e.key.toLowerCase()] = true;
 
-            // F1: Ajustes
             if (e.key === 'F1') {
                 e.preventDefault();
                 openSettings();
                 return;
             }
 
-            // Ctrl+Z / Ctrl+Shift+Z
             if (e.ctrlKey && e.key.toLowerCase() === 'z') {
                 e.preventDefault();
                 if (e.shiftKey) redo();
@@ -848,14 +1007,12 @@
                 return;
             }
 
-            // Detección simultánea Z + 2 y Z + 6
             if (activeKeys['z'] && activeKeys['2']) {
                 setRenderMode('MATERIAL');
             } else if (activeKeys['z'] && activeKeys['6']) {
                 setRenderMode('GRAY');
             }
 
-            // Atajos estándar Blender
             if (!activeKeys['z']) {
                 switch(e.key.toLowerCase()) {
                     case 'g': startGrabMove(); break;
@@ -890,12 +1047,9 @@
             });
         }
 
-        // --- SECCIÓN DE TEXTURAS ---
+        // --- SECCION DE TEXTURAS ---
         function applyTexture(event) {
-            if (!selectedObject) {
-                alert("Selecciona un objeto primero.");
-                return;
-            }
+            if (!selectedObject) return;
             const file = event.target.files[0];
             if (!file) return;
 
@@ -937,10 +1091,9 @@
             }
         }
 
-        // --- SECCIÓN DE MODIFICADORES ---
+        // --- SECCION DE MODIFICADORES ---
         function addModifier() {
             if (!selectedObject) return;
-            const modVal = document.getElementById('modifier-select').value;
             const modName = document.getElementById('modifier-select').options[document.getElementById('modifier-select').selectedIndex].text;
 
             if (!selectedObject.userData.modifiers) selectedObject.userData.modifiers = [];
@@ -950,7 +1103,6 @@
 
         function applyModifier() {
             if (!selectedObject || !selectedObject.userData.modifiers || selectedObject.userData.modifiers.length === 0) return;
-            alert("Modificadores aplicados exitosamente a la geometría.");
             selectedObject.userData.modifiers = [];
             syncModifiersUI();
         }
@@ -964,47 +1116,63 @@
             }
         }
 
-        // --- INFORMACIÓN Y ESTADÍSTICAS EN TIEMPO REAL ---
+        // --- CALCULO EXACTO DE DATOS DE LA ESCENA EN TIEMPO REAL ---
         function updateSceneStats() {
             let totalVerts = 0;
             let totalFaces = 0;
             let totalTris = 0;
+            let totalGeomBytes = 0;
 
             objects.forEach(obj => {
                 if (obj.geometry) {
                     const geom = obj.geometry;
+                    
                     if (geom.isBufferGeometry) {
-                        const pos = geom.attributes.position;
-                        if (pos) totalVerts += pos.count;
+                        const posAttr = geom.attributes.position;
+                        if (posAttr) {
+                            totalVerts += posAttr.count;
+                            totalGeomBytes += posAttr.array.byteLength;
+                        }
+
+                        if (geom.attributes.normal) {
+                            totalGeomBytes += geom.attributes.normal.array.byteLength;
+                        }
+                        if (geom.attributes.uv) {
+                            totalGeomBytes += geom.attributes.uv.array.byteLength;
+                        }
+
                         if (geom.index) {
-                            totalTris += geom.index.count / 3;
-                            totalFaces += geom.index.count / 3;
-                        } else if (pos) {
-                            totalTris += pos.count / 3;
-                            totalFaces += pos.count / 3;
+                            const triCount = geom.index.count / 3;
+                            totalTris += triCount;
+                            totalFaces += triCount;
+                            totalGeomBytes += geom.index.array.byteLength;
+                        } else if (posAttr) {
+                            const triCount = posAttr.count / 3;
+                            totalTris += triCount;
+                            totalFaces += triCount;
                         }
                     }
                 }
             });
 
             document.getElementById('stat-selected').innerText = selectedObject ? selectedObject.name : "Ninguno";
-            document.getElementById('stat-verts').innerText = totalVerts;
-            document.getElementById('stat-faces').innerText = Math.floor(totalFaces);
-            document.getElementById('stat-tris').innerText = Math.floor(totalTris);
+            document.getElementById('stat-verts').innerText = totalVerts.toLocaleString();
+            document.getElementById('stat-faces').innerText = Math.floor(totalFaces).toLocaleString();
+            document.getElementById('stat-tris').innerText = Math.floor(totalTris).toLocaleString();
             document.getElementById('stat-objs').innerText = objects.length;
             
-            // Estimación aproximada de memoria acumulada
-            let memKb = (totalVerts * 32) / 1024;
-            document.getElementById('stat-mem').innerText = memKb.toFixed(1) + " KB";
+            let memKb = totalGeomBytes / 1024;
+            document.getElementById('stat-mem').innerText = memKb.toFixed(2) + " KB";
         }
 
-        // --- MODELADO BÁSICO Y TRANSFORMACIONES ---
+        // --- MODELADO Y TRANSFORMACIONES ---
         function extrudeObject() {
             if (!selectedObject) return;
             saveState();
             selectedObject.scale.y += 0.5;
             selectedObject.position.y += 0.25;
             syncTransformUI();
+            updateSceneStats();
         }
 
         function subdivideObject() {
@@ -1026,6 +1194,7 @@
             selectedObject.scale.x *= 1.05;
             selectedObject.scale.z *= 1.05;
             syncTransformUI();
+            updateSceneStats();
         }
 
         function reducePolygons() {
@@ -1035,7 +1204,7 @@
         }
 
         function joinSelected() {
-            alert("Objetos unidos correctamente.");
+            updateSceneStats();
         }
 
         function deleteSelected() {
@@ -1095,6 +1264,7 @@
                 parseFloat(document.getElementById('scale-y').value),
                 parseFloat(document.getElementById('scale-z').value)
             );
+            updateSceneStats();
         }
 
         function syncMaterialUI() {
@@ -1129,7 +1299,7 @@
             list.innerHTML = "";
             objects.forEach(obj => {
                 const li = document.createElement('li');
-                li.innerHTML = `<span>${obj.geometry ? "📦 " : "💡 "} ${obj.name}</span>`;
+                li.innerHTML = `<span>${obj.name}</span>`;
                 if (obj === selectedObject) li.classList.add('selected');
                 
                 li.onclick = () => selectObject(obj);
@@ -1145,9 +1315,10 @@
             selectedObject.rotation.set(0, 0, 0);
             selectedObject.scale.set(1, 1, 1);
             syncTransformUI();
+            updateSceneStats();
         }
 
-        // --- SISTEMA DE AJUSTES DEL SITIO (F1) ---
+        // --- AJUSTES Y TEMAS ---
         function openSettings() {
             document.getElementById('settings-modal').style.display = 'flex';
         }
@@ -1156,74 +1327,135 @@
             document.getElementById('settings-modal').style.display = 'none';
         }
 
-        function saveSettings() {
+        function liveApplySettings() {
             settings.theme = document.getElementById('setting-theme').value;
+            settings.bgDark = document.getElementById('setting-bg-dark').value;
+            settings.bgPanel = document.getElementById('setting-bg-panel').value;
+            settings.accent = document.getElementById('setting-accent').value;
+            settings.fontSize = parseInt(document.getElementById('setting-font-size').value);
+            settings.panelSpacing = parseInt(document.getElementById('setting-panel-spacing').value);
+            settings.layoutPos = document.getElementById('setting-layout-pos').value;
             settings.mouseSpeed = parseFloat(document.getElementById('setting-mouse-speed').value);
             settings.rotateSpeed = parseFloat(document.getElementById('setting-rotate-speed').value);
             settings.showStats = document.getElementById('setting-show-stats').checked;
 
-            applySettings();
-            localStorage.setItem('krhorkos_settings', JSON.stringify(settings));
-            closeSettings();
-        }
+            document.body.className = "theme-" + settings.theme;
 
-        function restoreDefaultSettings() {
-            settings = {
-                theme: 'dark',
-                mouseSpeed: 1.0,
-                rotateSpeed: 1.0,
-                showStats: true
-            };
-            document.getElementById('setting-theme').value = 'dark';
-            document.getElementById('setting-mouse-speed').value = 1.0;
-            document.getElementById('setting-rotate-speed').value = 1.0;
-            document.getElementById('setting-show-stats').checked = true;
-            applySettings();
-        }
-
-        function applySettings() {
-            if (settings.theme === 'light') {
-                document.body.classList.add('light-theme');
+            if (settings.layoutPos === 'invertido') {
+                document.body.classList.add('layout-invertido');
             } else {
-                document.body.classList.remove('light-theme');
+                document.body.classList.remove('layout-invertido');
             }
+
+            document.documentElement.style.setProperty('--bg-dark', settings.bgDark);
+            document.documentElement.style.setProperty('--bg-panel', settings.bgPanel);
+            document.documentElement.style.setProperty('--accent', settings.accent);
+            document.documentElement.style.setProperty('--font-size-base', settings.fontSize + 'px');
+            document.documentElement.style.setProperty('--panel-spacing', settings.panelSpacing + 'px');
 
             controls.rotateSpeed = settings.rotateSpeed;
             document.getElementById('scene-stats-panel').style.display = settings.showStats ? 'block' : 'none';
         }
 
+        function saveSettings() {
+            liveApplySettings();
+            localStorage.setItem('krhorkos_custom_settings', JSON.stringify(settings));
+            closeSettings();
+        }
+
+        function restoreDefaultSettings() {
+            settings = {
+                theme: 'oscuro',
+                bgDark: '#1d1d1d',
+                bgPanel: '#282828',
+                accent: '#e67e22',
+                fontSize: 12,
+                panelSpacing: 8,
+                layoutPos: 'normal',
+                mouseSpeed: 1.0,
+                rotateSpeed: 1.0,
+                showStats: true
+            };
+            document.getElementById('setting-theme').value = 'oscuro';
+            document.getElementById('setting-bg-dark').value = '#1d1d1d';
+            document.getElementById('setting-bg-panel').value = '#282828';
+            document.getElementById('setting-accent').value = '#e67e22';
+            document.getElementById('setting-font-size').value = 12;
+            document.getElementById('setting-panel-spacing').value = 8;
+            document.getElementById('setting-layout-pos').value = 'normal';
+            document.getElementById('setting-mouse-speed').value = 1.0;
+            document.getElementById('setting-rotate-speed').value = 1.0;
+            document.getElementById('setting-show-stats').checked = true;
+
+            liveApplySettings();
+            saveSettings();
+        }
+
         function loadSavedSettings() {
-            const saved = localStorage.getItem('krhorkos_settings');
+            const saved = localStorage.getItem('krhorkos_custom_settings');
             if (saved) {
                 settings = JSON.parse(saved);
-                document.getElementById('setting-theme').value = settings.theme;
-                document.getElementById('setting-mouse-speed').value = settings.mouseSpeed;
-                document.getElementById('setting-rotate-speed').value = settings.rotateSpeed;
-                document.getElementById('setting-show-stats').checked = settings.showStats;
-                applySettings();
+                document.getElementById('setting-theme').value = settings.theme || 'oscuro';
+                document.getElementById('setting-bg-dark').value = settings.bgDark || '#1d1d1d';
+                document.getElementById('setting-bg-panel').value = settings.bgPanel || '#282828';
+                document.getElementById('setting-accent').value = settings.accent || '#e67e22';
+                document.getElementById('setting-font-size').value = settings.fontSize || 12;
+                document.getElementById('setting-panel-spacing').value = settings.panelSpacing || 8;
+                document.getElementById('setting-layout-pos').value = settings.layoutPos || 'normal';
+                document.getElementById('setting-mouse-speed').value = settings.mouseSpeed || 1.0;
+                document.getElementById('setting-rotate-speed').value = settings.rotateSpeed || 1.0;
+                document.getElementById('setting-show-stats').checked = settings.showStats !== false;
+                liveApplySettings();
             }
         }
 
-        // --- EXPORTACIÓN ---
-        function exportScene() {
-            const format = document.getElementById('export-format').value;
-            let exporter, output, filename = "escena_krhorkos";
+        // --- EXPORTACION CON OPCIONES ---
+        function openExportModal() {
+            document.getElementById('export-modal').style.display = 'flex';
+        }
+
+        function closeExportModal() {
+            document.getElementById('export-modal').style.display = 'none';
+        }
+
+        function executeExport() {
+            const format = document.getElementById('exp-format').value;
+            const onlySelected = document.getElementById('exp-inc-selected').checked;
+
+            // Filtrar SOLO formas geometricas
+            let exportGroup = new THREE.Group();
+            
+            objects.forEach(obj => {
+                if (obj.isMesh && obj.geometry) {
+                    if (!onlySelected || (onlySelected && obj === selectedObject)) {
+                        let cloneMesh = obj.clone();
+                        if (renderMode === 'GRAY') {
+                            cloneMesh.material = obj.userData.materialColor || obj.material;
+                        }
+                        exportGroup.add(cloneMesh);
+                    }
+                }
+            });
+
+            let filename = "escena_geometria_krhorkos";
 
             if (format === 'obj') {
-                exporter = new THREE.OBJExporter();
-                output = exporter.parse(scene);
+                const exporter = new THREE.OBJExporter();
+                const output = exporter.parse(exportGroup);
                 downloadFile(output, filename + ".obj", "text/plain");
             } else if (format === 'stl') {
-                exporter = new THREE.STLExporter();
-                output = exporter.parse(scene, { binary: true });
+                const exporter = new THREE.STLExporter();
+                const output = exporter.parse(exportGroup, { binary: true });
                 downloadFile(output, filename + ".stl", "application/octet-stream");
             } else if (format === 'gltf') {
-                exporter = new THREE.GLTFExporter();
-                exporter.parse(scene, function (gltf) {
+                const exporter = new THREE.GLTFExporter();
+                exporter.parse(exportGroup, function (gltf) {
                     const outputStr = JSON.stringify(gltf, null, 2);
                     downloadFile(outputStr, filename + ".gltf", "application/json");
-                });
+                }, { binary: false });
             }
+
+            closeExportModal();
         }
 
         function downloadFile(content, fileName, contentType) {
@@ -1234,7 +1466,7 @@
             a.click();
         }
 
-        // --- BUCLE DE RENDERIZADO Y RESPONSIVIDAD ---
+        // --- ANIMACION Y RESPONSIVIDAD ---
         function animate() {
             requestAnimationFrame(animate);
             controls.update();
@@ -1247,7 +1479,6 @@
             renderer.setSize(container.clientWidth, container.clientHeight);
         });
 
-        // Inicializar
         loadSavedSettings();
         addPrimitive('cube', false);
         animate();
