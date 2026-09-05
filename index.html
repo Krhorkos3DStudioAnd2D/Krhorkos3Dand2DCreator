@@ -41,12 +41,13 @@
             user-select: none;
         }
 
-        body {
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-dark);
             color: var(--text);
-            height: 100vh;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
             font-size: var(--font-size-base);
@@ -97,6 +98,7 @@
             flex: 1;
             height: calc(100vh - 52px);
             position: relative;
+            width: 100%;
         }
 
         body.layout-invertido #main-layout {
@@ -144,11 +146,15 @@
             flex: 1;
             position: relative;
             background-color: #111;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
         }
 
         #viewport {
             width: 100%;
             height: 100%;
+            display: block;
         }
 
         #viewport-overlay {
@@ -180,7 +186,6 @@
             z-index: 5;
         }
 
-        /* GLOBO DE PERSPECTIVA */
         #gizmo-container {
             position: absolute;
             top: 10px;
@@ -380,7 +385,6 @@
             width: auto;
         }
 
-        /* ACORDEONES MODIFICADORES ORGANIZADOS */
         details {
             background: rgba(0,0,0,0.15);
             border: 1px solid var(--border);
@@ -403,7 +407,6 @@
             gap: 4px;
         }
 
-        /* PANEL LATERAL DE RESOLUCION DE MALLA */
         #mesh-res-panel {
             position: absolute;
             top: 50px;
@@ -684,16 +687,11 @@
                     <select id="setting-language" onchange="changeLanguage(this.value)">
                         <option value="es">Espanol</option>
                         <option value="en">English</option>
-                        <option value="fr">Francais</option>
-                        <option value="de">Deutsch</option>
-                        <option value="it">Italiano</option>
-                        <option value="pt">Portugues</option>
                     </select>
                 </div>
 
                 <div class="modal-section-title" data-i18n="shortcuts_sec">Configuracion de Atajos de Teclado</div>
-                <div id="shortcuts-bindings-list">
-                    </div>
+                <div id="shortcuts-bindings-list"></div>
 
                 <div class="modal-section-title" data-i18n="themes_sec">Temas Predefinidos</div>
                 <div class="input-group">
@@ -765,97 +763,146 @@
     </div>
 
     <script>
-        // --- INICIALIZACION DE LA ESCENA THREE.JS ---
-        const container = document.getElementById('viewport');
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x1e1e1e);
+        let container, scene, camera, renderer, controls, transformControls;
+        let gizmoContainer, gizmoScene, gizmoCamera, gizmoRenderer, gizmoGroup;
+        let objects = [];
+        let selectedObject = null;
+        let objectCount = 0;
+        let renderMode = 'GRAY'; 
+        let defaultGrayMaterial;
+        let raycaster = new THREE.Raycaster();
+        let mouse = new THREE.Vector2();
+        let isGrabbing = false;
+        let plane = new THREE.Plane();
+        let planeIntersect = new THREE.Vector3();
+        let activeKeys = {};
+        let undoStack = [], redoStack = [];
 
-        const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
-        camera.position.set(5, 4, 7);
+        const translations = {
+            es: { engine_mode: "Engine Mode: WebGL / Three.js", donations: "Donaciones", transform: "Transformacion", select: "Seleccionar", move: "Mover (G)", rotate: "Rotar (R)", scale: "Escalar (S)", reset: "Reset Org.", primitives: "Formas Primitivas", cube: "Cubo", sphere: "Esfera", icosphere: "Icosphere", cylinder: "Cilindro", cone: "Cono", torus: "Toro", capsule: "Capsula", plane: "Plano", modeling_tools: "Herramientas de Modelado", extrude: "Extruir / Engrosar (E)", subdivide: "Subdividir Malla", bevel: "Biselar (Bevel)", smooth_shading: "Sombras Suaves", flat_shading: "Sombras Planas", reduce_poly: "Reducir Poligonos", join: "Unir (Ctrl+J)", delete: "Eliminar (Supr)", lighting: "Iluminacion", point_light: "Luz Puntual", sun_light: "Luz Solar", spot_light: "Foco (Spot)", mode: "Modo", object: "Objeto", selection: "Seleccion", vertices: "Vertices totales", faces: "Caras totales", triangles: "Triangulos totales", objects: "Objetos en escena", memory: "Memoria estimada", outliner: "Esquema de la Escena (Outliner)", transform_active: "Transformacion Activa", position: "Posicion", scale_label: "Escala", materials: "Materiales y Sombras", base_color: "Color Base", roughness: "Rugosidad", metalness: "Metalico", emission: "Emision", transparency: "Transparencia", modifiers: "Modificadores de Blender", mod_sec_wrench: "Llave Inglesa - Geometria", mod_sec_windows: "Ventanas - Texturas y UV", mod_sec_fx: "Efectos Especiales", mod_sec_sim: "Simulacion", load_texture: "Cargar imagen", remove_texture: "Quitar textura", blur_option: "Opcion de desenfoque", fx_fire: "Fuego alrededor", fx_smoke: "Humo alrededor", fx_water: "Agua escurriendo", water_drain: "Escurrimiento", add: "Anadir", apply: "Aplicar Modificadores", export: "Exportar Proyecto", export_btn: "Exportar Archivo 3D", status_bar: "Atajos: [G] Mover | [R] Rotar | [S] Escalar | [E] Extruir | [1-6] Vistas | [Ctrl+X] Resolucion | [F1] Ajustes", settings_title: "Ajustes del Sitio Web", language_sec: "Sistema de Idiomas", select_language: "Idioma", shortcuts_sec: "Configuracion de Atajos de Teclado", themes_sec: "Temas Predefinidos", select_theme: "Seleccionar Tema", customization_sec: "Personalizacion Completa", bg_main: "Color Fondo Principal", bg_panels: "Color Fondo Paneles", btn_accent: "Color Botones / Acento", font_size: "Tamano de Letra (px)", panel_spacing: "Espaciado Paneles (px)", toolbar_pos: "Posicion Barras Herramientas", restore: "Restaurar Valores", save: "Guardar Cambios", export_options: "Opciones de Exportacion", format: "Formato de Exportacion", sel_only: "Objetos seleccionados solamente", cancel: "Cancelar", export_geom: "Exportar Geometria", mesh_resolution: "Resolucion de Malla", quality: "Calidad", res_desc: "Ajusta la densidad y vertices de la geometria seleccionada." },
+            en: { engine_mode: "Engine Mode: WebGL / Three.js", donations: "Donations", transform: "Transform", select: "Select", move: "Move (G)", rotate: "Rotate (R)", scale: "Scale (S)", reset: "Reset Org.", primitives: "Primitives", cube: "Cube", sphere: "Sphere", icosphere: "Icosphere", cylinder: "Cylinder", cone: "Cone", torus: "Torus", capsule: "Capsule", plane: "Plane", modeling_tools: "Modeling Tools", extrude: "Extrude (E)", subdivide: "Subdivide Mesh", bevel: "Bevel", smooth_shading: "Smooth Shading", flat_shading: "Flat Shading", reduce_poly: "Reduce Poly", join: "Join (Ctrl+J)", delete: "Delete (Del)", lighting: "Lighting", point_light: "Point Light", sun_light: "Sun Light", spot_light: "Spot Light", mode: "Mode", object: "Object", selection: "Selection", vertices: "Total Vertices", faces: "Total Faces", triangles: "Total Triangles", objects: "Objects in Scene", memory: "Est. Memory", outliner: "Outliner", transform_active: "Active Transform", position: "Position", scale_label: "Scale", materials: "Materials & Shadows", base_color: "Base Color", roughness: "Roughness", metalness: "Metalness", emission: "Emission", transparency: "Transparency", modifiers: "Blender Modifiers", mod_sec_wrench: "Wrench - Geometry", mod_sec_windows: "Windows - Textures & UV", mod_sec_fx: "Special Effects", mod_sec_sim: "Simulation", load_texture: "Load Image", remove_texture: "Remove Texture", blur_option: "Blur Option", fx_fire: "Fire Effect", fx_smoke: "Smoke Effect", fx_water: "Water Flow", water_drain: "Static Drain", add: "Add", apply: "Apply Modifiers", export: "Export Project", export_btn: "Export 3D File", status_bar: "Shortcuts: [G] Move | [R] Rotate | [S] Scale | [E] Extrude | [1-6] Views | [Ctrl+X] Resolution | [F1] Settings", settings_title: "Website Settings", language_sec: "Language System", select_language: "Language", shortcuts_sec: "Keyboard Shortcuts Configuration", themes_sec: "Presets Themes", select_theme: "Select Theme", customization_sec: "Full Customization", bg_main: "Main BG Color", bg_panels: "Panels BG Color", btn_accent: "Buttons/Accent Color", font_size: "Font Size (px)", panel_spacing: "Panel Spacing (px)", toolbar_pos: "Toolbars Position", restore: "Restore Defaults", save: "Save Changes", export_options: "Export Options", format: "Export Format", sel_only: "Selected Objects Only", cancel: "Cancel", export_geom: "Export Geometry", mesh_resolution: "Mesh Resolution", quality: "Quality", res_desc: "Adjusts geometry vertex density." }
+        };
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        container.appendChild(renderer.domElement);
+        let shortcutBindings = {
+            move: ['g'], rotate: ['r'], scale: ['s'], extrude: ['e'], settings: ['f1'], meshRes: ['control', 'x']
+        };
 
-        const gridHelper = new THREE.GridHelper(20, 20, 0x444444, 0x222222);
-        scene.add(gridHelper);
+        let settings = {
+            theme: 'oscuro', bgDark: '#1d1d1d', bgPanel: '#282828', accent: '#e67e22', fontSize: 12, panelSpacing: 8, layoutPos: 'normal'
+        };
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-        scene.add(ambientLight);
-
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        dirLight.position.set(5, 10, 7);
-        dirLight.castShadow = true;
-        scene.add(dirLight);
-
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-
-        const transformControls = new THREE.TransformControls(camera, renderer.domElement);
-        transformControls.size = 0.75;
-        scene.add(transformControls);
-
-        transformControls.addEventListener('dragging-changed', function (event) {
-            controls.enabled = !event.value;
-            if(!event.value) saveState();
+        window.addEventListener('load', () => {
+            initEngine();
+            onWindowResize();
+            addPrimitive('cube', false);
+            animate();
         });
 
-        transformControls.addEventListener('change', function () {
-            if (selectedObject) syncTransformUI();
-        });
+        function initEngine() {
+            container = document.getElementById('viewport');
+            
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1e1e1e);
 
-        // --- GLOBO DE PERSPECTIVA (GIZMO) ---
-        const gizmoContainer = document.getElementById('gizmo-container');
-        const gizmoScene = new THREE.Scene();
-        const gizmoCamera = new THREE.OrthographicCamera(-2, 2, 2, -2, 0.1, 10);
-        gizmoCamera.position.set(0, 0, 5);
-        const gizmoRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        gizmoRenderer.setSize(100, 100);
-        gizmoContainer.appendChild(gizmoRenderer.domElement);
+            let w = container.clientWidth || 100;
+            let h = container.clientHeight || 100;
 
-        const gizmoGroup = new THREE.Group();
-        gizmoScene.add(gizmoGroup);
+            camera = new THREE.PerspectiveCamera(60, w / h, 0.1, 1000);
+            camera.position.set(5, 4, 7);
 
-        const axes = [
-            { dir: new THREE.Vector3(1, 0, 0), color: 0xff0000, label: 'X+' },
-            { dir: new THREE.Vector3(-1, 0, 0), color: 0x880000, label: 'X-' },
-            { dir: new THREE.Vector3(0, 1, 0), color: 0x00ff00, label: 'Y+' },
-            { dir: new THREE.Vector3(0, -1, 0), color: 0x008800, label: 'Y-' },
-            { dir: new THREE.Vector3(0, 0, 1), color: 0x0000ff, label: 'Z+' },
-            { dir: new THREE.Vector3(0, 0, -1), color: 0x000088, label: 'Z-' }
-        ];
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(w, h);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
 
-        axes.forEach(axis => {
-            const sphereGeo = new THREE.SphereGeometry(0.25, 16, 16);
-            const sphereMat = new THREE.MeshBasicMaterial({ color: axis.color });
-            const sphere = new THREE.Mesh(sphereGeo, sphereMat);
-            sphere.position.copy(axis.dir.clone().multiplyScalar(1.2));
-            sphere.userData = { axis: axis.label };
-            gizmoGroup.add(sphere);
-        });
+            const gridHelper = new THREE.GridHelper(20, 20, 0x444444, 0x222222);
+            scene.add(gridHelper);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(5, 10, 7);
+            dirLight.castShadow = true;
+            scene.add(dirLight);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+
+            transformControls = new THREE.TransformControls(camera, renderer.domElement);
+            transformControls.size = 0.75;
+            scene.add(transformControls);
+
+            transformControls.addEventListener('dragging-changed', function (event) {
+                controls.enabled = !event.value;
+                if(!event.value) saveState();
+            });
+
+            transformControls.addEventListener('change', function () {
+                if (selectedObject) syncTransformUI();
+            });
+
+            defaultGrayMaterial = new THREE.MeshStandardMaterial({
+                color: 0x909090, roughness: 0.5, metalness: 0.1, flatShading: false
+            });
+
+            initGizmo();
+            container.addEventListener('pointerdown', onPointerDown);
+        }
+
+        function initGizmo() {
+            gizmoContainer = document.getElementById('gizmo-container');
+            gizmoScene = new THREE.Scene();
+            gizmoCamera = new THREE.OrthographicCamera(-2, 2, 2, -2, 0.1, 10);
+            gizmoCamera.position.set(0, 0, 5);
+            gizmoRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            gizmoRenderer.setSize(100, 100);
+            gizmoContainer.appendChild(gizmoRenderer.domElement);
+
+            gizmoGroup = new THREE.Group();
+            gizmoScene.add(gizmoGroup);
+
+            const axes = [
+                { dir: new THREE.Vector3(1, 0, 0), color: 0xff0000, label: 'X+' },
+                { dir: new THREE.Vector3(-1, 0, 0), color: 0x880000, label: 'X-' },
+                { dir: new THREE.Vector3(0, 1, 0), color: 0x00ff00, label: 'Y+' },
+                { dir: new THREE.Vector3(0, -1, 0), color: 0x008800, label: 'Y-' },
+                { dir: new THREE.Vector3(0, 0, 1), color: 0x0000ff, label: 'Z+' },
+                { dir: new THREE.Vector3(0, 0, -1), color: 0x000088, label: 'Z-' }
+            ];
+
+            axes.forEach(axis => {
+                const sphereGeo = new THREE.SphereGeometry(0.25, 16, 16);
+                const sphereMat = new THREE.MeshBasicMaterial({ color: axis.color });
+                const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+                sphere.position.copy(axis.dir.clone().multiplyScalar(1.2));
+                sphere.userData = { axis: axis.label };
+                gizmoGroup.add(sphere);
+            });
+
+            gizmoContainer.addEventListener('click', (e) => {
+                const rect = gizmoRenderer.domElement.getBoundingClientRect();
+                const gMouse = new THREE.Vector2(
+                    ((e.clientX - rect.left) / 100) * 2 - 1,
+                    -((e.clientY - rect.top) / 100) * 2 + 1
+                );
+                const gRaycaster = new THREE.Raycaster();
+                gRaycaster.setFromCamera(gMouse, gizmoCamera);
+                const intersects = gRaycaster.intersectObjects(gizmoGroup.children);
+                if (intersects.length > 0) {
+                    setStandardView(intersects[0].object.userData.axis);
+                }
+            });
+        }
 
         function updateGizmo() {
+            if (!gizmoGroup || !camera) return;
             gizmoGroup.quaternion.copy(camera.quaternion).invert();
             gizmoRenderer.render(gizmoScene, gizmoCamera);
         }
-
-        gizmoContainer.addEventListener('click', (e) => {
-            const rect = gizmoRenderer.domElement.getBoundingClientRect();
-            const gMouse = new THREE.Vector2(
-                ((e.clientX - rect.left) / 100) * 2 - 1,
-                -((e.clientY - rect.top) / 100) * 2 + 1
-            );
-            const gRaycaster = new THREE.Raycaster();
-            gRaycaster.setFromCamera(gMouse, gizmoCamera);
-            const intersects = gRaycaster.intersectObjects(gizmoGroup.children);
-            if (intersects.length > 0) {
-                const label = intersects[0].object.userData.axis;
-                setStandardView(label);
-            }
-        });
 
         function setStandardView(view) {
             const dist = camera.position.distanceTo(controls.target);
@@ -871,32 +918,13 @@
             controls.update();
         }
 
-        // --- TRADUCCIONES Y SISTEMA DE IDIOMAS ---
-        const translations = {
-            es: { engine_mode: "Engine Mode: WebGL / Three.js", donations: "Donaciones", transform: "Transformacion", select: "Seleccionar", move: "Mover (G)", rotate: "Rotar (R)", scale: "Escalar (S)", reset: "Reset Org.", primitives: "Formas Primitivas", cube: "Cubo", sphere: "Esfera", icosphere: "Icosphere", cylinder: "Cilindro", cone: "Cono", torus: "Toro", capsule: "Capsula", plane: "Plano", modeling_tools: "Herramientas de Modelado", extrude: "Extruir / Engrosar (E)", subdivide: "Subdividir Malla", bevel: "Biselar (Bevel)", smooth_shading: "Sombras Suaves", flat_shading: "Sombras Planas", reduce_poly: "Reducir Poligonos", join: "Unir (Ctrl+J)", delete: "Eliminar (Supr)", lighting: "Iluminacion", point_light: "Luz Puntual", sun_light: "Luz Solar", spot_light: "Foco (Spot)", mode: "Modo", object: "Objeto", selection: "Seleccion", vertices: "Vertices totales", faces: "Caras totales", triangles: "Triangulos totales", objects: "Objetos en escena", memory: "Memoria estimada", outliner: "Esquema de la Escena (Outliner)", transform_active: "Transformacion Activa", position: "Posicion", scale_label: "Escala", materials: "Materiales y Sombras", base_color: "Color Base", roughness: "Rugosidad", metalness: "Metalico", emission: "Emision", transparency: "Transparencia", modifiers: "Modificadores de Blender", mod_sec_wrench: "Llave Inglesa - Geometria", mod_sec_windows: "Ventanas - Texturas y UV", mod_sec_fx: "Efectos Especiales", mod_sec_sim: "Simulacion", load_texture: "Cargar imagen", remove_texture: "Quitar textura", blur_option: "Opcion de desenfoque", fx_fire: "Fuego alrededor", fx_smoke: "Humo alrededor", fx_water: "Agua escurriendo", water_drain: "Escurrimiento", add: "Anadir", apply: "Aplicar Modificadores", export: "Exportar Proyecto", export_btn: "Exportar Archivo 3D", status_bar: "Atajos: [G] Mover | [R] Rotar | [S] Escalar | [E] Extruir | [1-6] Vistas | [Ctrl+X] Resolucion | [F1] Ajustes", settings_title: "Ajustes del Sitio Web", language_sec: "Sistema de Idiomas", select_language: "Idioma", shortcuts_sec: "Configuracion de Atajos de Teclado", themes_sec: "Temas Predefinidos", select_theme: "Seleccionar Tema", customization_sec: "Personalizacion Completa", bg_main: "Color Fondo Principal", bg_panels: "Color Fondo Paneles", btn_accent: "Color Botones / Acento", font_size: "Tamano de Letra (px)", panel_spacing: "Espaciado Paneles (px)", toolbar_pos: "Posicion Barras Herramientas", restore: "Restaurar Valores", save: "Guardar Cambios", export_options: "Opciones de Exportacion", format: "Formato de Exportacion", sel_only: "Objetos seleccionados solamente", cancel: "Cancelar", export_geom: "Exportar Geometria", mesh_resolution: "Resolucion de Malla", quality: "Calidad", res_desc: "Ajusta la densidad y vertices de la geometria seleccionada." },
-            en: { engine_mode: "Engine Mode: WebGL / Three.js", donations: "Donations", transform: "Transform", select: "Select", move: "Move (G)", rotate: "Rotate (R)", scale: "Scale (S)", reset: "Reset Org.", primitives: "Primitives", cube: "Cube", sphere: "Sphere", icosphere: "Icosphere", cylinder: "Cylinder", cone: "Cone", torus: "Torus", capsule: "Capsule", plane: "Plane", modeling_tools: "Modeling Tools", extrude: "Extrude (E)", subdivide: "Subdivide Mesh", bevel: "Bevel", smooth_shading: "Smooth Shading", flat_shading: "Flat Shading", reduce_poly: "Reduce Poly", join: "Join (Ctrl+J)", delete: "Delete (Del)", lighting: "Lighting", point_light: "Point Light", sun_light: "Sun Light", spot_light: "Spot Light", mode: "Mode", object: "Object", selection: "Selection", vertices: "Total Vertices", faces: "Total Faces", triangles: "Total Triangles", objects: "Objects in Scene", memory: "Est. Memory", outliner: "Outliner", transform_active: "Active Transform", position: "Position", scale_label: "Scale", materials: "Materials & Shadows", base_color: "Base Color", roughness: "Roughness", metalness: "Metalness", emission: "Emission", transparency: "Transparency", modifiers: "Blender Modifiers", mod_sec_wrench: "Wrench - Geometry", mod_sec_windows: "Windows - Textures & UV", mod_sec_fx: "Special Effects", mod_sec_sim: "Simulation", load_texture: "Load Image", remove_texture: "Remove Texture", blur_option: "Blur Option", fx_fire: "Fire Effect", fx_smoke: "Smoke Effect", fx_water: "Water Flow", water_drain: "Static Drain", add: "Add", apply: "Apply Modifiers", export: "Export Project", export_btn: "Export 3D File", status_bar: "Shortcuts: [G] Move | [R] Rotate | [S] Scale | [E] Extrude | [1-6] Views | [Ctrl+X] Resolution | [F1] Settings", settings_title: "Website Settings", language_sec: "Language System", select_language: "Language", shortcuts_sec: "Keyboard Shortcuts Configuration", themes_sec: "Presets Themes", select_theme: "Select Theme", customization_sec: "Full Customization", bg_main: "Main BG Color", bg_panels: "Panels BG Color", btn_accent: "Buttons/Accent Color", font_size: "Font Size (px)", panel_spacing: "Panel Spacing (px)", toolbar_pos: "Toolbars Position", restore: "Restore Defaults", save: "Save Changes", export_options: "Export Options", format: "Export Format", sel_only: "Selected Objects Only", cancel: "Cancel", export_geom: "Export Geometry", mesh_resolution: "Mesh Resolution", quality: "Quality", res_desc: "Adjusts geometry vertex density." }
-        };
-
-        let currentLang = 'es';
-
         function changeLanguage(lang) {
-            currentLang = lang;
             const dict = translations[lang] || translations['es'];
             document.querySelectorAll('[data-i18n]').forEach(elem => {
                 const key = elem.getAttribute('data-i18n');
                 if (dict[key]) elem.innerText = dict[key];
             });
         }
-
-        // --- ATAJOS DE TECLADO CONFIGURABLES ---
-        let shortcutBindings = {
-            move: ['g'],
-            rotate: ['r'],
-            scale: ['s'],
-            extrude: ['e'],
-            settings: ['f1'],
-            meshRes: ['control', 'x']
-        };
 
         function renderShortcutsUI() {
             const list = document.getElementById('shortcuts-bindings-list');
@@ -911,40 +939,8 @@
         }
 
         function updateShortcut(action, value) {
-            const keys = value.toLowerCase().split('+').map(k => k.trim()).slice(0, 4);
-            shortcutBindings[action] = keys;
+            shortcutBindings[action] = value.toLowerCase().split('+').map(k => k.trim()).slice(0, 4);
         }
-
-        // --- ESTADO Y VARIABLES GLOBALES ---
-        let objects = [];
-        let selectedObject = null;
-        let objectCount = 0;
-        let renderMode = 'GRAY'; 
-        let settings = {
-            theme: 'oscuro',
-            bgDark: '#1d1d1d',
-            bgPanel: '#282828',
-            accent: '#e67e22',
-            fontSize: 12,
-            panelSpacing: 8,
-            layoutPos: 'normal',
-            mouseSpeed: 1.0,
-            rotateSpeed: 1.0,
-            showStats: true
-        };
-
-        const defaultGrayMaterial = new THREE.MeshStandardMaterial({
-            color: 0x909090,
-            roughness: 0.5,
-            metalness: 0.1,
-            flatShading: false
-        });
-
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-
-        let undoStack = [];
-        let redoStack = [];
 
         function saveState() {
             const state = objects.map(obj => ({
@@ -961,15 +957,13 @@
         function undo() {
             if (undoStack.length === 0) return;
             redoStack.push(getCurrentStateString());
-            let state = JSON.parse(undoStack.pop());
-            applyState(state);
+            applyState(JSON.parse(undoStack.pop()));
         }
 
         function redo() {
             if (redoStack.length === 0) return;
             undoStack.push(getCurrentStateString());
-            let state = JSON.parse(redoStack.pop());
-            applyState(state);
+            applyState(JSON.parse(redoStack.pop()));
         }
 
         function getCurrentStateString() {
@@ -999,15 +993,8 @@
             updateSceneStats();
         }
 
-        // --- SELECCION Y CLICK HANDLER ---
-        container.addEventListener('pointerdown', onPointerDown);
-
         function onPointerDown(event) {
-            if (isGrabbing) {
-                stopGrabMove();
-                return;
-            }
-
+            if (isGrabbing) { stopGrabMove(); return; }
             if (transformControls.dragging) return;
 
             const rect = renderer.domElement.getBoundingClientRect();
@@ -1017,19 +1004,15 @@
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(objects, true);
 
-            if (intersects.length > 0) {
-                selectObject(intersects[0].object);
-            }
+            if (intersects.length > 0) selectObject(intersects[0].object);
         }
 
-        // --- GESTION DE OBJETOS ---
         function addPrimitive(type, recordHistory = true) {
             if (recordHistory) saveState();
             let geometry;
             objectCount++;
             let name = type.charAt(0).toUpperCase() + type.slice(1) + "_" + objectCount;
 
-            // CUBO POR DEFECTO RIGUROSO: 8 VERTICES, 6 CARAS, 12 TRIANGULOS
             switch(type) {
                 case 'cube': geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5, 1, 1, 1); break;
                 case 'sphere': geometry = new THREE.SphereGeometry(1, 16, 12); break;
@@ -1041,19 +1024,14 @@
                 case 'plane': geometry = new THREE.PlaneGeometry(2, 2, 1, 1); break;
             }
 
-            const customMat = new THREE.MeshStandardMaterial({
-                color: 0xaaaaaa,
-                roughness: 0.4,
-                metalness: 0.2
-            });
-
+            const customMat = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, roughness: 0.4, metalness: 0.2 });
             const mesh = new THREE.Mesh(geometry, renderMode === 'GRAY' ? defaultGrayMaterial.clone() : customMat);
             mesh.userData.materialColor = customMat;
             mesh.userData.primitiveType = type;
             mesh.userData.modifiers = [];
             mesh.userData.fx = {};
             mesh.name = name;
-            mesh.position.y = 1;
+            mesh.position.y = 0.75;
             mesh.castShadow = true;
             mesh.receiveShadow = true;
 
@@ -1083,30 +1061,16 @@
         }
 
         function setTransformMode(mode) {
-            if (mode === 'select') {
-                transformControls.detach();
-            } else {
+            if (mode === 'select') transformControls.detach();
+            else {
                 if (selectedObject) transformControls.attach(selectedObject);
                 transformControls.setMode(mode);
             }
             document.querySelectorAll('#tools-panel button').forEach(b => b.classList.remove('active'));
-            if(document.getElementById('btn-' + mode)) {
-                document.getElementById('btn-' + mode).classList.add('active');
-            }
+            if(document.getElementById('btn-' + mode)) document.getElementById('btn-' + mode).classList.add('active');
         }
 
-        // --- COMPORTAMIENTO DE MOVIMIENTO TECLA G ---
-        let isGrabbing = false;
-        const plane = new THREE.Plane();
-        const planeIntersect = new THREE.Vector3();
-
-        function toggleGrabMove() {
-            if (isGrabbing) {
-                stopGrabMove();
-            } else {
-                startGrabMove();
-            }
-        }
+        function toggleGrabMove() { if (isGrabbing) stopGrabMove(); else startGrabMove(); }
 
         function startGrabMove() {
             if (!selectedObject) return;
@@ -1137,37 +1101,19 @@
             saveState();
         }
 
-        // --- MANEJO DE TECLAS Y TECLAS RAPIDAS (1-6) ---
-        let activeKeys = {};
-
         window.addEventListener('keydown', (e) => {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
 
             const key = e.key.toLowerCase();
             activeKeys[key] = true;
 
-            // Vistas fijas 1 a 6
-            if (['1','2','3','4','5','6'].includes(key)) {
-                setStandardView(key);
-                return;
-            }
-
-            if (checkShortcut('meshRes')) {
-                e.preventDefault();
-                toggleMeshResPanel();
-                return;
-            }
-
-            if (checkShortcut('settings')) {
-                e.preventDefault();
-                openSettings();
-                return;
-            }
+            if (['1','2','3','4','5','6'].includes(key)) { setStandardView(key); return; }
+            if (checkShortcut('meshRes')) { e.preventDefault(); toggleMeshResPanel(); return; }
+            if (checkShortcut('settings')) { e.preventDefault(); openSettings(); return; }
 
             if (e.ctrlKey && key === 'z') {
                 e.preventDefault();
-                if (e.shiftKey) redo();
-                else undo();
+                if (e.shiftKey) redo(); else undo();
                 return;
             }
 
@@ -1183,17 +1129,12 @@
             }
         });
 
-        window.addEventListener('keyup', (e) => {
-            delete activeKeys[e.key.toLowerCase()];
-        });
+        window.addEventListener('keyup', (e) => { delete activeKeys[e.key.toLowerCase()]; });
 
         function checkShortcut(action) {
             const keys = shortcutBindings[action];
             if (!keys) return false;
-            return keys.every(k => {
-                if (k === 'control' || k === 'ctrl') return activeKeys['control'] || activeKeys['ctrl'] || event.ctrlKey;
-                return activeKeys[k];
-            });
+            return keys.every(k => (k === 'control' || k === 'ctrl') ? (activeKeys['control'] || activeKeys['ctrl'] || event.ctrlKey) : activeKeys[k]);
         }
 
         function setRenderMode(mode) {
@@ -1213,7 +1154,6 @@
             });
         }
 
-        // --- EFECTOS ESPECIALES Y SUBDIVISIÓN SUPERFICIE ---
         function addSelectedModifier(selectId) {
             if (!selectedObject) return;
             const select = document.getElementById(selectId);
@@ -1223,7 +1163,6 @@
             if (!selectedObject.userData.modifiers) selectedObject.userData.modifiers = [];
             selectedObject.userData.modifiers.push(text);
 
-            // COMPORTAMIENTO SUBDIVIDIR SUPERFICIE SOBRE CUBO
             if (val === 'subsurf' && selectedObject.userData.primitiveType === 'cube') {
                 selectedObject.geometry.dispose();
                 selectedObject.geometry = new THREE.SphereGeometry(1, 16, 16);
@@ -1272,7 +1211,6 @@
             }
         }
 
-        // --- PANEL DE RESOLUCION DE MALLA (CTRL + X) ---
         function toggleMeshResPanel() {
             const p = document.getElementById('mesh-res-panel');
             p.style.display = p.style.display === 'none' || p.style.display === '' ? 'block' : 'none';
@@ -1293,7 +1231,6 @@
             updateSceneStats();
         }
 
-        // --- TEXTURAS & MATERIALES ---
         function applyTexture(event) {
             if (!selectedObject) return;
             const file = event.target.files[0];
@@ -1302,8 +1239,7 @@
             const reader = new FileReader();
             reader.onload = function (e) {
                 const imgUrl = e.target.result;
-                const textureLoader = new THREE.TextureLoader();
-                textureLoader.load(imgUrl, function (texture) {
+                new THREE.TextureLoader().load(imgUrl, function (texture) {
                     const targetMat = selectedObject.userData.materialColor || selectedObject.material;
                     targetMat.map = texture;
                     targetMat.needsUpdate = true;
@@ -1345,39 +1281,30 @@
 
         function syncModifiersUI() {
             const elem = document.getElementById('active-modifiers');
-            if (selectedObject && selectedObject.userData.modifiers && selectedObject.userData.modifiers.length > 0) {
-                elem.innerText = "Modificadores activos: " + selectedObject.userData.modifiers.join(', ');
-            } else {
-                elem.innerText = "Modificadores activos: Ninguno";
-            }
+            elem.innerText = (selectedObject && selectedObject.userData.modifiers && selectedObject.userData.modifiers.length > 0)
+                ? "Modificadores activos: " + selectedObject.userData.modifiers.join(', ')
+                : "Modificadores activos: Ninguno";
         }
 
-        // --- CALCULO EXACTO DE DATOS EN TIEMPO REAL ---
         function updateSceneStats() {
-            let totalVerts = 0;
-            let totalFaces = 0;
-            let totalTris = 0;
-            let totalGeomBytes = 0;
+            let totalVerts = 0, totalFaces = 0, totalTris = 0, totalGeomBytes = 0;
 
             objects.forEach(obj => {
-                if (obj.geometry) {
-                    const geom = obj.geometry;
-                    if (geom.isBufferGeometry) {
-                        const posAttr = geom.attributes.position;
-                        if (posAttr) {
-                            totalVerts += posAttr.count;
-                            totalGeomBytes += posAttr.array.byteLength;
-                        }
-                        if (geom.index) {
-                            const triCount = geom.index.count / 3;
-                            totalTris += triCount;
-                            totalFaces += triCount;
-                            totalGeomBytes += geom.index.array.byteLength;
-                        } else if (posAttr) {
-                            const triCount = posAttr.count / 3;
-                            totalTris += triCount;
-                            totalFaces += triCount;
-                        }
+                if (obj.geometry && obj.geometry.isBufferGeometry) {
+                    const posAttr = obj.geometry.attributes.position;
+                    if (posAttr) {
+                        totalVerts += posAttr.count;
+                        totalGeomBytes += posAttr.array.byteLength;
+                    }
+                    if (obj.geometry.index) {
+                        const triCount = obj.geometry.index.count / 3;
+                        totalTris += triCount;
+                        totalFaces += triCount;
+                        totalGeomBytes += obj.geometry.index.array.byteLength;
+                    } else if (posAttr) {
+                        const triCount = posAttr.count / 3;
+                        totalTris += triCount;
+                        totalFaces += triCount;
                     }
                 }
             });
@@ -1513,7 +1440,7 @@
         function resetTransforms() {
             if (!selectedObject) return;
             saveState();
-            selectedObject.position.set(0, 1, 0);
+            selectedObject.position.set(0, 0.75, 0);
             selectedObject.rotation.set(0, 0, 0);
             selectedObject.scale.set(1, 1, 1);
             syncTransformUI();
@@ -1525,9 +1452,7 @@
             document.getElementById('settings-modal').style.display = 'flex';
         }
 
-        function closeSettings() {
-            document.getElementById('settings-modal').style.display = 'none';
-        }
+        function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
 
         function liveApplySettings() {
             settings.theme = document.getElementById('setting-theme').value;
@@ -1566,7 +1491,6 @@
             saveSettings();
         }
 
-        // --- EXPORTACION EXCLUSIVA DE GEOMETRIA ---
         function openExportModal() { document.getElementById('export-modal').style.display = 'flex'; }
         function closeExportModal() { document.getElementById('export-modal').style.display = 'none'; }
 
@@ -1590,14 +1514,11 @@
             let filename = "geometria_krhorkos";
 
             if (format === 'obj') {
-                const exporter = new THREE.OBJExporter();
-                downloadFile(exporter.parse(exportGroup), filename + ".obj", "text/plain");
+                downloadFile(new THREE.OBJExporter().parse(exportGroup), filename + ".obj", "text/plain");
             } else if (format === 'stl') {
-                const exporter = new THREE.STLExporter();
-                downloadFile(exporter.parse(exportGroup, { binary: true }), filename + ".stl", "application/octet-stream");
+                downloadFile(new THREE.STLExporter().parse(exportGroup, { binary: true }), filename + ".stl", "application/octet-stream");
             } else if (format === 'gltf') {
-                const exporter = new THREE.GLTFExporter();
-                exporter.parse(exportGroup, function (gltf) {
+                new THREE.GLTFExporter().parse(exportGroup, function (gltf) {
                     downloadFile(JSON.stringify(gltf, null, 2), filename + ".gltf", "application/json");
                 }, { binary: false });
             }
@@ -1607,36 +1528,38 @@
 
         function downloadFile(content, fileName, contentType) {
             const a = document.createElement("a");
-            const file = new Blob([content], { type: contentType });
-            a.href = URL.createObjectURL(file);
+            a.href = URL.createObjectURL(new Blob([content], { type: contentType }));
             a.download = fileName;
             a.click();
         }
 
-        // --- BUCLE DE ANIMACION ---
         function animate() {
             requestAnimationFrame(animate);
 
-            // Animacion continua de agua si no esta activo el modo escurrimiento estatico
             objects.forEach(obj => {
                 if (obj.userData.fx && obj.userData.fx.water && !obj.userData.waterDrain) {
                     obj.userData.fx.water.rotation.y += 0.02;
                 }
             });
 
-            controls.update();
+            if (controls) controls.update();
             updateGizmo();
-            renderer.render(scene, camera);
+            if (renderer && scene && camera) renderer.render(scene, camera);
         }
 
-        window.addEventListener('resize', () => {
-            camera.aspect = container.clientWidth / container.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
-        });
+        function onWindowResize() {
+            if (!container || !renderer || !camera) return;
+            const width = container.clientWidth;
+            const height = container.clientHeight;
 
-        addPrimitive('cube', false);
-        animate();
+            if (width > 0 && height > 0) {
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+                renderer.setSize(width, height);
+            }
+        }
+
+        window.addEventListener('resize', onWindowResize);
     </script>
 </body>
 </html>
