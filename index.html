@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Krhorkos3DCreator v1.0</title>
+    <title>Krhorkos3Dand2DCreator v1.0</title>
     <style>
         :root {
             --bg-dark: #1d1d1d;
@@ -18,6 +18,7 @@
             --panel-spacing: 8px;
         }
 
+        /* TEMAS PREDEFINIDOS */
         body.theme-oscuro {
             --bg-dark: #1d1d1d; --bg-panel: #282828; --bg-header: #181818; --accent: #e67e22; --accent-hover: #d35400; --text: #cccccc; --text-bright: #ffffff; --border: #383838;
         }
@@ -41,13 +42,12 @@
             user-select: none;
         }
 
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+        body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-dark);
             color: var(--text);
+            height: 100vh;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             font-size: var(--font-size-base);
@@ -77,6 +77,7 @@
             gap: 10px;
         }
 
+        /* BOTON DONACIONES */
         .btn-donate {
             background-color: #27ae60;
             color: #ffffff;
@@ -98,7 +99,6 @@
             flex: 1;
             height: calc(100vh - 52px);
             position: relative;
-            width: 100%;
         }
 
         body.layout-invertido #main-layout {
@@ -146,15 +146,11 @@
             flex: 1;
             position: relative;
             background-color: #111;
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
         }
 
         #viewport {
             width: 100%;
             height: 100%;
-            display: block;
         }
 
         #viewport-overlay {
@@ -184,16 +180,6 @@
             pointer-events: none;
             line-height: 1.4;
             z-index: 5;
-        }
-
-        #gizmo-container {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 100px;
-            height: 100px;
-            z-index: 10;
-            cursor: pointer;
         }
 
         #properties-panel {
@@ -322,7 +308,7 @@
         .modal-content {
             background-color: var(--bg-panel);
             border: 1px solid var(--border);
-            width: 480px;
+            width: 460px;
             max-height: 90vh;
             overflow-y: auto;
             border-radius: 6px;
@@ -384,42 +370,6 @@
         .checkbox-group input {
             width: auto;
         }
-
-        details {
-            background: rgba(0,0,0,0.15);
-            border: 1px solid var(--border);
-            border-radius: 3px;
-            margin-bottom: 5px;
-            padding: 4px;
-        }
-        summary {
-            font-weight: bold;
-            cursor: pointer;
-            padding: 3px;
-            color: var(--text-bright);
-            font-size: 11px;
-            outline: none;
-        }
-        details .mod-content {
-            padding: 5px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        #mesh-res-panel {
-            position: absolute;
-            top: 50px;
-            right: 10px;
-            width: 220px;
-            background: rgba(30,30,30,0.95);
-            border: 1px solid var(--border);
-            border-radius: 5px;
-            padding: 10px;
-            display: none;
-            z-index: 20;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -434,105 +384,94 @@
     <header>
         <div class="logo">Krhorkos3Dand2DCreator v1.0</div>
         <div class="header-controls">
-            <span data-i18n="engine_mode">Engine Mode: WebGL / Three.js</span>
-            <a href="https://paypal.com" target="_blank" class="btn-donate" data-i18n="donations">Donaciones</a>
+            <span>Engine Mode: WebGL / Three.js</span>
+            <a href="https://paypal.com" target="_blank" class="btn-donate">Donaciones</a>
         </div>
     </header>
 
     <div id="main-layout">
         <div id="tools-panel" class="panel">
-            <div class="panel-title" data-i18n="transform">Transformacion</div>
+            <div class="panel-title">Transformacion</div>
             <div class="panel-section">
-                <button id="btn-select" onclick="setTransformMode('select')" data-i18n="select">Seleccionar</button>
+                <button id="btn-select" onclick="setTransformMode('select')">Seleccionar</button>
                 <div class="btn-grid">
-                    <button id="btn-translate" onclick="setTransformMode('translate')" data-i18n="move">Mover (G)</button>
-                    <button id="btn-rotate" onclick="setTransformMode('rotate')" data-i18n="rotate">Rotar (R)</button>
-                    <button id="btn-scale" onclick="setTransformMode('scale')" data-i18n="scale">Escalar (S)</button>
-                    <button onclick="resetTransforms()" data-i18n="reset">Reset Org.</button>
+                    <button id="btn-translate" onclick="setTransformMode('translate')">Mover (G)</button>
+                    <button id="btn-rotate" onclick="setTransformMode('rotate')">Rotar (R)</button>
+                    <button id="btn-scale" onclick="setTransformMode('scale')">Escalar (S)</button>
+                    <button onclick="resetTransforms()">Reset Org.</button>
                 </div>
             </div>
 
-            <div class="panel-title" data-i18n="primitives">Formas Primitivas</div>
+            <div class="panel-title">Formas Primitivas</div>
             <div class="panel-section">
                 <div class="btn-grid">
-                    <button onclick="addPrimitive('cube')" data-i18n="cube">Cubo</button>
-                    <button onclick="addPrimitive('sphere')" data-i18n="sphere">Esfera</button>
-                    <button onclick="addPrimitive('icosphere')" data-i18n="icosphere">Icosphere</button>
-                    <button onclick="addPrimitive('cylinder')" data-i18n="cylinder">Cilindro</button>
-                    <button onclick="addPrimitive('cone')" data-i18n="cone">Cono</button>
-                    <button onclick="addPrimitive('torus')" data-i18n="torus">Toro</button>
-                    <button onclick="addPrimitive('capsule')" data-i18n="capsule">Capsula</button>
-                    <button onclick="addPrimitive('plane')" data-i18n="plane">Plano</button>
+                    <button onclick="addPrimitive('cube')">Cubo</button>
+                    <button onclick="addPrimitive('sphere')">Esfera</button>
+                    <button onclick="addPrimitive('icosphere')">Icosphere</button>
+                    <button onclick="addPrimitive('cylinder')">Cilindro</button>
+                    <button onclick="addPrimitive('cone')">Cono</button>
+                    <button onclick="addPrimitive('torus')">Toro</button>
+                    <button onclick="addPrimitive('capsule')">Capsula</button>
+                    <button onclick="addPrimitive('plane')">Plano</button>
                 </div>
             </div>
 
-            <div class="panel-title" data-i18n="modeling_tools">Herramientas de Modelado</div>
+            <div class="panel-title">Herramientas de Modelado</div>
             <div class="panel-section">
-                <button onclick="extrudeObject()" data-i18n="extrude">Extruir / Engrosar (E)</button>
-                <button onclick="subdivideObject()" data-i18n="subdivide">Subdividir Malla</button>
-                <button onclick="bevelObject()" data-i18n="bevel">Biselar (Bevel)</button>
-                <button onclick="smoothShading(true)" data-i18n="smooth_shading">Sombras Suaves</button>
-                <button onclick="smoothShading(false)" data-i18n="flat_shading">Sombras Planas</button>
-                <button onclick="reducePolygons()" data-i18n="reduce_poly">Reducir Poligonos</button>
-                <button onclick="joinSelected()" data-i18n="join">Unir (Ctrl+J)</button>
-                <button onclick="deleteSelected()" data-i18n="delete">Eliminar (Supr)</button>
+                <button onclick="extrudeObject()">Extruir / Engrosar (E)</button>
+                <button onclick="subdivideObject()">Subdividir Malla</button>
+                <button onclick="bevelObject()">Biselar (Bevel)</button>
+                <button onclick="smoothShading(true)">Sombras Suaves</button>
+                <button onclick="smoothShading(false)">Sombras Planas</button>
+                <button onclick="reducePolygons()">Reducir Poligonos</button>
+                <button onclick="joinSelected()">Unir (Ctrl+J)</button>
+                <button onclick="deleteSelected()">Eliminar (Supr)</button>
             </div>
 
-            <div class="panel-title" data-i18n="lighting">Iluminacion</div>
+            <div class="panel-title">Iluminacion</div>
             <div class="panel-section">
                 <div class="btn-grid">
-                    <button onclick="addLight('point')" data-i18n="point_light">Luz Puntual</button>
-                    <button onclick="addLight('directional')" data-i18n="sun_light">Luz Solar</button>
-                    <button onclick="addLight('spot')" data-i18n="spot_light">Foco (Spot)</button>
+                    <button onclick="addLight('point')">Luz Puntual</button>
+                    <button onclick="addLight('directional')">Luz Solar</button>
+                    <button onclick="addLight('spot')">Foco (Spot)</button>
                 </div>
             </div>
         </div>
 
         <div id="viewport-container">
             <div id="viewport-overlay">
-                <span data-i18n="mode">Modo</span>: <span id="render-mode-label" style="color:#e67e22;">Sombreado Gris (Z+6)</span><br>
-                <span data-i18n="object">Objeto</span>: <span id="selected-name-label">Ninguno</span>
-            </div>
-
-            <div id="gizmo-container"></div>
-
-            <div id="mesh-res-panel">
-                <div class="panel-title" style="margin-bottom:8px;" data-i18n="mesh_resolution">Resolucion de Malla</div>
-                <div class="input-group">
-                    <label data-i18n="quality">Calidad</label>
-                    <input type="range" id="mesh-res-slider" min="1" max="5" value="3" oninput="changeMeshResolution(this.value)">
-                </div>
-                <div style="font-size:10px; color:#aaa; margin-top:5px;" data-i18n="res_desc">Ajusta la densidad y vertices de la geometria seleccionada.</div>
+                Modo: <span id="render-mode-label" style="color:#e67e22;">Sombreado Gris (Z+6)</span><br>
+                Objeto: <span id="selected-name-label">Ninguno</span>
             </div>
 
             <div id="scene-stats-panel">
                 <strong>Krhorkos3Dand2DCreator v1.0</strong><br>
-                • <span data-i18n="selection">Seleccion</span>: <span id="stat-selected">Ninguno</span><br>
-                • <span data-i18n="vertices">Vertices totales</span>: <span id="stat-verts">0</span><br>
-                • <span data-i18n="faces">Caras totales</span>: <span id="stat-faces">0</span><br>
-                • <span data-i18n="triangles">Triangulos totales</span>: <span id="stat-tris">0</span><br>
-                • <span data-i18n="objects">Objetos en escena</span>: <span id="stat-objs">0</span><br>
-                • <span data-i18n="memory">Memoria estimada</span>: <span id="stat-mem">0 KB</span>
+                • Seleccion: <span id="stat-selected">Ninguno</span><br>
+                • Vertices totales: <span id="stat-verts">0</span><br>
+                • Caras totales: <span id="stat-faces">0</span><br>
+                • Triangulos totales: <span id="stat-tris">0</span><br>
+                • Objetos en escena: <span id="stat-objs">0</span><br>
+                • Memoria estimada: <span id="stat-mem">0 KB</span>
             </div>
 
             <div id="viewport"></div>
         </div>
 
         <div id="properties-panel" class="panel">
-            <div class="panel-title" data-i18n="outliner">Esquema de la Escena (Outliner)</div>
+            <div class="panel-title">Esquema de la Escena (Outliner)</div>
             <div class="panel-section">
                 <ul id="outliner-list"></ul>
             </div>
 
-            <div class="panel-title" data-i18n="transform_active">Transformacion Activa</div>
+            <div class="panel-title">Transformacion Activa</div>
             <div class="panel-section" id="transform-props">
-                <div class="input-group"><label data-i18n="position">Posicion</label></div>
+                <div class="input-group"><label>Posicion</label></div>
                 <div class="vector3-input">
                     <input type="number" id="pos-x" step="0.1" onchange="updateObjectTransform()">
                     <input type="number" id="pos-y" step="0.1" onchange="updateObjectTransform()">
                     <input type="number" id="pos-z" step="0.1" onchange="updateObjectTransform()">
                 </div>
-                <div class="input-group" style="margin-top:5px;"><label data-i18n="scale_label">Escala</label></div>
+                <div class="input-group" style="margin-top:5px;"><label>Escala</label></div>
                 <div class="vector3-input">
                     <input type="number" id="scale-x" step="0.1" onchange="updateObjectTransform()">
                     <input type="number" id="scale-y" step="0.1" onchange="updateObjectTransform()">
@@ -540,162 +479,98 @@
                 </div>
             </div>
 
-            <div class="panel-title" data-i18n="materials">Materiales y Sombras</div>
+            <div class="panel-title">Materiales y Sombras</div>
             <div class="panel-section">
                 <div class="input-group">
-                    <label data-i18n="base_color">Color Base</label>
+                    <label>Color Base</label>
                     <input type="color" id="mat-color" value="#888888" onchange="updateMaterial()">
                 </div>
                 <div class="input-group">
-                    <label data-i18n="roughness">Rugosidad</label>
+                    <label>Rugosidad</label>
                     <input type="range" id="mat-roughness" min="0" max="1" step="0.05" value="0.5" oninput="updateMaterial()">
                 </div>
                 <div class="input-group">
-                    <label data-i18n="metalness">Metalico</label>
+                    <label>Metalico</label>
                     <input type="range" id="mat-metalness" min="0" max="1" step="0.05" value="0.1" oninput="updateMaterial()">
                 </div>
                 <div class="input-group">
-                    <label data-i18n="emission">Emision</label>
+                    <label>Emision</label>
                     <input type="color" id="mat-emissive" value="#000000" onchange="updateMaterial()">
                 </div>
                 <div class="input-group">
-                    <label data-i18n="transparency">Transparencia</label>
+                    <label>Transparencia</label>
                     <input type="range" id="mat-opacity" min="0" max="1" step="0.05" value="1" oninput="updateMaterial()">
                 </div>
             </div>
 
-            <div class="panel-title" data-i18n="modifiers">Modificadores de Blender</div>
+            <div class="panel-title">Texturas</div>
             <div class="panel-section">
-                <details>
-                    <summary data-i18n="mod_sec_wrench">Llave Inglesa - Geometria</summary>
-                    <div class="mod-content">
-                        <select id="mod-wrench-select" style="width:100%;">
+                <div class="input-group">
+                    <label>Cargar Textura</label>
+                    <input type="file" id="texture-input" accept="image/*" onchange="applyTexture(event)" style="width: 130px;">
+                </div>
+                <button style="width:100%; margin-top:4px;" onclick="removeTexture()">Quitar Textura</button>
+                <div id="texture-preview">Sin Textura Asignada</div>
+            </div>
+
+            <div class="panel-title">Modificadores de Blender</div>
+            <div class="panel-section">
+                <div class="input-group">
+                    <select id="modifier-select" style="width:100%;">
+                        <optgroup label="Editar">
                             <option value="data_transfer">Transferir datos</option>
                             <option value="mesh_cache">Cache de malla</option>
-                            <option value="mesh_seq_cache">Cache de secuencia de mallas</option>
                             <option value="normals">Editar normales</option>
-                            <option value="uv_project">Proyectar UV</option>
+                            <option value="vertex_weight">Influenciar vertices</option>
                             <option value="uv_warp">Deformar UV</option>
-                            <option value="vertex_weight_edit">Editar influencias de vertices</option>
-                            <option value="vertex_weight_mix">Mezclar influencias de vertices</option>
-                            <option value="vertex_weight_proximity">Influencias de vertices por proximidad</option>
-                            <option value="array">Repetir</option>
+                        </optgroup>
+                        <optgroup label="Generar">
                             <option value="bevel">Biselar</option>
                             <option value="boolean">Booleana</option>
                             <option value="build">Construir</option>
-                            <option value="decimate">Diemar</option>
-                            <option value="edge_split">Dividir bordes</option>
-                            <option value="mask">Mascara</option>
-                            <option value="mirror">Simetrizar</option>
-                            <option value="multires">Multi-resolucion</option>
-                            <option value="remesh">Reforzar malla</option>
-                            <option value="screw">Enroscar</option>
-                            <option value="skin">Forrar</option>
-                            <option value="solidify">Solidificar</option>
                             <option value="subsurf">Subdividir superficie</option>
-                            <option value="triangulate">Triangular</option>
-                            <option value="weld">Fusionar</option>
-                            <option value="wireframe">Estructura</option>
-                            <option value="armature">Esqueleto</option>
-                            <option value="cast">Moldear</option>
+                            <option value="join_sep">Unir / Separar</option>
+                        </optgroup>
+                        <optgroup label="Deformar">
+                            <option value="shape">Moldeador</option>
                             <option value="curve">Curva</option>
                             <option value="displace">Desplazar</option>
-                            <option value="hook">Gancho</option>
-                            <option value="laplacian_deform">Deformacion Laplaciana</option>
-                            <option value="lattice">Jaula</option>
-                            <option value="mesh_deform">Deformar con malla</option>
-                            <option value="shrinkwrap">Envolver</option>
                             <option value="smooth">Suavizado</option>
-                            <option value="corrective_smooth">Suavizado correctivo</option>
-                            <option value="laplacian_smooth">Suavizado Laplaciano</option>
-                            <option value="surface_deform">Deformar superficie</option>
-                            <option value="wave">Onda</option>
-                        </select>
-                        <button onclick="addSelectedModifier('mod-wrench-select')" data-i18n="add">Anadir</button>
-                    </div>
-                </details>
-
-                <details>
-                    <summary data-i18n="mod_sec_windows">Ventanas - Texturas y UV</summary>
-                    <div class="mod-content">
-                        <div class="input-group">
-                            <label data-i18n="load_texture">Cargar imagen</label>
-                            <input type="file" id="texture-input-sec" accept="image/*" onchange="applyTexture(event)" style="width: 100px;">
-                        </div>
-                        <button onclick="removeTexture()" data-i18n="remove_texture">Quitar textura</button>
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="uv-blur-opt" onchange="toggleTextureBlur(this.checked)">
-                            <label for="uv-blur-opt" data-i18n="blur_option">Opcion de desenfoque</label>
-                        </div>
-                    </div>
-                </details>
-
-                <details>
-                    <summary data-i18n="mod_sec_fx">Efectos Especiales</summary>
-                    <div class="mod-content">
-                        <button onclick="toggleSpecialFX('fire')" data-i18n="fx_fire">Fuego alrededor</button>
-                        <button onclick="toggleSpecialFX('smoke')" data-i18n="fx_smoke">Humo alrededor</button>
-                        <button onclick="toggleSpecialFX('water')" data-i18n="fx_water">Agua escurriendo</button>
-                        <div id="water-options" style="display:none; margin-top:4px;">
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="water-drain-check" onchange="toggleWaterDraining(this.checked)">
-                                <label for="water-drain-check" data-i18n="water_drain">Escurrimiento</label>
-                            </div>
-                        </div>
-                    </div>
-                </details>
-
-                <details>
-                    <summary data-i18n="mod_sec_sim">Simulacion</summary>
-                    <div class="mod-content">
-                        <select id="mod-sim-select" style="width:100%;">
-                            <option value="force_field">Campo de fuerza</option>
+                        </optgroup>
+                        <optgroup label="Simulacion">
                             <option value="collision">Colision</option>
-                            <option value="cloth">Ropa</option>
-                            <option value="dynamic_paint">Pintura dinamica</option>
-                            <option value="soft_body">Cuerpo blando</option>
+                            <option value="dynamic">Dinamica</option>
                             <option value="fluid">Fluido</option>
-                            <option value="rigid_body">Cuerpo rigido</option>
-                            <option value="rigid_body_constraint">Restriccion de cuerpo rigido</option>
-                        </select>
-                        <button onclick="addSelectedModifier('mod-sim-select')" data-i18n="add">Anadir</button>
-                    </div>
-                </details>
-
-                <button style="width:100%; margin-top:5px;" onclick="applyModifier()" data-i18n="apply">Aplicar Modificadores</button>
+                            <option value="particles">Particulas</option>
+                            <option value="soft_body">Cuerpo Blando</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="btn-grid" style="margin-top:5px;">
+                    <button onclick="addModifier()">Anadir</button>
+                    <button onclick="applyModifier()">Aplicar</button>
+                </div>
                 <div id="active-modifiers" style="margin-top:6px; font-size:11px; color:#aaa;">Modificadores activos: Ninguno</div>
             </div>
 
-            <div class="panel-title" data-i18n="export">Exportar Proyecto</div>
+            <div class="panel-title">Exportar Proyecto</div>
             <div class="panel-section">
-                <button style="width:100%; text-align:center; justify-content:center;" onclick="openExportModal()" data-i18n="export_btn">Exportar Archivo 3D</button>
+                <button style="width:100%; text-align:center; justify-content:center;" onclick="openExportModal()">Exportar Archivo 3D</button>
             </div>
         </div>
     </div>
 
-    <div id="status-bar" data-i18n="status_bar">
-        Atajos: [G] Mover | [R] Rotar | [S] Escalar | [E] Extruir | [1-6] Vistas | [Ctrl+X] Resolucion | [F1] Ajustes
+    <div id="status-bar">
+        Atajos: [G] Mover | [R] Rotar | [S] Escalar | [E] Extruir | [Z+6] Grises | [Z+2] Materiales | [Ctrl+Z] Deshacer | [Ctrl+Shift+Z] Rehacer | [F1] Ajustes
     </div>
 
     <div id="settings-modal" class="modal">
         <div class="modal-content">
-            <div class="modal-header" data-i18n="settings_title">Ajustes del Sitio Web</div>
+            <div class="modal-header">Ajustes del Sitio Web</div>
             <div class="modal-body">
-                <div class="modal-section-title" data-i18n="language_sec">Sistema de Idiomas</div>
+                <div class="modal-section-title">Temas Predefinidos</div>
                 <div class="input-group">
-                    <label data-i18n="select_language">Idioma</label>
-                    <select id="setting-language" onchange="changeLanguage(this.value)">
-                        <option value="es">Espanol</option>
-                        <option value="en">English</option>
-                    </select>
-                </div>
-
-                <div class="modal-section-title" data-i18n="shortcuts_sec">Configuracion de Atajos de Teclado</div>
-                <div id="shortcuts-bindings-list"></div>
-
-                <div class="modal-section-title" data-i18n="themes_sec">Temas Predefinidos</div>
-                <div class="input-group">
-                    <label data-i18n="select_theme">Seleccionar Tema</label>
+                    <label>Seleccionar Tema</label>
                     <select id="setting-theme" onchange="liveApplySettings()">
                         <option value="oscuro">Oscuro Profesional</option>
                         <option value="gris">Gris Medio</option>
@@ -705,251 +580,207 @@
                     </select>
                 </div>
 
-                <div class="modal-section-title" data-i18n="customization_sec">Personalizacion Completa</div>
+                <div class="modal-section-title">Personalizacion Completa</div>
                 <div class="input-group">
-                    <label data-i18n="bg_main">Color Fondo Principal</label>
+                    <label>Color Fondo Principal</label>
                     <input type="color" id="setting-bg-dark" value="#1d1d1d" onchange="liveApplySettings()">
                 </div>
                 <div class="input-group">
-                    <label data-i18n="bg_panels">Color Fondo Paneles</label>
+                    <label>Color Fondo Paneles</label>
                     <input type="color" id="setting-bg-panel" value="#282828" onchange="liveApplySettings()">
                 </div>
                 <div class="input-group">
-                    <label data-i18n="btn_accent">Color Botones / Acento</label>
+                    <label>Color Botones / Acento</label>
                     <input type="color" id="setting-accent" value="#e67e22" onchange="liveApplySettings()">
                 </div>
                 <div class="input-group">
-                    <label data-i18n="font_size">Tamano de Letra (px)</label>
+                    <label>Tamano de Letra (px)</label>
                     <input type="number" id="setting-font-size" min="10" max="16" value="12" onchange="liveApplySettings()">
                 </div>
                 <div class="input-group">
-                    <label data-i18n="panel_spacing">Espaciado Paneles (px)</label>
+                    <label>Espaciado Paneles (px)</label>
                     <input type="number" id="setting-panel-spacing" min="4" max="20" value="8" onchange="liveApplySettings()">
                 </div>
                 <div class="input-group">
-                    <label data-i18n="toolbar_pos">Posicion Barras Herramientas</label>
+                    <label>Posicion Barras Herramientas</label>
                     <select id="setting-layout-pos" onchange="liveApplySettings()">
                         <option value="normal">Herramientas Izq / Propiedades Der</option>
                         <option value="invertido">Herramientas Der / Propiedades Izq</option>
                     </select>
                 </div>
+
+                <div class="modal-section-title">Navegacion y Estadisticas</div>
+                <div class="input-group">
+                    <label>Velocidad Movimiento Raton</label>
+                    <input type="range" id="setting-mouse-speed" min="0.1" max="2" step="0.1" value="1" oninput="liveApplySettings()">
+                </div>
+                <div class="input-group">
+                    <label>Sensibilidad Rotacion Vista</label>
+                    <input type="range" id="setting-rotate-speed" min="0.1" max="2" step="0.1" value="1" oninput="liveApplySettings()">
+                </div>
+                <div class="input-group">
+                    <label>Mostrar Panel Info Escena</label>
+                    <input type="checkbox" id="setting-show-stats" checked style="width:auto;" onchange="liveApplySettings()">
+                </div>
             </div>
             <div class="modal-footer">
-                <button onclick="restoreDefaultSettings()" data-i18n="restore">Restaurar Valores</button>
-                <button onclick="saveSettings()" style="background:var(--accent);" data-i18n="save">Guardar Cambios</button>
+                <button onclick="restoreDefaultSettings()">Restaurar Valores</button>
+                <button onclick="saveSettings()" style="background:var(--accent);">Guardar Cambios</button>
             </div>
         </div>
     </div>
 
     <div id="export-modal" class="modal">
         <div class="modal-content">
-            <div class="modal-header" data-i18n="export_options">Opciones de Exportacion</div>
+            <div class="modal-header">Opciones de Exportacion</div>
             <div class="modal-body">
                 <div class="input-group">
-                    <label data-i18n="format">Formato de Exportacion</label>
+                    <label>Formato de Exportacion</label>
                     <select id="exp-format">
                         <option value="gltf">GLTF / GLB (.GLTF)</option>
                         <option value="obj">Wavefront (.OBJ)</option>
                         <option value="stl">Stereolithography (.STL)</option>
                     </select>
                 </div>
-                <div class="checkbox-group"><input type="checkbox" id="exp-inc-selected"><label for="exp-inc-selected" data-i18n="sel_only">Objetos seleccionados solamente</label></div>
+
+                <div class="modal-section-title">Incluir</div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-inc-selected"><label for="exp-inc-selected">Objetos seleccionados solamente</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-inc-props" checked><label for="exp-inc-props">Propiedades personalizadas</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-inc-cameras"><label for="exp-inc-cameras">Camaras</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-inc-lights"><label for="exp-inc-lights">Luces puntuales</label></div>
+
+                <div class="modal-section-title">Transformacion</div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-trans-y" checked><label for="exp-trans-y">Eje +Y hacia arriba</label></div>
+
+                <div class="modal-section-title">Geometria</div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-geo-modifiers" checked><label for="exp-geo-modifiers">Aplicar modificadores</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-geo-uv" checked><label for="exp-geo-uv">Coordenadas UV</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-geo-normals" checked><label for="exp-geo-normals">Normales</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-geo-tangents" checked><label for="exp-geo-tangents">Tangentes</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-geo-colors" checked><label for="exp-geo-colors">Colores de vertices</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-geo-materials" checked><label for="exp-geo-materials">Materiales</label></div>
+
+                <div class="modal-section-title">Imagenes</div>
+                <div class="input-group">
+                    <label>Modo Imagenes</label>
+                    <select id="exp-img-mode">
+                        <option value="auto">Automatico</option>
+                        <option value="embed">Incrustar en archivo</option>
+                        <option value="copy">Copiar referencias</option>
+                    </select>
+                </div>
+
+                <div class="modal-section-title">Compresion</div>
+                <div class="input-group">
+                    <label>Nivel de Compresion</label>
+                    <input type="range" id="exp-comp-level" min="0" max="10" value="6">
+                </div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-quant-pos" checked><label for="exp-quant-pos">Cuantizar Posicion</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-quant-norm" checked><label for="exp-quant-norm">Cuantizar Normal</label></div>
+
+                <div class="modal-section-title">Animacion</div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-anim-include"><label for="exp-anim-include">Incluir animacion</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-anim-keys"><label for="exp-anim-keys">Formas clave</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="exp-anim-skins"><label for="exp-anim-skins">Deformacion con esqueletos</label></div>
             </div>
             <div class="modal-footer">
-                <button onclick="closeExportModal()" data-i18n="cancel">Cancelar</button>
-                <button onclick="executeExport()" style="background:var(--accent);" data-i18n="export_geom">Exportar Geometria</button>
+                <button onclick="closeExportModal()">Cancelar</button>
+                <button onclick="executeExport()" style="background:var(--accent);">Exportar Geometria</button>
             </div>
         </div>
     </div>
 
     <script>
-        let container, scene, camera, renderer, controls, transformControls;
-        let gizmoContainer, gizmoScene, gizmoCamera, gizmoRenderer, gizmoGroup;
+        // --- INICIALIZACION DE LA ESCENA THREE.JS ---
+        const container = document.getElementById('viewport');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1e1e1e);
+
+        const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(5, 4, 7);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+
+        const gridHelper = new THREE.GridHelper(20, 20, 0x444444, 0x222222);
+        scene.add(gridHelper);
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(5, 10, 7);
+        dirLight.castShadow = true;
+        scene.add(dirLight);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        const transformControls = new THREE.TransformControls(camera, renderer.domElement);
+        transformControls.size = 0.75;
+        scene.add(transformControls);
+
+        transformControls.addEventListener('dragging-changed', function (event) {
+            controls.enabled = !event.value;
+            if(!event.value) saveState();
+        });
+
+        transformControls.addEventListener('change', function () {
+            if (selectedObject) syncTransformUI();
+        });
+
+        // --- ESTADO Y VARIABLES GLOBALES ---
         let objects = [];
         let selectedObject = null;
         let objectCount = 0;
         let renderMode = 'GRAY'; 
-        let defaultGrayMaterial;
-        let raycaster = new THREE.Raycaster();
-        let mouse = new THREE.Vector2();
-        let isGrabbing = false;
-        let plane = new THREE.Plane();
-        let planeIntersect = new THREE.Vector3();
-        let activeKeys = {};
-        let undoStack = [], redoStack = [];
-
-        const translations = {
-            es: { engine_mode: "Engine Mode: WebGL / Three.js", donations: "Donaciones", transform: "Transformacion", select: "Seleccionar", move: "Mover (G)", rotate: "Rotar (R)", scale: "Escalar (S)", reset: "Reset Org.", primitives: "Formas Primitivas", cube: "Cubo", sphere: "Esfera", icosphere: "Icosphere", cylinder: "Cilindro", cone: "Cono", torus: "Toro", capsule: "Capsula", plane: "Plano", modeling_tools: "Herramientas de Modelado", extrude: "Extruir / Engrosar (E)", subdivide: "Subdividir Malla", bevel: "Biselar (Bevel)", smooth_shading: "Sombras Suaves", flat_shading: "Sombras Planas", reduce_poly: "Reducir Poligonos", join: "Unir (Ctrl+J)", delete: "Eliminar (Supr)", lighting: "Iluminacion", point_light: "Luz Puntual", sun_light: "Luz Solar", spot_light: "Foco (Spot)", mode: "Modo", object: "Objeto", selection: "Seleccion", vertices: "Vertices totales", faces: "Caras totales", triangles: "Triangulos totales", objects: "Objetos en escena", memory: "Memoria estimada", outliner: "Esquema de la Escena (Outliner)", transform_active: "Transformacion Activa", position: "Posicion", scale_label: "Escala", materials: "Materiales y Sombras", base_color: "Color Base", roughness: "Rugosidad", metalness: "Metalico", emission: "Emision", transparency: "Transparencia", modifiers: "Modificadores de Blender", mod_sec_wrench: "Llave Inglesa - Geometria", mod_sec_windows: "Ventanas - Texturas y UV", mod_sec_fx: "Efectos Especiales", mod_sec_sim: "Simulacion", load_texture: "Cargar imagen", remove_texture: "Quitar textura", blur_option: "Opcion de desenfoque", fx_fire: "Fuego alrededor", fx_smoke: "Humo alrededor", fx_water: "Agua escurriendo", water_drain: "Escurrimiento", add: "Anadir", apply: "Aplicar Modificadores", export: "Exportar Proyecto", export_btn: "Exportar Archivo 3D", status_bar: "Atajos: [G] Mover | [R] Rotar | [S] Escalar | [E] Extruir | [1-6] Vistas | [Ctrl+X] Resolucion | [F1] Ajustes", settings_title: "Ajustes del Sitio Web", language_sec: "Sistema de Idiomas", select_language: "Idioma", shortcuts_sec: "Configuracion de Atajos de Teclado", themes_sec: "Temas Predefinidos", select_theme: "Seleccionar Tema", customization_sec: "Personalizacion Completa", bg_main: "Color Fondo Principal", bg_panels: "Color Fondo Paneles", btn_accent: "Color Botones / Acento", font_size: "Tamano de Letra (px)", panel_spacing: "Espaciado Paneles (px)", toolbar_pos: "Posicion Barras Herramientas", restore: "Restaurar Valores", save: "Guardar Cambios", export_options: "Opciones de Exportacion", format: "Formato de Exportacion", sel_only: "Objetos seleccionados solamente", cancel: "Cancelar", export_geom: "Exportar Geometria", mesh_resolution: "Resolucion de Malla", quality: "Calidad", res_desc: "Ajusta la densidad y vertices de la geometria seleccionada." },
-            en: { engine_mode: "Engine Mode: WebGL / Three.js", donations: "Donations", transform: "Transform", select: "Select", move: "Move (G)", rotate: "Rotate (R)", scale: "Scale (S)", reset: "Reset Org.", primitives: "Primitives", cube: "Cube", sphere: "Sphere", icosphere: "Icosphere", cylinder: "Cylinder", cone: "Cone", torus: "Torus", capsule: "Capsule", plane: "Plane", modeling_tools: "Modeling Tools", extrude: "Extrude (E)", subdivide: "Subdivide Mesh", bevel: "Bevel", smooth_shading: "Smooth Shading", flat_shading: "Flat Shading", reduce_poly: "Reduce Poly", join: "Join (Ctrl+J)", delete: "Delete (Del)", lighting: "Lighting", point_light: "Point Light", sun_light: "Sun Light", spot_light: "Spot Light", mode: "Mode", object: "Object", selection: "Selection", vertices: "Total Vertices", faces: "Total Faces", triangles: "Total Triangles", objects: "Objects in Scene", memory: "Est. Memory", outliner: "Outliner", transform_active: "Active Transform", position: "Position", scale_label: "Scale", materials: "Materials & Shadows", base_color: "Base Color", roughness: "Roughness", metalness: "Metalness", emission: "Emission", transparency: "Transparency", modifiers: "Blender Modifiers", mod_sec_wrench: "Wrench - Geometry", mod_sec_windows: "Windows - Textures & UV", mod_sec_fx: "Special Effects", mod_sec_sim: "Simulation", load_texture: "Load Image", remove_texture: "Remove Texture", blur_option: "Blur Option", fx_fire: "Fire Effect", fx_smoke: "Smoke Effect", fx_water: "Water Flow", water_drain: "Static Drain", add: "Add", apply: "Apply Modifiers", export: "Export Project", export_btn: "Export 3D File", status_bar: "Shortcuts: [G] Move | [R] Rotate | [S] Scale | [E] Extrude | [1-6] Views | [Ctrl+X] Resolution | [F1] Settings", settings_title: "Website Settings", language_sec: "Language System", select_language: "Language", shortcuts_sec: "Keyboard Shortcuts Configuration", themes_sec: "Presets Themes", select_theme: "Select Theme", customization_sec: "Full Customization", bg_main: "Main BG Color", bg_panels: "Panels BG Color", btn_accent: "Buttons/Accent Color", font_size: "Font Size (px)", panel_spacing: "Panel Spacing (px)", toolbar_pos: "Toolbars Position", restore: "Restore Defaults", save: "Save Changes", export_options: "Export Options", format: "Export Format", sel_only: "Selected Objects Only", cancel: "Cancel", export_geom: "Export Geometry", mesh_resolution: "Mesh Resolution", quality: "Quality", res_desc: "Adjusts geometry vertex density." }
-        };
-
-        let shortcutBindings = {
-            move: ['g'], rotate: ['r'], scale: ['s'], extrude: ['e'], settings: ['f1'], meshRes: ['control', 'x']
-        };
-
         let settings = {
-            theme: 'oscuro', bgDark: '#1d1d1d', bgPanel: '#282828', accent: '#e67e22', fontSize: 12, panelSpacing: 8, layoutPos: 'normal'
+            theme: 'oscuro',
+            bgDark: '#1d1d1d',
+            bgPanel: '#282828',
+            accent: '#e67e22',
+            fontSize: 12,
+            panelSpacing: 8,
+            layoutPos: 'normal',
+            mouseSpeed: 1.0,
+            rotateSpeed: 1.0,
+            showStats: true
         };
 
-        window.addEventListener('load', () => {
-            initEngine();
-            onWindowResize();
-            addPrimitive('cube', false);
-            animate();
+        const defaultGrayMaterial = new THREE.MeshStandardMaterial({
+            color: 0x909090,
+            roughness: 0.5,
+            metalness: 0.1,
+            flatShading: false
         });
 
-        function initEngine() {
-            container = document.getElementById('viewport');
-            
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x1e1e1e);
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
 
-            let w = container.clientWidth || 100;
-            let h = container.clientHeight || 100;
-
-            camera = new THREE.PerspectiveCamera(60, w / h, 0.1, 1000);
-            camera.position.set(5, 4, 7);
-
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(w, h);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            container.appendChild(renderer.domElement);
-
-            const gridHelper = new THREE.GridHelper(20, 20, 0x444444, 0x222222);
-            scene.add(gridHelper);
-
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-            scene.add(ambientLight);
-
-            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            dirLight.position.set(5, 10, 7);
-            dirLight.castShadow = true;
-            scene.add(dirLight);
-
-            controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            controls.dampingFactor = 0.05;
-
-            transformControls = new THREE.TransformControls(camera, renderer.domElement);
-            transformControls.size = 0.75;
-            scene.add(transformControls);
-
-            transformControls.addEventListener('dragging-changed', function (event) {
-                controls.enabled = !event.value;
-                if(!event.value) saveState();
-            });
-
-            transformControls.addEventListener('change', function () {
-                if (selectedObject) syncTransformUI();
-            });
-
-            defaultGrayMaterial = new THREE.MeshStandardMaterial({
-                color: 0x909090, roughness: 0.5, metalness: 0.1, flatShading: false
-            });
-
-            initGizmo();
-            container.addEventListener('pointerdown', onPointerDown);
-        }
-
-        function initGizmo() {
-            gizmoContainer = document.getElementById('gizmo-container');
-            gizmoScene = new THREE.Scene();
-            gizmoCamera = new THREE.OrthographicCamera(-2, 2, 2, -2, 0.1, 10);
-            gizmoCamera.position.set(0, 0, 5);
-            gizmoRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            gizmoRenderer.setSize(100, 100);
-            gizmoContainer.appendChild(gizmoRenderer.domElement);
-
-            gizmoGroup = new THREE.Group();
-            gizmoScene.add(gizmoGroup);
-
-            const axes = [
-                { dir: new THREE.Vector3(1, 0, 0), color: 0xff0000, label: 'X+' },
-                { dir: new THREE.Vector3(-1, 0, 0), color: 0x880000, label: 'X-' },
-                { dir: new THREE.Vector3(0, 1, 0), color: 0x00ff00, label: 'Y+' },
-                { dir: new THREE.Vector3(0, -1, 0), color: 0x008800, label: 'Y-' },
-                { dir: new THREE.Vector3(0, 0, 1), color: 0x0000ff, label: 'Z+' },
-                { dir: new THREE.Vector3(0, 0, -1), color: 0x000088, label: 'Z-' }
-            ];
-
-            axes.forEach(axis => {
-                const sphereGeo = new THREE.SphereGeometry(0.25, 16, 16);
-                const sphereMat = new THREE.MeshBasicMaterial({ color: axis.color });
-                const sphere = new THREE.Mesh(sphereGeo, sphereMat);
-                sphere.position.copy(axis.dir.clone().multiplyScalar(1.2));
-                sphere.userData = { axis: axis.label };
-                gizmoGroup.add(sphere);
-            });
-
-            gizmoContainer.addEventListener('click', (e) => {
-                const rect = gizmoRenderer.domElement.getBoundingClientRect();
-                const gMouse = new THREE.Vector2(
-                    ((e.clientX - rect.left) / 100) * 2 - 1,
-                    -((e.clientY - rect.top) / 100) * 2 + 1
-                );
-                const gRaycaster = new THREE.Raycaster();
-                gRaycaster.setFromCamera(gMouse, gizmoCamera);
-                const intersects = gRaycaster.intersectObjects(gizmoGroup.children);
-                if (intersects.length > 0) {
-                    setStandardView(intersects[0].object.userData.axis);
-                }
-            });
-        }
-
-        function updateGizmo() {
-            if (!gizmoGroup || !camera) return;
-            gizmoGroup.quaternion.copy(camera.quaternion).invert();
-            gizmoRenderer.render(gizmoScene, gizmoCamera);
-        }
-
-        function setStandardView(view) {
-            const dist = camera.position.distanceTo(controls.target);
-            switch(view) {
-                case 'Y+': case '1': camera.position.set(0, dist, 0.001); break;
-                case 'Y-': case '2': camera.position.set(0, -dist, 0.001); break;
-                case 'X+': case '3': camera.position.set(dist, 0, 0); break;
-                case 'X-': case '4': camera.position.set(-dist, 0, 0); break;
-                case 'Z+': case '5': camera.position.set(0, 0, dist); break;
-                case 'Z-': case '6': camera.position.set(0, 0, -dist); break;
-            }
-            camera.lookAt(controls.target);
-            controls.update();
-        }
-
-        function changeLanguage(lang) {
-            const dict = translations[lang] || translations['es'];
-            document.querySelectorAll('[data-i18n]').forEach(elem => {
-                const key = elem.getAttribute('data-i18n');
-                if (dict[key]) elem.innerText = dict[key];
-            });
-        }
-
-        function renderShortcutsUI() {
-            const list = document.getElementById('shortcuts-bindings-list');
-            list.innerHTML = "";
-            for (let action in shortcutBindings) {
-                const div = document.createElement('div');
-                div.className = "input-group";
-                div.innerHTML = `<label style="text-transform:capitalize;">${action}</label>
-                                 <input type="text" value="${shortcutBindings[action].join('+')}" onchange="updateShortcut('${action}', this.value)">`;
-                list.appendChild(div);
-            }
-        }
-
-        function updateShortcut(action, value) {
-            shortcutBindings[action] = value.toLowerCase().split('+').map(k => k.trim()).slice(0, 4);
-        }
+        // --- SISTEMA DE DESHACER Y REHACER ---
+        let undoStack = [];
+        let redoStack = [];
 
         function saveState() {
-            const state = objects.map(obj => ({
-                name: obj.name,
-                type: obj.userData.primitiveType,
-                position: obj.position.clone(),
-                rotation: obj.rotation.clone(),
-                scale: obj.scale.clone()
-            }));
+            const state = objects.map(obj => {
+                return {
+                    name: obj.name,
+                    type: obj.userData.primitiveType,
+                    position: obj.position.clone(),
+                    rotation: obj.rotation.clone(),
+                    scale: obj.scale.clone(),
+                    materialProps: obj.userData.materialColor ? {
+                        color: '#' + obj.userData.materialColor.color.getHexString(),
+                        roughness: obj.userData.materialColor.roughness,
+                        metalness: obj.userData.materialColor.metalness,
+                        opacity: obj.userData.materialColor.opacity
+                    } : null
+                };
+            });
             undoStack.push(JSON.stringify(state));
             redoStack = [];
         }
@@ -957,13 +788,15 @@
         function undo() {
             if (undoStack.length === 0) return;
             redoStack.push(getCurrentStateString());
-            applyState(JSON.parse(undoStack.pop()));
+            let state = JSON.parse(undoStack.pop());
+            applyState(state);
         }
 
         function redo() {
             if (redoStack.length === 0) return;
             undoStack.push(getCurrentStateString());
-            applyState(JSON.parse(redoStack.pop()));
+            let state = JSON.parse(redoStack.pop());
+            applyState(state);
         }
 
         function getCurrentStateString() {
@@ -993,9 +826,12 @@
             updateSceneStats();
         }
 
+        // --- SELECCION Y RAYCASTING ---
+        container.addEventListener('pointerdown', onPointerDown);
+        container.addEventListener('dblclick', onDoubleClick);
+
         function onPointerDown(event) {
-            if (isGrabbing) { stopGrabMove(); return; }
-            if (transformControls.dragging) return;
+            if (transformControls.dragging || isGrabbing) return;
 
             const rect = renderer.domElement.getBoundingClientRect();
             mouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1;
@@ -1004,9 +840,29 @@
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(objects, true);
 
-            if (intersects.length > 0) selectObject(intersects[0].object);
+            if (intersects.length > 0) {
+                selectObject(intersects[0].object);
+            }
         }
 
+        function onDoubleClick(event) {
+            if (isGrabbing) {
+                stopGrabMove();
+                return;
+            }
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / container.clientHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(objects, true);
+
+            if (intersects.length > 0) {
+                promptRename(intersects[0].object);
+            }
+        }
+
+        // --- GESTION DE OBJETOS ---
         function addPrimitive(type, recordHistory = true) {
             if (recordHistory) saveState();
             let geometry;
@@ -1014,24 +870,28 @@
             let name = type.charAt(0).toUpperCase() + type.slice(1) + "_" + objectCount;
 
             switch(type) {
-                case 'cube': geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5, 1, 1, 1); break;
-                case 'sphere': geometry = new THREE.SphereGeometry(1, 16, 12); break;
-                case 'icosphere': geometry = new THREE.IcosahedronGeometry(1, 1); break;
-                case 'cylinder': geometry = new THREE.CylinderGeometry(0.8, 0.8, 2, 16); break;
-                case 'cone': geometry = new THREE.ConeGeometry(1, 2, 16); break;
-                case 'torus': geometry = new THREE.TorusGeometry(1, 0.3, 12, 24); break;
-                case 'capsule': geometry = new THREE.CylinderGeometry(0.5, 0.5, 1.5, 12); break;
-                case 'plane': geometry = new THREE.PlaneGeometry(2, 2, 1, 1); break;
+                case 'cube': geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5); break;
+                case 'sphere': geometry = new THREE.SphereGeometry(1, 32, 16); break;
+                case 'icosphere': geometry = new THREE.IcosahedronGeometry(1, 2); break;
+                case 'cylinder': geometry = new THREE.CylinderGeometry(0.8, 0.8, 2, 32); break;
+                case 'cone': geometry = new THREE.ConeGeometry(1, 2, 32); break;
+                case 'torus': geometry = new THREE.TorusGeometry(1, 0.3, 16, 100); break;
+                case 'capsule': geometry = new THREE.CylinderGeometry(0.5, 0.5, 1.5, 16); break;
+                case 'plane': geometry = new THREE.PlaneGeometry(2, 2); break;
             }
 
-            const customMat = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, roughness: 0.4, metalness: 0.2 });
+            const customMat = new THREE.MeshStandardMaterial({
+                color: 0xaaaaaa,
+                roughness: 0.4,
+                metalness: 0.2
+            });
+
             const mesh = new THREE.Mesh(geometry, renderMode === 'GRAY' ? defaultGrayMaterial.clone() : customMat);
             mesh.userData.materialColor = customMat;
             mesh.userData.primitiveType = type;
             mesh.userData.modifiers = [];
-            mesh.userData.fx = {};
             mesh.name = name;
-            mesh.position.y = 0.75;
+            mesh.position.y = 1;
             mesh.castShadow = true;
             mesh.receiveShadow = true;
 
@@ -1060,17 +920,35 @@
             updateSceneStats();
         }
 
+        function promptRename(obj) {
+            if (!obj) return;
+            let newName = prompt("Nuevo nombre para el objeto:", obj.name);
+            if (newName && newName.trim() !== "") {
+                saveState();
+                obj.name = newName.trim();
+                document.getElementById('selected-name-label').innerText = obj.name;
+                updateOutliner();
+                updateSceneStats();
+            }
+        }
+
         function setTransformMode(mode) {
-            if (mode === 'select') transformControls.detach();
-            else {
+            if (mode === 'select') {
+                transformControls.detach();
+            } else {
                 if (selectedObject) transformControls.attach(selectedObject);
                 transformControls.setMode(mode);
             }
             document.querySelectorAll('#tools-panel button').forEach(b => b.classList.remove('active'));
-            if(document.getElementById('btn-' + mode)) document.getElementById('btn-' + mode).classList.add('active');
+            if(document.getElementById('btn-' + mode)) {
+                document.getElementById('btn-' + mode).classList.add('active');
+            }
         }
 
-        function toggleGrabMove() { if (isGrabbing) stopGrabMove(); else startGrabMove(); }
+        // --- MOVIMIENTO LIBRE CON TECLA G ---
+        let isGrabbing = false;
+        const plane = new THREE.Plane();
+        const planeIntersect = new THREE.Vector3();
 
         function startGrabMove() {
             if (!selectedObject) return;
@@ -1078,6 +956,7 @@
             transformControls.detach();
             plane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(plane.normal).negate(), selectedObject.position);
             container.addEventListener('pointermove', onGrabMove);
+            container.addEventListener('contextmenu', onRightClickCancelGrab);
         }
 
         function onGrabMove(event) {
@@ -1097,45 +976,57 @@
             if (!isGrabbing) return;
             isGrabbing = false;
             container.removeEventListener('pointermove', onGrabMove);
+            container.removeEventListener('contextmenu', onRightClickCancelGrab);
             if (selectedObject) transformControls.attach(selectedObject);
             saveState();
         }
 
+        function onRightClickCancelGrab(e) {
+            e.preventDefault();
+            stopGrabMove();
+        }
+
+        // --- ATAJOS Y VISUALIZACION Z+2 Y Z+6 ---
+        let activeKeys = {};
+
         window.addEventListener('keydown', (e) => {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
 
-            const key = e.key.toLowerCase();
-            activeKeys[key] = true;
+            activeKeys[e.key.toLowerCase()] = true;
 
-            if (['1','2','3','4','5','6'].includes(key)) { setStandardView(key); return; }
-            if (checkShortcut('meshRes')) { e.preventDefault(); toggleMeshResPanel(); return; }
-            if (checkShortcut('settings')) { e.preventDefault(); openSettings(); return; }
-
-            if (e.ctrlKey && key === 'z') {
+            if (e.key === 'F1') {
                 e.preventDefault();
-                if (e.shiftKey) redo(); else undo();
+                openSettings();
                 return;
             }
 
-            if (activeKeys['z'] && activeKeys['2']) setRenderMode('MATERIAL');
-            if (activeKeys['z'] && activeKeys['6']) setRenderMode('GRAY');
+            if (e.ctrlKey && e.key.toLowerCase() === 'z') {
+                e.preventDefault();
+                if (e.shiftKey) redo();
+                else undo();
+                return;
+            }
+
+            if (activeKeys['z'] && activeKeys['2']) {
+                setRenderMode('MATERIAL');
+            } else if (activeKeys['z'] && activeKeys['6']) {
+                setRenderMode('GRAY');
+            }
 
             if (!activeKeys['z']) {
-                if (checkShortcut('move')) toggleGrabMove();
-                else if (checkShortcut('rotate')) setTransformMode('rotate');
-                else if (checkShortcut('scale')) setTransformMode('scale');
-                else if (checkShortcut('extrude')) extrudeObject();
-                else if (key === 'delete') deleteSelected();
+                switch(e.key.toLowerCase()) {
+                    case 'g': startGrabMove(); break;
+                    case 'r': setTransformMode('rotate'); break;
+                    case 's': setTransformMode('scale'); break;
+                    case 'e': extrudeObject(); break;
+                    case 'delete': deleteSelected(); break;
+                }
             }
         });
 
-        window.addEventListener('keyup', (e) => { delete activeKeys[e.key.toLowerCase()]; });
-
-        function checkShortcut(action) {
-            const keys = shortcutBindings[action];
-            if (!keys) return false;
-            return keys.every(k => (k === 'control' || k === 'ctrl') ? (activeKeys['control'] || activeKeys['ctrl'] || event.ctrlKey) : activeKeys[k]);
-        }
+        window.addEventListener('keyup', (e) => {
+            delete activeKeys[e.key.toLowerCase()];
+        });
 
         function setRenderMode(mode) {
             renderMode = mode;
@@ -1147,90 +1038,16 @@
                     label.innerText = "Sombreado Gris (Z+6)";
                     label.style.color = "#e67e22";
                 } else if (mode === 'MATERIAL') {
-                    if (obj.userData.materialColor) obj.material = obj.userData.materialColor;
+                    if (obj.userData.materialColor) {
+                        obj.material = obj.userData.materialColor;
+                    }
                     label.innerText = "Vista Material (Z+2)";
                     label.style.color = "#2ec4b6";
                 }
             });
         }
 
-        function addSelectedModifier(selectId) {
-            if (!selectedObject) return;
-            const select = document.getElementById(selectId);
-            const val = select.value;
-            const text = select.options[select.selectedIndex].text;
-
-            if (!selectedObject.userData.modifiers) selectedObject.userData.modifiers = [];
-            selectedObject.userData.modifiers.push(text);
-
-            if (val === 'subsurf' && selectedObject.userData.primitiveType === 'cube') {
-                selectedObject.geometry.dispose();
-                selectedObject.geometry = new THREE.SphereGeometry(1, 16, 16);
-            }
-
-            syncModifiersUI();
-            updateSceneStats();
-        }
-
-        function toggleSpecialFX(type) {
-            if (!selectedObject) return;
-            if (!selectedObject.userData.fx) selectedObject.userData.fx = {};
-
-            if (type === 'water') {
-                const opt = document.getElementById('water-options');
-                opt.style.display = opt.style.display === 'none' ? 'block' : 'none';
-            }
-
-            if (selectedObject.userData.fx[type]) {
-                scene.remove(selectedObject.userData.fx[type]);
-                delete selectedObject.userData.fx[type];
-            } else {
-                let fxGeo = new THREE.SphereGeometry(1.2, 16, 16);
-                let fxMat;
-                if (type === 'fire') fxMat = new THREE.MeshBasicMaterial({ color: 0xff4400, wireframe: true });
-                if (type === 'smoke') fxMat = new THREE.MeshBasicMaterial({ color: 0x888888, wireframe: true });
-                if (type === 'water') fxMat = new THREE.MeshBasicMaterial({ color: 0x0088ff, transparent: true, opacity: 0.5 });
-
-                let fxMesh = new THREE.Mesh(fxGeo, fxMat);
-                selectedObject.add(fxMesh);
-                selectedObject.userData.fx[type] = fxMesh;
-            }
-        }
-
-        function toggleWaterDraining(isDrain) {
-            if (!selectedObject || !selectedObject.userData.fx.water) return;
-            selectedObject.userData.waterDrain = isDrain;
-        }
-
-        function toggleTextureBlur(blur) {
-            if (!selectedObject) return;
-            const mat = selectedObject.userData.materialColor || selectedObject.material;
-            if (mat.map) {
-                mat.map.magFilter = blur ? THREE.LinearFilter : THREE.NearestFilter;
-                mat.map.needsUpdate = true;
-            }
-        }
-
-        function toggleMeshResPanel() {
-            const p = document.getElementById('mesh-res-panel');
-            p.style.display = p.style.display === 'none' || p.style.display === '' ? 'block' : 'none';
-        }
-
-        function changeMeshResolution(val) {
-            if (!selectedObject) return;
-            saveState();
-            let seg = parseInt(val) * 8;
-            let type = selectedObject.userData.primitiveType;
-            selectedObject.geometry.dispose();
-
-            switch(type) {
-                case 'cube': selectedObject.geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5, val, val, val); break;
-                case 'sphere': selectedObject.geometry = new THREE.SphereGeometry(1, seg, seg); break;
-                default: selectedObject.geometry = new THREE.SphereGeometry(1, seg, seg); break;
-            }
-            updateSceneStats();
-        }
-
+        // --- SECCION DE TEXTURAS ---
         function applyTexture(event) {
             if (!selectedObject) return;
             const file = event.target.files[0];
@@ -1239,7 +1056,8 @@
             const reader = new FileReader();
             reader.onload = function (e) {
                 const imgUrl = e.target.result;
-                new THREE.TextureLoader().load(imgUrl, function (texture) {
+                const textureLoader = new THREE.TextureLoader();
+                textureLoader.load(imgUrl, function (texture) {
                     const targetMat = selectedObject.userData.materialColor || selectedObject.material;
                     targetMat.map = texture;
                     targetMat.needsUpdate = true;
@@ -1273,38 +1091,66 @@
             }
         }
 
+        // --- SECCION DE MODIFICADORES ---
+        function addModifier() {
+            if (!selectedObject) return;
+            const modName = document.getElementById('modifier-select').options[document.getElementById('modifier-select').selectedIndex].text;
+
+            if (!selectedObject.userData.modifiers) selectedObject.userData.modifiers = [];
+            selectedObject.userData.modifiers.push(modName);
+            syncModifiersUI();
+        }
+
         function applyModifier() {
-            if (!selectedObject || !selectedObject.userData.modifiers) return;
+            if (!selectedObject || !selectedObject.userData.modifiers || selectedObject.userData.modifiers.length === 0) return;
             selectedObject.userData.modifiers = [];
             syncModifiersUI();
         }
 
         function syncModifiersUI() {
             const elem = document.getElementById('active-modifiers');
-            elem.innerText = (selectedObject && selectedObject.userData.modifiers && selectedObject.userData.modifiers.length > 0)
-                ? "Modificadores activos: " + selectedObject.userData.modifiers.join(', ')
-                : "Modificadores activos: Ninguno";
+            if (selectedObject && selectedObject.userData.modifiers && selectedObject.userData.modifiers.length > 0) {
+                elem.innerText = "Modificadores activos: " + selectedObject.userData.modifiers.join(', ');
+            } else {
+                elem.innerText = "Modificadores activos: Ninguno";
+            }
         }
 
+        // --- CALCULO EXACTO DE DATOS DE LA ESCENA EN TIEMPO REAL ---
         function updateSceneStats() {
-            let totalVerts = 0, totalFaces = 0, totalTris = 0, totalGeomBytes = 0;
+            let totalVerts = 0;
+            let totalFaces = 0;
+            let totalTris = 0;
+            let totalGeomBytes = 0;
 
             objects.forEach(obj => {
-                if (obj.geometry && obj.geometry.isBufferGeometry) {
-                    const posAttr = obj.geometry.attributes.position;
-                    if (posAttr) {
-                        totalVerts += posAttr.count;
-                        totalGeomBytes += posAttr.array.byteLength;
-                    }
-                    if (obj.geometry.index) {
-                        const triCount = obj.geometry.index.count / 3;
-                        totalTris += triCount;
-                        totalFaces += triCount;
-                        totalGeomBytes += obj.geometry.index.array.byteLength;
-                    } else if (posAttr) {
-                        const triCount = posAttr.count / 3;
-                        totalTris += triCount;
-                        totalFaces += triCount;
+                if (obj.geometry) {
+                    const geom = obj.geometry;
+                    
+                    if (geom.isBufferGeometry) {
+                        const posAttr = geom.attributes.position;
+                        if (posAttr) {
+                            totalVerts += posAttr.count;
+                            totalGeomBytes += posAttr.array.byteLength;
+                        }
+
+                        if (geom.attributes.normal) {
+                            totalGeomBytes += geom.attributes.normal.array.byteLength;
+                        }
+                        if (geom.attributes.uv) {
+                            totalGeomBytes += geom.attributes.uv.array.byteLength;
+                        }
+
+                        if (geom.index) {
+                            const triCount = geom.index.count / 3;
+                            totalTris += triCount;
+                            totalFaces += triCount;
+                            totalGeomBytes += geom.index.array.byteLength;
+                        } else if (posAttr) {
+                            const triCount = posAttr.count / 3;
+                            totalTris += triCount;
+                            totalFaces += triCount;
+                        }
                     }
                 }
             });
@@ -1314,9 +1160,12 @@
             document.getElementById('stat-faces').innerText = Math.floor(totalFaces).toLocaleString();
             document.getElementById('stat-tris').innerText = Math.floor(totalTris).toLocaleString();
             document.getElementById('stat-objs').innerText = objects.length;
-            document.getElementById('stat-mem').innerText = (totalGeomBytes / 1024).toFixed(2) + " KB";
+            
+            let memKb = totalGeomBytes / 1024;
+            document.getElementById('stat-mem').innerText = memKb.toFixed(2) + " KB";
         }
 
+        // --- MODELADO Y TRANSFORMACIONES ---
         function extrudeObject() {
             if (!selectedObject) return;
             saveState();
@@ -1348,8 +1197,15 @@
             updateSceneStats();
         }
 
-        function reducePolygons() { if (selectedObject) saveState(); updateSceneStats(); }
-        function joinSelected() { updateSceneStats(); }
+        function reducePolygons() {
+            if (!selectedObject) return;
+            saveState();
+            updateSceneStats();
+        }
+
+        function joinSelected() {
+            updateSceneStats();
+        }
 
         function deleteSelected() {
             if (!selectedObject) return;
@@ -1366,9 +1222,16 @@
         function addLight(type) {
             objectCount++;
             let light, helper;
-            if (type === 'point') { light = new THREE.PointLight(0xffffff, 1, 10); helper = new THREE.PointLightHelper(light, 0.3); }
-            else if (type === 'directional') { light = new THREE.DirectionalLight(0xffffff, 1); helper = new THREE.DirectionalLightHelper(light, 0.5); }
-            else if (type === 'spot') { light = new THREE.SpotLight(0xffffff, 1); helper = new THREE.SpotLightHelper(light); }
+            if (type === 'point') {
+                light = new THREE.PointLight(0xffffff, 1, 10);
+                helper = new THREE.PointLightHelper(light, 0.3);
+            } else if (type === 'directional') {
+                light = new THREE.DirectionalLight(0xffffff, 1);
+                helper = new THREE.DirectionalLightHelper(light, 0.5);
+            } else if (type === 'spot') {
+                light = new THREE.SpotLight(0xffffff, 1);
+                helper = new THREE.SpotLightHelper(light);
+            }
             light.position.set(2, 4, 2);
             light.name = type.charAt(0).toUpperCase() + type.slice(1) + "Light_" + objectCount;
             scene.add(light);
@@ -1382,6 +1245,7 @@
             document.getElementById('pos-x').value = selectedObject.position.x.toFixed(2);
             document.getElementById('pos-y').value = selectedObject.position.y.toFixed(2);
             document.getElementById('pos-z').value = selectedObject.position.z.toFixed(2);
+
             document.getElementById('scale-x').value = selectedObject.scale.x.toFixed(2);
             document.getElementById('scale-y').value = selectedObject.scale.y.toFixed(2);
             document.getElementById('scale-z').value = selectedObject.scale.z.toFixed(2);
@@ -1415,14 +1279,19 @@
         function updateMaterial() {
             if (!selectedObject) return;
             const targetMat = selectedObject.userData.materialColor || selectedObject.material;
+            
             targetMat.color.set(document.getElementById('mat-color').value);
             targetMat.roughness = parseFloat(document.getElementById('mat-roughness').value);
             targetMat.metalness = parseFloat(document.getElementById('mat-metalness').value);
             targetMat.emissive.set(document.getElementById('mat-emissive').value);
+            
             const opacity = parseFloat(document.getElementById('mat-opacity').value);
             targetMat.opacity = opacity;
             targetMat.transparent = opacity < 1.0;
-            if (renderMode === 'MATERIAL') selectedObject.material = targetMat;
+
+            if (renderMode === 'MATERIAL') {
+                selectedObject.material = targetMat;
+            }
         }
 
         function updateOutliner() {
@@ -1432,7 +1301,9 @@
                 const li = document.createElement('li');
                 li.innerHTML = `<span>${obj.name}</span>`;
                 if (obj === selectedObject) li.classList.add('selected');
+                
                 li.onclick = () => selectObject(obj);
+                li.ondblclick = () => promptRename(obj);
                 list.appendChild(li);
             });
         }
@@ -1440,19 +1311,21 @@
         function resetTransforms() {
             if (!selectedObject) return;
             saveState();
-            selectedObject.position.set(0, 0.75, 0);
+            selectedObject.position.set(0, 1, 0);
             selectedObject.rotation.set(0, 0, 0);
             selectedObject.scale.set(1, 1, 1);
             syncTransformUI();
             updateSceneStats();
         }
 
+        // --- AJUSTES Y TEMAS ---
         function openSettings() {
-            renderShortcutsUI();
             document.getElementById('settings-modal').style.display = 'flex';
         }
 
-        function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
+        function closeSettings() {
+            document.getElementById('settings-modal').style.display = 'none';
+        }
 
         function liveApplySettings() {
             settings.theme = document.getElementById('setting-theme').value;
@@ -1462,24 +1335,47 @@
             settings.fontSize = parseInt(document.getElementById('setting-font-size').value);
             settings.panelSpacing = parseInt(document.getElementById('setting-panel-spacing').value);
             settings.layoutPos = document.getElementById('setting-layout-pos').value;
+            settings.mouseSpeed = parseFloat(document.getElementById('setting-mouse-speed').value);
+            settings.rotateSpeed = parseFloat(document.getElementById('setting-rotate-speed').value);
+            settings.showStats = document.getElementById('setting-show-stats').checked;
 
             document.body.className = "theme-" + settings.theme;
-            if (settings.layoutPos === 'invertido') document.body.classList.add('layout-invertido');
-            else document.body.classList.remove('layout-invertido');
+
+            if (settings.layoutPos === 'invertido') {
+                document.body.classList.add('layout-invertido');
+            } else {
+                document.body.classList.remove('layout-invertido');
+            }
 
             document.documentElement.style.setProperty('--bg-dark', settings.bgDark);
             document.documentElement.style.setProperty('--bg-panel', settings.bgPanel);
             document.documentElement.style.setProperty('--accent', settings.accent);
             document.documentElement.style.setProperty('--font-size-base', settings.fontSize + 'px');
             document.documentElement.style.setProperty('--panel-spacing', settings.panelSpacing + 'px');
+
+            controls.rotateSpeed = settings.rotateSpeed;
+            document.getElementById('scene-stats-panel').style.display = settings.showStats ? 'block' : 'none';
         }
 
         function saveSettings() {
             liveApplySettings();
+            localStorage.setItem('krhorkos_custom_settings', JSON.stringify(settings));
             closeSettings();
         }
 
         function restoreDefaultSettings() {
+            settings = {
+                theme: 'oscuro',
+                bgDark: '#1d1d1d',
+                bgPanel: '#282828',
+                accent: '#e67e22',
+                fontSize: 12,
+                panelSpacing: 8,
+                layoutPos: 'normal',
+                mouseSpeed: 1.0,
+                rotateSpeed: 1.0,
+                showStats: true
+            };
             document.getElementById('setting-theme').value = 'oscuro';
             document.getElementById('setting-bg-dark').value = '#1d1d1d';
             document.getElementById('setting-bg-panel').value = '#282828';
@@ -1487,39 +1383,75 @@
             document.getElementById('setting-font-size').value = 12;
             document.getElementById('setting-panel-spacing').value = 8;
             document.getElementById('setting-layout-pos').value = 'normal';
+            document.getElementById('setting-mouse-speed').value = 1.0;
+            document.getElementById('setting-rotate-speed').value = 1.0;
+            document.getElementById('setting-show-stats').checked = true;
+
             liveApplySettings();
             saveSettings();
         }
 
-        function openExportModal() { document.getElementById('export-modal').style.display = 'flex'; }
-        function closeExportModal() { document.getElementById('export-modal').style.display = 'none'; }
+        function loadSavedSettings() {
+            const saved = localStorage.getItem('krhorkos_custom_settings');
+            if (saved) {
+                settings = JSON.parse(saved);
+                document.getElementById('setting-theme').value = settings.theme || 'oscuro';
+                document.getElementById('setting-bg-dark').value = settings.bgDark || '#1d1d1d';
+                document.getElementById('setting-bg-panel').value = settings.bgPanel || '#282828';
+                document.getElementById('setting-accent').value = settings.accent || '#e67e22';
+                document.getElementById('setting-font-size').value = settings.fontSize || 12;
+                document.getElementById('setting-panel-spacing').value = settings.panelSpacing || 8;
+                document.getElementById('setting-layout-pos').value = settings.layoutPos || 'normal';
+                document.getElementById('setting-mouse-speed').value = settings.mouseSpeed || 1.0;
+                document.getElementById('setting-rotate-speed').value = settings.rotateSpeed || 1.0;
+                document.getElementById('setting-show-stats').checked = settings.showStats !== false;
+                liveApplySettings();
+            }
+        }
+
+        // --- EXPORTACION CON OPCIONES ---
+        function openExportModal() {
+            document.getElementById('export-modal').style.display = 'flex';
+        }
+
+        function closeExportModal() {
+            document.getElementById('export-modal').style.display = 'none';
+        }
 
         function executeExport() {
             const format = document.getElementById('exp-format').value;
             const onlySelected = document.getElementById('exp-inc-selected').checked;
 
+            // Filtrar SOLO formas geometricas
             let exportGroup = new THREE.Group();
+            
             objects.forEach(obj => {
                 if (obj.isMesh && obj.geometry) {
                     if (!onlySelected || (onlySelected && obj === selectedObject)) {
-                        let cleanMesh = new THREE.Mesh(obj.geometry.clone(), obj.material.clone());
-                        cleanMesh.position.copy(obj.position);
-                        cleanMesh.rotation.copy(obj.rotation);
-                        cleanMesh.scale.copy(obj.scale);
-                        exportGroup.add(cleanMesh);
+                        let cloneMesh = obj.clone();
+                        if (renderMode === 'GRAY') {
+                            cloneMesh.material = obj.userData.materialColor || obj.material;
+                        }
+                        exportGroup.add(cloneMesh);
                     }
                 }
             });
 
-            let filename = "geometria_krhorkos";
+            let filename = "escena_geometria_krhorkos";
 
             if (format === 'obj') {
-                downloadFile(new THREE.OBJExporter().parse(exportGroup), filename + ".obj", "text/plain");
+                const exporter = new THREE.OBJExporter();
+                const output = exporter.parse(exportGroup);
+                downloadFile(output, filename + ".obj", "text/plain");
             } else if (format === 'stl') {
-                downloadFile(new THREE.STLExporter().parse(exportGroup, { binary: true }), filename + ".stl", "application/octet-stream");
+                const exporter = new THREE.STLExporter();
+                const output = exporter.parse(exportGroup, { binary: true });
+                downloadFile(output, filename + ".stl", "application/octet-stream");
             } else if (format === 'gltf') {
-                new THREE.GLTFExporter().parse(exportGroup, function (gltf) {
-                    downloadFile(JSON.stringify(gltf, null, 2), filename + ".gltf", "application/json");
+                const exporter = new THREE.GLTFExporter();
+                exporter.parse(exportGroup, function (gltf) {
+                    const outputStr = JSON.stringify(gltf, null, 2);
+                    downloadFile(outputStr, filename + ".gltf", "application/json");
                 }, { binary: false });
             }
 
@@ -1528,38 +1460,28 @@
 
         function downloadFile(content, fileName, contentType) {
             const a = document.createElement("a");
-            a.href = URL.createObjectURL(new Blob([content], { type: contentType }));
+            const file = new Blob([content], { type: contentType });
+            a.href = URL.createObjectURL(file);
             a.download = fileName;
             a.click();
         }
 
+        // --- ANIMACION Y RESPONSIVIDAD ---
         function animate() {
             requestAnimationFrame(animate);
-
-            objects.forEach(obj => {
-                if (obj.userData.fx && obj.userData.fx.water && !obj.userData.waterDrain) {
-                    obj.userData.fx.water.rotation.y += 0.02;
-                }
-            });
-
-            if (controls) controls.update();
-            updateGizmo();
-            if (renderer && scene && camera) renderer.render(scene, camera);
+            controls.update();
+            renderer.render(scene, camera);
         }
 
-        function onWindowResize() {
-            if (!container || !renderer || !camera) return;
-            const width = container.clientWidth;
-            const height = container.clientHeight;
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
 
-            if (width > 0 && height > 0) {
-                camera.aspect = width / height;
-                camera.updateProjectionMatrix();
-                renderer.setSize(width, height);
-            }
-        }
-
-        window.addEventListener('resize', onWindowResize);
+        loadSavedSettings();
+        addPrimitive('cube', false);
+        animate();
     </script>
 </body>
 </html>
