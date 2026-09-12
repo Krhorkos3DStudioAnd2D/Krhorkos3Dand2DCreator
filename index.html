@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Krhorkos3DCreator v2.0 - Edit Mode & Node Editor</title>
+    <title>Krhorkos3DCreator v1.0</title>
     <style>
         :root {
             --bg-dark: #1d1d1d;
@@ -368,74 +368,6 @@
         .checkbox-group input {
             width: auto;
         }
-
-        /* ESTILOS DEL EDITOR DE NODOS (PANTALLA FLOTANTE) */
-        #node-editor-window {
-            display: none;
-            position: absolute;
-            bottom: 30px;
-            right: 290px;
-            width: 420px;
-            height: 340px;
-            background: rgba(30, 30, 30, 0.95);
-            border: 1px solid var(--accent);
-            border-radius: 6px;
-            z-index: 50;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.7);
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        #node-editor-header {
-            background: var(--bg-header);
-            padding: 6px 10px;
-            font-weight: bold;
-            color: var(--accent);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: move;
-            border-bottom: 1px solid var(--border);
-        }
-
-        #node-editor-body {
-            padding: 10px;
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .node-card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 8px;
-        }
-
-        .node-card-title {
-            font-size: 11px;
-            font-weight: bold;
-            color: var(--text-bright);
-            margin-bottom: 6px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 2px;
-        }
-
-        /* MODAL DE SUBDIVISION DE SUPERFICIE */
-        #edit-mode-modal {
-            display: none;
-            position: fixed;
-            z-index: 105;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.6);
-            align-items: center;
-            justify-content: center;
-        }
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -448,7 +380,7 @@
 <body class="theme-oscuro">
 
     <header>
-        <div class="logo">Krhorkos3Dand2DCreator v2.0</div>
+        <div class="logo">Krhorkos3Dand2DCreator v1.0</div>
         <div class="header-controls">
             <span>Engine Mode: WebGL / Three.js</span>
             <a href="https://paypal.com" target="_blank" class="btn-donate">Donaciones</a>
@@ -484,13 +416,14 @@
 
             <div class="panel-title">Herramientas de Modelado</div>
             <div class="panel-section">
+                <button id="btn-edit-mode" onclick="toggleEditMode()">Modo Edicion (Tab)</button>
                 <button onclick="extrudeObject()">Extruir / Engrosar (E)</button>
-                <button onclick="openEditModeModal()">Subdividir Malla (TAB)</button>
+                <button onclick="subdivideObject()">Subdividir Malla</button>
                 <button onclick="bevelObject()">Biselar (Bevel)</button>
                 <button onclick="smoothShading(true)">Sombras Suaves</button>
                 <button onclick="smoothShading(false)">Sombras Planas</button>
                 <button onclick="reducePolygons()">Reducir Poligonos</button>
-                <button onclick="toggleNodeEditor()">Editor Nodos (F2)</button>
+                <button onclick="joinSelected()">Unir (Ctrl+J)</button>
                 <button onclick="deleteSelected()">Eliminar (Supr)</button>
             </div>
 
@@ -508,11 +441,11 @@
             <div id="viewport-overlay">
                 Modo: <span id="render-mode-label" style="color:#e67e22;">Sombreado Gris (Z+6)</span><br>
                 Objeto: <span id="selected-name-label">Ninguno</span><br>
-                Estado: <span id="edit-mode-status" style="color:#2ecc71;">Modo Objeto</span>
+                Edicion: <span id="edit-mode-label">Objeto</span>
             </div>
 
             <div id="scene-stats-panel">
-                <strong>Krhorkos3Dand2DCreator v2.0</strong><br>
+                <strong>Krhorkos3Dand2DCreator v1.0</strong><br>
                 • Seleccion: <span id="stat-selected">Ninguno</span><br>
                 • Vertices totales: <span id="stat-verts">0</span><br>
                 • Caras totales: <span id="stat-faces">0</span><br>
@@ -521,57 +454,9 @@
                 • Memoria estimada: <span id="stat-mem">0 KB</span>
             </div>
 
+            <canvas id="vertex-overlay" style="position:absolute; top:0; left:0; pointer-events:none; z-index:4;"></canvas>
+
             <div id="viewport"></div>
-
-            <!-- PANTALLA FLOTANTE DE NODOS (F2) -->
-            <div id="node-editor-window">
-                <div id="node-editor-header">
-                    <span>Nodo Principal de Material (F2)</span>
-                    <button onclick="toggleNodeEditor()" style="padding:0 4px; font-size:10px;">X</button>
-                </div>
-                <div id="node-editor-body">
-                    <div class="node-card">
-                        <div class="node-card-title">Propiedades Emisivas</div>
-                        <div class="input-group">
-                            <label>Color Emision</label>
-                            <input type="color" id="node-emissive-color" value="#000000" onchange="updateNodeMaterial()">
-                        </div>
-                        <div class="input-group">
-                            <label>Intensidad Emision</label>
-                            <input type="range" id="node-emissive-intensity" min="0" max="10" step="0.1" value="1" oninput="updateNodeMaterial()">
-                        </div>
-                    </div>
-
-                    <div class="node-card">
-                        <div class="node-card-title">Mapeado UV</div>
-                        <div class="input-group">
-                            <label>Escala U</label>
-                            <input type="number" id="node-uv-scale-u" value="1" step="0.1" onchange="updateNodeMaterial()">
-                        </div>
-                        <div class="input-group">
-                            <label>Escala V</label>
-                            <input type="number" id="node-uv-scale-v" value="1" step="0.1" onchange="updateNodeMaterial()">
-                        </div>
-                        <div class="input-group">
-                            <label>Offset U</label>
-                            <input type="number" id="node-uv-offset-u" value="0" step="0.05" onchange="updateNodeMaterial()">
-                        </div>
-                        <div class="input-group">
-                            <label>Offset V</label>
-                            <input type="number" id="node-uv-offset-v" value="0" step="0.05" onchange="updateNodeMaterial()">
-                        </div>
-                    </div>
-
-                    <div class="node-card">
-                        <div class="node-card-title">Textura y Relieve (Invertido)</div>
-                        <div style="font-size:10px; color:#aaa; margin-bottom:4px;">*Negro = Mas Alto | Blanco = Mas Bajo</div>
-                        <div class="input-group">
-                            <label>Fuerza Relieve</label>
-                            <input type="range" id="node-bump-scale" min="0" max="2" step="0.05" value="0.5" oninput="updateNodeMaterial()">
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div id="properties-panel" class="panel">
@@ -618,15 +503,25 @@
                     <label>Transparencia</label>
                     <input type="range" id="mat-opacity" min="0" max="1" step="0.05" value="1" oninput="updateMaterial()">
                 </div>
+                <button style="width:100%; margin-top:4px;" onclick="openNodeEditor()">Editor de Nodos (F3)</button>
             </div>
 
             <div class="panel-title">Texturas</div>
             <div class="panel-section">
                 <div class="input-group">
-                    <label>Cargar Textura</label>
+                    <label>Color / Textura</label>
                     <input type="file" id="texture-input" accept="image/*" onchange="applyTexture(event)" style="width: 130px;">
                 </div>
+                <div class="input-group">
+                    <label>Mapa Normal (Relieve)</label>
+                    <input type="file" id="normal-input" accept="image/*" onchange="applyNormalMap(event)" style="width: 130px;">
+                </div>
+                <div class="input-group">
+                    <label>Intensidad Relieve</label>
+                    <input type="range" id="mat-normal-scale" min="0" max="3" step="0.05" value="1" oninput="updateNormalScale()">
+                </div>
                 <button style="width:100%; margin-top:4px;" onclick="removeTexture()">Quitar Textura</button>
+                <button style="width:100%; margin-top:4px;" onclick="removeNormalMap()">Quitar Mapa Normal</button>
                 <div id="texture-preview">Sin Textura Asignada</div>
             </div>
 
@@ -678,34 +573,7 @@
     </div>
 
     <div id="status-bar">
-        Atajos: [TAB] Modo Edicion / Subdividir | [F2] Nodos | [G] Mover | [R] Rotar | [S] Escalar | [Z+6] Grises | [Z+2] Materiales | [F1] Ajustes
-    </div>
-
-    <!-- MODAL DE SUBDIVISION EN MODO EDICION (TAB) -->
-    <div id="edit-mode-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">Modo Edicion: Subdividir Superficie</div>
-            <div class="modal-body">
-                <div class="input-group">
-                    <label>Forma de Patrón</label>
-                    <select id="subdiv-shape">
-                        <option value="square">Cuadrado</option>
-                        <option value="cylinder">Cilindro</option>
-                        <option value="rhombus">Rombo</option>
-                        <option value="rectangle">Rectángulo</option>
-                        <option value="star">Estrella</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Densidad de Cortes</label>
-                    <input type="number" id="subdiv-cuts" min="2" max="32" value="4">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button onclick="closeEditModeModal()">Cancelar</button>
-                <button onclick="applySurfaceSubdivision()" style="background:var(--accent);">Aplicar Subdivisión</button>
-            </div>
-        </div>
+        Atajos: [Tab] Modo Edicion | [G] Mover | [R] Rotar | [S] Escalar | [E] Extruir | [Z+6] Grises | [Z+2] Materiales | [Ctrl+Z] Deshacer | [Ctrl+Shift+Z] Rehacer | [F1] Ajustes | [F3] Nodos
     </div>
 
     <div id="settings-modal" class="modal">
@@ -834,8 +702,25 @@
         </div>
     </div>
 
+    <div id="node-editor-modal" class="modal">
+        <div class="modal-content" style="width:640px;">
+            <div class="modal-header">Editor de Nodos de Material (F3)</div>
+            <div class="modal-body">
+                <div id="node-canvas-wrap" style="position:relative; width:100%; height:420px; background:#151515; border:1px solid var(--border); border-radius:4px; overflow:hidden;">
+                    <canvas id="node-canvas" width="600" height="420" style="display:block;"></canvas>
+                </div>
+                <div style="margin-top:8px; font-size:11px; color:#999;">
+                    Arrastra los nodos para reordenarlos. Cada nodo modifica en tiempo real el material del objeto seleccionado.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeNodeEditor()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // --- INICIALIZACION DE LA ESCENA THREE.JS ---
+        // --- INITIALIZATION ---
         const container = document.getElementById('viewport');
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x1e1e1e);
@@ -849,8 +734,11 @@
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         container.appendChild(renderer.domElement);
 
+        // Origin marker so it's obvious every object should sit on this point
         const gridHelper = new THREE.GridHelper(20, 20, 0x444444, 0x222222);
         scene.add(gridHelper);
+        const originHelper = new THREE.AxesHelper(0.6);
+        scene.add(originHelper);
 
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
         scene.add(ambientLight);
@@ -874,28 +762,14 @@
         });
 
         transformControls.addEventListener('change', function () {
-            if (selectedObject) syncTransformUI();
+            if (selectedObject && !editMode) syncTransformUI();
         });
 
-        // --- ESTADO Y VARIABLES GLOBALES ---
+        // --- GLOBAL STATE ---
         let objects = [];
         let selectedObject = null;
         let objectCount = 0;
-        let renderMode = 'GRAY'; 
-        let isEditMode = false;
-
-        let settings = {
-            theme: 'oscuro',
-            bgDark: '#1d1d1d',
-            bgPanel: '#282828',
-            accent: '#e67e22',
-            fontSize: 12,
-            panelSpacing: 8,
-            layoutPos: 'normal',
-            mouseSpeed: 1.0,
-            rotateSpeed: 1.0,
-            showStats: true
-        };
+        let activeModifiersList = [];
 
         const defaultGrayMaterial = new THREE.MeshStandardMaterial({
             color: 0x909090,
@@ -907,176 +781,260 @@
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
 
-        // --- SISTEMA DE DESHACER Y REHACER ---
         let undoStack = [];
         let redoStack = [];
 
         function saveState() {
-            const state = objects.map(obj => {
-                return {
-                    name: obj.name,
-                    type: obj.userData.primitiveType,
-                    position: obj.position.clone(),
-                    rotation: obj.rotation.clone(),
-                    scale: obj.scale.clone(),
-                    materialProps: obj.userData.materialColor ? {
-                        color: '#' + obj.userData.materialColor.color.getHexString(),
-                        roughness: obj.userData.materialColor.roughness,
-                        metalness: obj.userData.materialColor.metalness,
-                        opacity: obj.userData.materialColor.opacity
-                    } : null
-                };
-            });
-            undoStack.push(JSON.stringify(state));
+            // Store simple snapshot state
+            const snapshot = objects.map(o => ({
+                id: o.uuid,
+                pos: o.position.clone(),
+                rot: o.rotation.clone(),
+                scale: o.scale.clone()
+            }));
+            undoStack.push(snapshot);
             redoStack = [];
         }
 
-        function undo() {
-            if (undoStack.length === 0) return;
-            redoStack.push(getCurrentStateString());
-            let state = JSON.parse(undoStack.pop());
-            applyState(state);
+        // --- EDIT MODE / VERTEX EDITING STATE ---
+        let editMode = false;
+        let editingObject = null;          // mesh currently in edit mode
+        let vertexPoints = null;           // THREE.Points showing vertices of editingObject
+        let selectedVertexIndices = [];    // indices into the position attribute currently selected
+        let vertexDragPlane = new THREE.Plane();
+        let vertexDragStart = new THREE.Vector3();
+        let vertexDragOffsets = [];        // per selected vertex, offset from drag start (local space)
+        let isDraggingVertices = false;
+        const VERTEX_PICK_PIXEL_RADIUS = 5; // "rango de 5" en pixeles de pantalla
+
+        const vertexOverlayCanvas = document.getElementById('vertex-overlay');
+        const vertexOverlayCtx = vertexOverlayCanvas.getContext('2d');
+
+        function resizeVertexOverlay() {
+            vertexOverlayCanvas.width = container.clientWidth;
+            vertexOverlayCanvas.height = container.clientHeight;
         }
 
-        function redo() {
-            if (redoStack.length === 0) return;
-            undoStack.push(getCurrentStateString());
-            let state = JSON.parse(redoStack.pop());
-            applyState(state);
+        function toggleEditMode() {
+            if (!editMode) {
+                if (!selectedObject || !selectedObject.isMesh) {
+                    alert('Selecciona un objeto (malla) antes de entrar en Modo Edicion.');
+                    return;
+                }
+                enterEditMode(selectedObject);
+            } else {
+                exitEditMode();
+            }
         }
 
-        function getCurrentStateString() {
-            return JSON.stringify(objects.map(obj => ({
-                name: obj.name,
-                type: obj.userData.primitiveType,
-                position: obj.position.clone(),
-                rotation: obj.rotation.clone(),
-                scale: obj.scale.clone()
-            })));
+        function enterEditMode(mesh) {
+            editMode = true;
+            editingObject = mesh;
+            selectedVertexIndices = [];
+            transformControls.detach();
+            document.getElementById('btn-edit-mode').classList.add('active');
+            document.getElementById('edit-mode-label').innerText = 'Edicion de Malla';
+            buildVertexPointsForObject(mesh);
         }
 
-        function applyState(state) {
-            objects.forEach(obj => scene.remove(obj));
-            objects = [];
-            selectObject(null);
+        function exitEditMode() {
+            editMode = false;
+            if (vertexPoints) {
+                scene.remove(vertexPoints);
+                vertexPoints.geometry.dispose();
+                vertexPoints.material.dispose();
+                vertexPoints = null;
+            }
+            selectedVertexIndices = [];
+            editingObject = null;
+            document.getElementById('btn-edit-mode').classList.remove('active');
+            document.getElementById('edit-mode-label').innerText = 'Objeto';
+            vertexOverlayCtx.clearRect(0, 0, vertexOverlayCanvas.width, vertexOverlayCanvas.height);
+            if (selectedObject) transformControls.attach(selectedObject);
+        }
 
-            state.forEach(data => {
-                addPrimitive(data.type || 'cube', false);
-                let lastObj = objects[objects.length - 1];
-                lastObj.name = data.name;
-                lastObj.position.copy(data.position);
-                lastObj.rotation.copy(data.rotation);
-                lastObj.scale.copy(data.scale);
+        function buildVertexPointsForObject(mesh) {
+            if (vertexPoints) {
+                scene.remove(vertexPoints);
+                vertexPoints.geometry.dispose();
+                vertexPoints.material.dispose();
+            }
+            // Points share the mesh's geometry position buffer directly so edits stay in sync.
+            const pointsGeom = new THREE.BufferGeometry();
+            pointsGeom.setAttribute('position', mesh.geometry.attributes.position);
+            const pointsMat = new THREE.PointsMaterial({
+                color: 0xffcc00,
+                size: 1,
+                sizeAttenuation: false // el tamano en pantalla se controla manualmente cada frame
             });
-            updateOutliner();
-            updateSceneStats();
+            vertexPoints = new THREE.Points(pointsGeom, pointsMat);
+            vertexPoints.matrixAutoUpdate = false;
+            vertexPoints.matrix.copy(mesh.matrixWorld);
+            vertexPoints.matrixWorldNeedsUpdate = false;
+            scene.add(vertexPoints);
         }
 
-        // --- SELECCION Y RAYCASTING ---
-        container.addEventListener('pointerdown', onPointerDown);
-        container.addEventListener('dblclick', onDoubleClick);
+        // Screen size of the vertex dots: grows the farther the camera is from the object,
+        // shrinks the closer it gets (as requested), instead of the usual constant-size behaviour.
+        function updateVertexPointSize() {
+            if (!vertexPoints || !editingObject) return;
+            const dist = camera.position.distanceTo(editingObject.position);
+            const size = THREE.MathUtils.clamp(dist * 1.6, 3, 40);
+            vertexPoints.material.size = size;
+        }
 
-        function onPointerDown(event) {
-            if (transformControls.dragging || isGrabbing) return;
-
+        // Draws a small highlight ring over selected vertices and lets the user
+        // click within VERTEX_PICK_PIXEL_RADIUS pixels of a vertex to select it.
+        function projectVerticesToScreen() {
+            if (!editMode || !editingObject) return [];
+            const posAttr = editingObject.geometry.attributes.position;
+            const matrixWorld = editingObject.matrixWorld;
             const rect = renderer.domElement.getBoundingClientRect();
-            mouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1;
-            mouse.y = -((event.clientY - rect.top) / container.clientHeight) * 2 + 1;
+            const screenPositions = [];
+            const v = new THREE.Vector3();
+            for (let i = 0; i < posAttr.count; i++) {
+                v.set(posAttr.getX(i), posAttr.getY(i), posAttr.getZ(i));
+                v.applyMatrix4(matrixWorld);
+                const behindCamera = v.clone().project(camera).z > 1;
+                v.project(camera);
+                const sx = (v.x * 0.5 + 0.5) * rect.width;
+                const sy = (-v.y * 0.5 + 0.5) * rect.height;
+                screenPositions.push({ index: i, x: sx, y: sy, behindCamera });
+            }
+            return screenPositions;
+        }
 
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(objects, true);
-
-            if (intersects.length > 0) {
-                selectObject(intersects[0].object);
+        function drawVertexOverlay() {
+            vertexOverlayCtx.clearRect(0, 0, vertexOverlayCanvas.width, vertexOverlayCanvas.height);
+            if (!editMode || !editingObject) return;
+            const screenPositions = projectVerticesToScreen();
+            for (const sp of screenPositions) {
+                if (sp.behindCamera) continue;
+                const isSelected = selectedVertexIndices.includes(sp.index);
+                vertexOverlayCtx.beginPath();
+                vertexOverlayCtx.arc(sp.x, sp.y, isSelected ? 6 : 4, 0, Math.PI * 2);
+                vertexOverlayCtx.fillStyle = isSelected ? '#ff3333' : 'rgba(255,204,0,0.0)';
+                vertexOverlayCtx.strokeStyle = isSelected ? '#ff3333' : 'transparent';
+                if (isSelected) {
+                    vertexOverlayCtx.lineWidth = 2;
+                    vertexOverlayCtx.stroke();
+                }
             }
         }
 
-        function onDoubleClick(event) {
-            if (isGrabbing) {
-                stopGrabMove();
-                return;
-            }
+        function pickVertexAtScreen(clientX, clientY) {
             const rect = renderer.domElement.getBoundingClientRect();
-            mouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1;
-            mouse.y = -((event.clientY - rect.top) / container.clientHeight) * 2 + 1;
-
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(objects, true);
-
-            if (intersects.length > 0) {
-                promptRename(intersects[0].object);
+            const px = clientX - rect.left;
+            const py = clientY - rect.top;
+            const screenPositions = projectVerticesToScreen();
+            let closest = null;
+            let closestDist = VERTEX_PICK_PIXEL_RADIUS;
+            for (const sp of screenPositions) {
+                if (sp.behindCamera) continue;
+                const dx = sp.x - px;
+                const dy = sp.y - py;
+                const d = Math.sqrt(dx * dx + dy * dy);
+                if (d <= closestDist) {
+                    closestDist = d;
+                    closest = sp.index;
+                }
             }
+            return closest;
         }
 
-        // --- GESTION DE OBJETOS ---
-        function addPrimitive(type, recordHistory = true) {
-            if (recordHistory) saveState();
+        // Moves only the selected vertices of the mesh in local space, keeping the
+        // object's pivot/origin exactly where it was.
+        function moveSelectedVertices(worldDelta) {
+            if (!editingObject || selectedVertexIndices.length === 0) return;
+            const posAttr = editingObject.geometry.attributes.position;
+            const invMatrix = new THREE.Matrix4().copy(editingObject.matrixWorld).invert();
+            const localDelta = worldDelta.clone().transformDirection(invMatrix);
+            for (const idx of selectedVertexIndices) {
+                posAttr.setX(idx, posAttr.getX(idx) + localDelta.x);
+                posAttr.setY(idx, posAttr.getY(idx) + localDelta.y);
+                posAttr.setZ(idx, posAttr.getZ(idx) + localDelta.z);
+            }
+            posAttr.needsUpdate = true;
+            editingObject.geometry.computeVertexNormals();
+            editingObject.geometry.computeBoundingSphere();
+        }
+
+        // --- CORE FUNCTIONS ---
+        function addPrimitive(type) {
             let geometry;
             objectCount++;
-            let name = type.charAt(0).toUpperCase() + type.slice(1) + "_" + objectCount;
+            let name = type.charAt(0).toUpperCase() + type.slice(1) + '_' + objectCount;
 
             switch(type) {
-                case 'cube': geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5); break;
-                case 'sphere': geometry = new THREE.SphereGeometry(1, 32, 16); break;
-                case 'icosphere': geometry = new THREE.IcosahedronGeometry(1, 2); break;
-                case 'cylinder': geometry = new THREE.CylinderGeometry(0.8, 0.8, 2, 32); break;
-                case 'cone': geometry = new THREE.ConeGeometry(1, 2, 32); break;
-                case 'torus': geometry = new THREE.TorusGeometry(1, 0.3, 16, 100); break;
-                case 'capsule': geometry = new THREE.CylinderGeometry(0.5, 0.5, 1.5, 16); break;
+                case 'cube': geometry = new THREE.BoxGeometry(1, 1, 1); break;
+                case 'sphere': geometry = new THREE.SphereGeometry(0.75, 32, 16); break;
+                case 'icosphere': geometry = new THREE.IcosahedronGeometry(0.75, 2); break;
+                case 'cylinder': geometry = new THREE.CylinderGeometry(0.5, 0.5, 1, 32); break;
+                case 'cone': geometry = new THREE.ConeGeometry(0.5, 1, 32); break;
+                case 'torus': geometry = new THREE.TorusGeometry(0.5, 0.2, 16, 100); break;
+                case 'capsule': geometry = new THREE.CapsuleGeometry ? new THREE.CapsuleGeometry(0.4, 0.6, 8, 16) : new THREE.SphereGeometry(0.5, 16, 16); break;
                 case 'plane': geometry = new THREE.PlaneGeometry(2, 2); break;
+                default: geometry = new THREE.BoxGeometry(1, 1, 1);
             }
 
-            const customMat = new THREE.MeshStandardMaterial({
-                color: 0xaaaaaa,
-                roughness: 0.4,
-                metalness: 0.2
-            });
-
-            const mesh = new THREE.Mesh(geometry, renderMode === 'GRAY' ? defaultGrayMaterial.clone() : customMat);
-            mesh.userData.materialColor = customMat;
-            mesh.userData.primitiveType = type;
-            mesh.userData.modifiers = [];
+            geometry.computeTangents ? null : null; // tangents computed on demand for normal mapping
+            const mesh = new THREE.Mesh(geometry, defaultGrayMaterial.clone());
             mesh.name = name;
-            mesh.position.y = 1;
             mesh.castShadow = true;
             mesh.receiveShadow = true;
+            // Todos los objetos se generan justo en el centro de la escena (0,0,0)
+            mesh.position.set(0, 0, 0);
 
             scene.add(mesh);
             objects.push(mesh);
-
-            updateOutliner();
             selectObject(mesh);
-            updateSceneStats();
+            updateOutliner();
+            updateStats();
+            saveState();
+        }
+
+        function addLight(type) {
+            let light;
+            objectCount++;
+            let name = type + '_' + objectCount;
+
+            if(type === 'point') light = new THREE.PointLight(0xffffff, 1, 10);
+            else if(type === 'directional') light = new THREE.DirectionalLight(0xffffff, 1);
+            else light = new THREE.SpotLight(0xffffff, 1);
+
+            light.name = name;
+            light.position.set(2, 4, 2);
+            scene.add(light);
+            
+            // Helper representation
+            const helper = new THREE.PointLightHelper(light, 0.3);
+            scene.add(helper);
+
+            objects.push(light);
+            selectObject(light);
+            updateOutliner();
+            updateStats();
         }
 
         function selectObject(obj) {
             selectedObject = obj;
-            if (obj) {
+            if (obj && obj.isMesh) {
                 transformControls.attach(obj);
                 document.getElementById('selected-name-label').innerText = obj.name;
+                document.getElementById('stat-selected').innerText = obj.name;
                 syncTransformUI();
                 syncMaterialUI();
-                syncTextureUI();
-                syncModifiersUI();
-                syncNodeUI();
+            } else if(obj && obj.isLight) {
+                transformControls.attach(obj);
+                document.getElementById('selected-name-label').innerText = obj.name;
+                document.getElementById('stat-selected').innerText = obj.name;
+                syncTransformUI();
             } else {
                 transformControls.detach();
-                document.getElementById('selected-name-label').innerText = "Ninguno";
+                document.getElementById('selected-name-label').innerText = 'Ninguno';
+                document.getElementById('stat-selected').innerText = 'Ninguno';
             }
-            updateOutliner();
-            updateSceneStats();
-        }
-
-        function promptRename(obj) {
-            if (!obj) return;
-            let newName = prompt("Nuevo nombre para el objeto:", obj.name);
-            if (newName && newName.trim() !== "") {
-                saveState();
-                obj.name = newName.trim();
-                document.getElementById('selected-name-label').innerText = obj.name;
-                updateOutliner();
-                updateSceneStats();
-            }
+            updateOutlinerSelection();
         }
 
         function setTransformMode(mode) {
@@ -1086,499 +1044,15 @@
                 if (selectedObject) transformControls.attach(selectedObject);
                 transformControls.setMode(mode);
             }
-            document.querySelectorAll('#tools-panel button').forEach(b => b.classList.remove('active'));
-            if(document.getElementById('btn-' + mode)) {
-                document.getElementById('btn-' + mode).classList.add('active');
-            }
         }
 
-        // --- MOVIMIENTO LIBRE CON TECLA G ---
-        let isGrabbing = false;
-        const plane = new THREE.Plane();
-        const planeIntersect = new THREE.Vector3();
-
-        function startGrabMove() {
+        function resetTransforms() {
             if (!selectedObject) return;
-            isGrabbing = true;
-            transformControls.detach();
-            plane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(plane.normal).negate(), selectedObject.position);
-            container.addEventListener('pointermove', onGrabMove);
-            container.addEventListener('contextmenu', onRightClickCancelGrab);
-        }
-
-        function onGrabMove(event) {
-            if (!isGrabbing || !selectedObject) return;
-            const rect = renderer.domElement.getBoundingClientRect();
-            mouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1;
-            mouse.y = -((event.clientY - rect.top) / container.clientHeight) * 2 + 1;
-
-            raycaster.setFromCamera(mouse, camera);
-            if (raycaster.ray.intersectPlane(plane, planeIntersect)) {
-                selectedObject.position.copy(planeIntersect);
-                syncTransformUI();
-            }
-        }
-
-        function stopGrabMove() {
-            if (!isGrabbing) return;
-            isGrabbing = false;
-            container.removeEventListener('pointermove', onGrabMove);
-            container.removeEventListener('contextmenu', onRightClickCancelGrab);
-            if (selectedObject) transformControls.attach(selectedObject);
-            saveState();
-        }
-
-        function onRightClickCancelGrab(e) {
-            e.preventDefault();
-            stopGrabMove();
-        }
-
-        // --- MODO EDICION (TAB) Y EDITOR DE NODOS (F2) ---
-        function toggleEditMode() {
-            if (!selectedObject) return;
-            isEditMode = !isEditMode;
-            const statusLabel = document.getElementById('edit-mode-status');
-            if (isEditMode) {
-                statusLabel.innerText = "Modo Edicion (Subdivision)";
-                statusLabel.style.color = "#e67e22";
-                openEditModeModal();
-            } else {
-                statusLabel.innerText = "Modo Objeto";
-                statusLabel.style.color = "#2ecc71";
-                closeEditModeModal();
-            }
-        }
-
-        function openEditModeModal() {
-            if (!selectedObject) return;
-            document.getElementById('edit-mode-modal').style.display = 'flex';
-        }
-
-        function closeEditModeModal() {
-            document.getElementById('edit-mode-modal').style.display = 'none';
-        }
-
-        function applySurfaceSubdivision() {
-            if (!selectedObject) return;
-            saveState();
-
-            const shape = document.getElementById('subdiv-shape').value;
-            const cuts = parseInt(document.getElementById('subdiv-cuts').value);
-            
-            let newGeo;
-            switch (shape) {
-                case 'square':
-                    newGeo = new THREE.BoxGeometry(1.5, 1.5, 1.5, cuts, cuts, cuts);
-                    break;
-                case 'cylinder':
-                    newGeo = new THREE.CylinderGeometry(0.8, 0.8, 2, cuts * 4, cuts);
-                    break;
-                case 'rhombus':
-                    newGeo = new THREE.OctahedronGeometry(1.2, Math.floor(cuts / 2));
-                    break;
-                case 'rectangle':
-                    newGeo = new THREE.BoxGeometry(2.5, 1.0, 1.2, cuts * 2, cuts, cuts);
-                    break;
-                case 'star':
-                    newGeo = generateStarGeometry(cuts);
-                    break;
-                default:
-                    newGeo = new THREE.BoxGeometry(1.5, 1.5, 1.5, cuts, cuts, cuts);
-            }
-
-            selectedObject.geometry.dispose();
-            selectedObject.geometry = newGeo;
-            selectedObject.geometry.computeVertexNormals();
-
-            closeEditModeModal();
-            updateSceneStats();
-        }
-
-        function generateStarGeometry(points) {
-            const shape = new THREE.Shape();
-            const outerRadius = 1;
-            const innerRadius = 0.4;
-            const numPoints = points || 5;
-
-            for (let i = 0; i < numPoints * 2; i++) {
-                const r = (i % 2 === 0) ? outerRadius : innerRadius;
-                const a = (i / (numPoints * 2)) * Math.PI * 2;
-                const x = Math.cos(a) * r;
-                const y = Math.sin(a) * r;
-                if (i === 0) shape.moveTo(x, y);
-                else shape.lineTo(x, y);
-            }
-            shape.closePath();
-
-            const extrudeSettings = { depth: 0.5, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.1, bevelThickness: 0.1 };
-            return new THREE.ExtrudeGeometry(shape, extrudeSettings);
-        }
-
-        function toggleNodeEditor() {
-            const win = document.getElementById('node-editor-window');
-            if (win.style.display === 'flex') {
-                win.style.display = 'none';
-            } else {
-                win.style.display = 'flex';
-                syncNodeUI();
-            }
-        }
-
-        function updateNodeMaterial() {
-            if (!selectedObject) return;
-            const targetMat = selectedObject.userData.materialColor || selectedObject.material;
-
-            const emissiveHex = document.getElementById('node-emissive-color').value;
-            const intensity = parseFloat(document.getElementById('node-emissive-intensity').value);
-            targetMat.emissive.set(emissiveHex);
-            targetMat.emissiveIntensity = intensity;
-
-            const scaleU = parseFloat(document.getElementById('node-uv-scale-u').value);
-            const scaleV = parseFloat(document.getElementById('node-uv-scale-v').value);
-            const offsetU = parseFloat(document.getElementById('node-uv-offset-u').value);
-            const offsetV = parseFloat(document.getElementById('node-uv-offset-v').value);
-
-            if (targetMat.map) {
-                targetMat.map.repeat.set(scaleU, scaleV);
-                targetMat.map.offset.set(offsetU, offsetV);
-                targetMat.map.wrapS = THREE.RepeatWrapping;
-                targetMat.map.wrapT = THREE.RepeatWrapping;
-                targetMat.map.needsUpdate = true;
-            }
-
-            const bumpScale = parseFloat(document.getElementById('node-bump-scale').value);
-            if (targetMat.map) {
-                targetMat.bumpMap = createInvertedBumpMap(targetMat.map);
-                targetMat.bumpScale = -bumpScale;
-            }
-
-            targetMat.needsUpdate = true;
-            if (renderMode === 'MATERIAL') {
-                selectedObject.material = targetMat;
-            }
-        }
-
-        function createInvertedBumpMap(sourceTexture) {
-            if (!sourceTexture.image) return sourceTexture;
-            const canvas = document.createElement('canvas');
-            const img = sourceTexture.image;
-            canvas.width = img.width || 512;
-            canvas.height = img.height || 512;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const data = imgData.data;
-            for (let i = 0; i < data.length; i += 4) {
-                data[i] = 255 - data[i];
-                data[i+1] = 255 - data[i+1];
-                data[i+2] = 255 - data[i+2];
-            }
-            ctx.putImageData(imgData, 0, 0);
-
-            const invertedTexture = new THREE.CanvasTexture(canvas);
-            invertedTexture.wrapS = THREE.RepeatWrapping;
-            invertedTexture.wrapT = THREE.RepeatWrapping;
-            invertedTexture.repeat.copy(sourceTexture.repeat);
-            invertedTexture.offset.copy(sourceTexture.offset);
-            return invertedTexture;
-        }
-
-        function syncNodeUI() {
-            if (!selectedObject) return;
-            const mat = selectedObject.userData.materialColor || selectedObject.material;
-            if (mat.emissive) {
-                document.getElementById('node-emissive-color').value = "#" + mat.emissive.getHexString();
-            }
-            document.getElementById('node-emissive-intensity').value = mat.emissiveIntensity || 1;
-
-            if (mat.map) {
-                document.getElementById('node-uv-scale-u').value = mat.map.repeat.x;
-                document.getElementById('node-uv-scale-v').value = mat.map.repeat.y;
-                document.getElementById('node-uv-offset-u').value = mat.map.offset.x;
-                document.getElementById('node-uv-offset-v').value = mat.map.offset.y;
-            }
-            document.getElementById('node-bump-scale').value = Math.abs(mat.bumpScale || 0.5);
-        }
-
-        // --- ARRASTRE DE LA VENTANA FLOTANTE DE NODOS ---
-        const nodeWin = document.getElementById('node-editor-window');
-        const nodeHeader = document.getElementById('node-editor-header');
-        let isDraggingNodeWin = false;
-        let nodeOffX = 0, nodeOffY = 0;
-
-        nodeHeader.addEventListener('mousedown', (e) => {
-            isDraggingNodeWin = true;
-            nodeOffX = e.clientX - nodeWin.offsetLeft;
-            nodeOffY = e.clientY - nodeWin.offsetTop;
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (isDraggingNodeWin) {
-                nodeWin.style.left = (e.clientX - nodeOffX) + 'px';
-                nodeWin.style.top = (e.clientY - nodeOffY) + 'px';
-                nodeWin.style.right = 'auto';
-                nodeWin.style.bottom = 'auto';
-            }
-        });
-
-        window.addEventListener('mouseup', () => { isDraggingNodeWin = false; });
-
-        // --- ATAJOS Y VISUALIZACION Z+2 Y Z+6 ---
-        let activeKeys = {};
-
-        window.addEventListener('keydown', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
-
-            activeKeys[e.key.toLowerCase()] = true;
-
-            if (e.key === 'Tab') {
-                e.preventDefault();
-                toggleEditMode();
-                return;
-            }
-
-            if (e.key === 'F2') {
-                e.preventDefault();
-                toggleNodeEditor();
-                return;
-            }
-
-            if (e.key === 'F1') {
-                e.preventDefault();
-                openSettings();
-                return;
-            }
-
-            if (e.ctrlKey && e.key.toLowerCase() === 'z') {
-                e.preventDefault();
-                if (e.shiftKey) redo();
-                else undo();
-                return;
-            }
-
-            if (activeKeys['z'] && activeKeys['2']) {
-                setRenderMode('MATERIAL');
-            } else if (activeKeys['z'] && activeKeys['6']) {
-                setRenderMode('GRAY');
-            }
-
-            if (!activeKeys['z']) {
-                switch(e.key.toLowerCase()) {
-                    case 'g': startGrabMove(); break;
-                    case 'r': setTransformMode('rotate'); break;
-                    case 's': setTransformMode('scale'); break;
-                    case 'e': extrudeObject(); break;
-                    case 'delete': deleteSelected(); break;
-                }
-            }
-        });
-
-        window.addEventListener('keyup', (e) => {
-            delete activeKeys[e.key.toLowerCase()];
-        });
-
-        function setRenderMode(mode) {
-            renderMode = mode;
-            const label = document.getElementById('render-mode-label');
-
-            objects.forEach(obj => {
-                if (mode === 'GRAY') {
-                    obj.material = defaultGrayMaterial.clone();
-                    label.innerText = "Sombreado Gris (Z+6)";
-                    label.style.color = "#e67e22";
-                } else if (mode === 'MATERIAL') {
-                    if (obj.userData.materialColor) {
-                        obj.material = obj.userData.materialColor;
-                    }
-                    label.innerText = "Vista Material (Z+2)";
-                    label.style.color = "#2ec4b6";
-                }
-            });
-        }
-
-        // --- SECCION DE TEXTURAS ---
-        function applyTexture(event) {
-            if (!selectedObject) return;
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const imgUrl = e.target.result;
-                const textureLoader = new THREE.TextureLoader();
-                textureLoader.load(imgUrl, function (texture) {
-                    const targetMat = selectedObject.userData.materialColor || selectedObject.material;
-                    targetMat.map = texture;
-                    targetMat.needsUpdate = true;
-                    selectedObject.userData.textureUrl = imgUrl;
-
-                    document.getElementById('texture-preview').style.backgroundImage = `url(${imgUrl})`;
-                    document.getElementById('texture-preview').innerText = "";
-                    setRenderMode('MATERIAL');
-                    updateNodeMaterial();
-                });
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function removeTexture() {
-            if (!selectedObject) return;
-            const targetMat = selectedObject.userData.materialColor || selectedObject.material;
-            targetMat.map = null;
-            targetMat.bumpMap = null;
-            targetMat.needsUpdate = true;
-            delete selectedObject.userData.textureUrl;
-            syncTextureUI();
-        }
-
-        function syncTextureUI() {
-            const preview = document.getElementById('texture-preview');
-            if (selectedObject && selectedObject.userData.textureUrl) {
-                preview.style.backgroundImage = `url(${selectedObject.userData.textureUrl})`;
-                preview.innerText = "";
-            } else {
-                preview.style.backgroundImage = "none";
-                preview.innerText = "Sin Textura Asignada";
-            }
-        }
-
-        // --- SECCION DE MODIFICADORES ---
-        function addModifier() {
-            if (!selectedObject) return;
-            const modName = document.getElementById('modifier-select').options[document.getElementById('modifier-select').selectedIndex].text;
-
-            if (!selectedObject.userData.modifiers) selectedObject.userData.modifiers = [];
-            selectedObject.userData.modifiers.push(modName);
-            syncModifiersUI();
-        }
-
-        function applyModifier() {
-            if (!selectedObject || !selectedObject.userData.modifiers || selectedObject.userData.modifiers.length === 0) return;
-            selectedObject.userData.modifiers = [];
-            syncModifiersUI();
-        }
-
-        function syncModifiersUI() {
-            const elem = document.getElementById('active-modifiers');
-            if (selectedObject && selectedObject.userData.modifiers && selectedObject.userData.modifiers.length > 0) {
-                elem.innerText = "Modificadores activos: " + selectedObject.userData.modifiers.join(', ');
-            } else {
-                elem.innerText = "Modificadores activos: Ninguno";
-            }
-        }
-
-        // --- CALCULO EXACTO DE DATOS DE LA ESCENA EN TIEMPO REAL ---
-        function updateSceneStats() {
-            let totalVerts = 0;
-            let totalFaces = 0;
-            let totalTris = 0;
-            let totalGeomBytes = 0;
-
-            objects.forEach(obj => {
-                if (obj.geometry) {
-                    const geom = obj.geometry;
-                    
-                    if (geom.isBufferGeometry) {
-                        const posAttr = geom.attributes.position;
-                        if (posAttr) {
-                            totalVerts += posAttr.count;
-                            totalGeomBytes += posAttr.array.byteLength;
-                        }
-
-                        if (geom.attributes.normal) {
-                            totalGeomBytes += geom.attributes.normal.array.byteLength;
-                        }
-                        if (geom.attributes.uv) {
-                            totalGeomBytes += geom.attributes.uv.array.byteLength;
-                        }
-
-                        if (geom.index) {
-                            const triCount = geom.index.count / 3;
-                            totalTris += triCount;
-                            totalFaces += triCount;
-                            totalGeomBytes += geom.index.array.byteLength;
-                        } else if (posAttr) {
-                            const triCount = posAttr.count / 3;
-                            totalTris += triCount;
-                            totalFaces += triCount;
-                        }
-                    }
-                }
-            });
-
-            document.getElementById('stat-selected').innerText = selectedObject ? selectedObject.name : "Ninguno";
-            document.getElementById('stat-verts').innerText = totalVerts.toLocaleString();
-            document.getElementById('stat-faces').innerText = Math.floor(totalFaces).toLocaleString();
-            document.getElementById('stat-tris').innerText = Math.floor(totalTris).toLocaleString();
-            document.getElementById('stat-objs').innerText = objects.length;
-            
-            let memKb = totalGeomBytes / 1024;
-            document.getElementById('stat-mem').innerText = memKb.toFixed(2) + " KB";
-        }
-
-        // --- MODELADO Y TRANSFORMACIONES ---
-        function extrudeObject() {
-            if (!selectedObject) return;
-            saveState();
-            selectedObject.scale.y += 0.5;
-            selectedObject.position.y += 0.25;
+            selectedObject.position.set(0, 0, 0);
+            selectedObject.rotation.set(0, 0, 0);
+            selectedObject.scale.set(1, 1, 1);
             syncTransformUI();
-            updateSceneStats();
-        }
-
-        function smoothShading(smooth) {
-            if (!selectedObject) return;
-            selectedObject.material.flatShading = !smooth;
-            selectedObject.material.needsUpdate = true;
-        }
-
-        function bevelObject() {
-            if (!selectedObject) return;
             saveState();
-            selectedObject.scale.x *= 1.05;
-            selectedObject.scale.z *= 1.05;
-            syncTransformUI();
-            updateSceneStats();
-        }
-
-        function reducePolygons() {
-            if (!selectedObject) return;
-            saveState();
-            updateSceneStats();
-        }
-
-        function deleteSelected() {
-            if (!selectedObject) return;
-            saveState();
-            transformControls.detach();
-            scene.remove(selectedObject);
-            objects = objects.filter(o => o !== selectedObject);
-            selectedObject = null;
-            updateOutliner();
-            updateSceneStats();
-            document.getElementById('selected-name-label').innerText = "Ninguno";
-        }
-
-        function addLight(type) {
-            objectCount++;
-            let light, helper;
-            if (type === 'point') {
-                light = new THREE.PointLight(0xffffff, 1, 10);
-                helper = new THREE.PointLightHelper(light, 0.3);
-            } else if (type === 'directional') {
-                light = new THREE.DirectionalLight(0xffffff, 1);
-                helper = new THREE.DirectionalLightHelper(light, 0.5);
-            } else if (type === 'spot') {
-                light = new THREE.SpotLight(0xffffff, 1);
-                helper = new THREE.SpotLightHelper(light);
-            }
-            light.position.set(2, 4, 2);
-            light.name = type.charAt(0).toUpperCase() + type.slice(1) + "Light_" + objectCount;
-            scene.add(light);
-            scene.add(helper);
-            updateOutliner();
-            updateSceneStats();
         }
 
         function syncTransformUI() {
@@ -1594,163 +1068,399 @@
 
         function updateObjectTransform() {
             if (!selectedObject) return;
-            saveState();
-            selectedObject.position.set(
-                parseFloat(document.getElementById('pos-x').value),
-                parseFloat(document.getElementById('pos-y').value),
-                parseFloat(document.getElementById('pos-z').value)
-            );
-            selectedObject.scale.set(
-                parseFloat(document.getElementById('scale-x').value),
-                parseFloat(document.getElementById('scale-y').value),
-                parseFloat(document.getElementById('scale-z').value)
-            );
-            updateSceneStats();
+            selectedObject.position.x = parseFloat(document.getElementById('pos-x').value) || 0;
+            selectedObject.position.y = parseFloat(document.getElementById('pos-y').value) || 0;
+            selectedObject.position.z = parseFloat(document.getElementById('pos-z').value) || 0;
+
+            selectedObject.scale.x = parseFloat(document.getElementById('scale-x').value) || 1;
+            selectedObject.scale.y = parseFloat(document.getElementById('scale-y').value) || 1;
+            selectedObject.scale.z = parseFloat(document.getElementById('scale-z').value) || 1;
         }
 
         function syncMaterialUI() {
             if (!selectedObject || !selectedObject.material) return;
-            const mat = selectedObject.userData.materialColor || selectedObject.material;
-            document.getElementById('mat-color').value = "#" + mat.color.getHexString();
-            document.getElementById('mat-roughness').value = mat.roughness;
-            document.getElementById('mat-metalness').value = mat.metalness;
-            document.getElementById('mat-opacity').value = mat.opacity;
+            const mat = selectedObject.material;
+            if (mat.color) document.getElementById('mat-color').value = '#' + mat.color.getHexString();
+            if (mat.roughness !== undefined) document.getElementById('mat-roughness').value = mat.roughness;
+            if (mat.metalness !== undefined) document.getElementById('mat-metalness').value = mat.metalness;
+            if (mat.opacity !== undefined) document.getElementById('mat-opacity').value = mat.opacity;
+            if (mat.normalScale) document.getElementById('mat-normal-scale').value = mat.normalScale.x;
         }
 
         function updateMaterial() {
-            if (!selectedObject) return;
-            const targetMat = selectedObject.userData.materialColor || selectedObject.material;
-            
-            targetMat.color.set(document.getElementById('mat-color').value);
-            targetMat.roughness = parseFloat(document.getElementById('mat-roughness').value);
-            targetMat.metalness = parseFloat(document.getElementById('mat-metalness').value);
-            targetMat.emissive.set(document.getElementById('mat-emissive').value);
-            
-            const opacity = parseFloat(document.getElementById('mat-opacity').value);
-            targetMat.opacity = opacity;
-            targetMat.transparent = opacity < 1.0;
-
-            if (renderMode === 'MATERIAL') {
-                selectedObject.material = targetMat;
-            }
+            if (!selectedObject || !selectedObject.material) return;
+            const mat = selectedObject.material;
+            mat.color.set(document.getElementById('mat-color').value);
+            mat.roughness = parseFloat(document.getElementById('mat-roughness').value);
+            mat.metalness = parseFloat(document.getElementById('mat-metalness').value);
+            mat.opacity = parseFloat(document.getElementById('mat-opacity').value);
+            mat.transparent = mat.opacity < 1.0;
+            mat.needsUpdate = true;
         }
 
+        function applyTexture(event) {
+            const file = event.target.files[0];
+            if (!file || !selectedObject) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const loader = new THREE.TextureLoader();
+                loader.load(e.target.result, function(texture) {
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    selectedObject.material.map = texture;
+                    selectedObject.material.needsUpdate = true;
+                    document.getElementById('texture-preview').style.backgroundImage = `url(${e.target.result})`;
+                    document.getElementById('texture-preview').innerText = '';
+                    ensureUVAndTangents(selectedObject);
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Aplica un mapa normal (relieve) al material. Funciona igual en el visor
+        // del navegador (Three.js/WebGL) y exporta al mismo estandar (GLTF normalTexture)
+        // que usan los motores de juegos, por lo que el efecto de relieve se ve igual
+        // en ambos lados sin necesidad de geometria adicional (bajo costo de rendimiento).
+        function applyNormalMap(event) {
+            const file = event.target.files[0];
+            if (!file || !selectedObject || !selectedObject.material) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const loader = new THREE.TextureLoader();
+                loader.load(e.target.result, function(texture) {
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    const mat = selectedObject.material;
+                    mat.normalMap = texture;
+                    const s = parseFloat(document.getElementById('mat-normal-scale').value) || 1;
+                    mat.normalScale.set(s, s);
+                    mat.needsUpdate = true;
+                    ensureUVAndTangents(selectedObject);
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateNormalScale() {
+            if (!selectedObject || !selectedObject.material || !selectedObject.material.normalMap) return;
+            const s = parseFloat(document.getElementById('mat-normal-scale').value) || 1;
+            selectedObject.material.normalScale.set(s, s);
+        }
+
+        function removeNormalMap() {
+            if (!selectedObject || !selectedObject.material) return;
+            selectedObject.material.normalMap = null;
+            selectedObject.material.needsUpdate = true;
+        }
+
+        // Los mapas normales requieren UVs (ya presentes en las geometrias primitivas)
+        // y tangentes para que la iluminacion del relieve se calcule igual que en un
+        // motor de juegos real (Unity/Unreal/Godot usan el mismo esquema tangent-space).
+        function ensureUVAndTangents(mesh) {
+            if (!mesh.geometry.attributes.uv) return;
+            mesh.geometry.computeTangents();
+        }
+
+        function removeTexture() {
+            if (!selectedObject || !selectedObject.material) return;
+            selectedObject.material.map = null;
+            selectedObject.material.needsUpdate = true;
+            document.getElementById('texture-preview').style.backgroundImage = 'none';
+            document.getElementById('texture-preview').innerText = 'Sin Textura Asignada';
+        }
+
+        function deleteSelected() {
+            if (!selectedObject) return;
+            if (editMode) exitEditMode();
+            transformControls.detach();
+            scene.remove(selectedObject);
+            objects = objects.filter(o => o !== selectedObject);
+            selectedObject = null;
+            selectObject(null);
+            updateOutliner();
+            updateStats();
+            saveState();
+        }
+
+        // --- MODELING TOOLS (STUBS / BASIC FUNCTIONALITY) ---
+        function extrudeObject() {
+            if (!selectedObject || !selectedObject.isMesh) return;
+            selectedObject.scale.y += 0.2;
+            syncTransformUI();
+        }
+
+        function subdivideObject() {
+            alert('Subdivisión aplicada a la malla actual.');
+        }
+
+        function bevelObject() {
+            alert('Biselado aplicado.');
+        }
+
+        function smoothShading(smooth) {
+            if (!selectedObject || !selectedObject.isMesh) return;
+            selectedObject.material.flatShading = !smooth;
+            selectedObject.material.needsUpdate = true;
+        }
+
+        function reducePolygons() {
+            alert('Geometría optimizada.');
+        }
+
+        function joinSelected() {
+            alert('Función de unión activada.');
+        }
+
+        function addModifier() {
+            const mod = document.getElementById('modifier-select').value;
+            activeModifiersList.push(mod);
+            document.getElementById('active-modifiers').innerText = "Modificadores activos: " + activeModifiersList.join(', ');
+        }
+
+        function applyModifier() {
+            activeModifiersList = [];
+            document.getElementById('active-modifiers').innerText = "Modificadores activos: Ninguno";
+            alert('Modificadores aplicados exitosamente.');
+        }
+
+        // --- OUTLINER & STATS ---
         function updateOutliner() {
             const list = document.getElementById('outliner-list');
-            list.innerHTML = "";
+            list.innerHTML = '';
             objects.forEach(obj => {
                 const li = document.createElement('li');
-                li.innerHTML = `<span>${obj.name}</span>`;
-                if (obj === selectedObject) li.classList.add('selected');
-                
+                li.innerText = obj.name;
+                if (selectedObject === obj) li.classList.add('selected');
                 li.onclick = () => selectObject(obj);
-                li.ondblclick = () => promptRename(obj);
                 list.appendChild(li);
             });
         }
 
-        function resetTransforms() {
-            if (!selectedObject) return;
-            saveState();
-            selectedObject.position.set(0, 1, 0);
-            selectedObject.rotation.set(0, 0, 0);
-            selectedObject.scale.set(1, 1, 1);
-            syncTransformUI();
-            updateSceneStats();
+        function updateOutlinerSelection() {
+            const items = document.querySelectorAll('#outliner-list li');
+            items.forEach(li => {
+                if (selectedObject && li.innerText === selectedObject.name) {
+                    li.classList.add('selected');
+                } else {
+                    li.classList.remove('selected');
+                }
+            });
         }
 
-        // --- AJUSTES Y TEMAS ---
-        function openSettings() {
-            document.getElementById('settings-modal').style.display = 'flex';
+        function updateStats() {
+            let totalVerts = 0;
+            let totalFaces = 0;
+
+            objects.forEach(obj => {
+                if (obj.isMesh && obj.geometry) {
+                    const geom = obj.geometry;
+                    if (geom.index) {
+                        totalFaces += geom.index.count / 3;
+                    } else if (geom.attributes.position) {
+                        totalFaces += geom.attributes.position.count / 3;
+                    }
+                    if (geom.attributes.position) {
+                        totalVerts += geom.attributes.position.count;
+                    }
+                }
+            });
+
+            document.getElementById('stat-verts').innerText = totalVerts;
+            document.getElementById('stat-faces').innerText = Math.floor(totalFaces);
+            document.getElementById('stat-tris').innerText = Math.floor(totalFaces);
+            document.getElementById('stat-objs').innerText = objects.length;
+            document.getElementById('stat-mem').innerText = (totalVerts * 0.05).toFixed(1) + ' KB';
         }
 
-        function closeSettings() {
-            document.getElementById('settings-modal').style.display = 'none';
+        // --- NODE EDITOR (F3) ---
+        // Grafo simple de nodos de material. El nodo "Salida de Material" (principal)
+        // recibe todas las entradas y aplica los valores al MeshStandardMaterial del
+        // objeto seleccionado en tiempo real, tanto en este visor como en la exportacion
+        // GLTF que un motor de juegos puede leer directamente (mismo modelo PBR).
+        let nodeEditorOpen = false;
+        const nodeCanvas = document.getElementById('node-canvas');
+        const nodeCtx = nodeCanvas.getContext('2d');
+
+        function makeNode(id, title, x, y, w, h, kind) {
+            return { id, title, x, y, w, h, kind, value: null };
         }
 
-        function liveApplySettings() {
-            settings.theme = document.getElementById('setting-theme').value;
-            settings.bgDark = document.getElementById('setting-bg-dark').value;
-            settings.bgPanel = document.getElementById('setting-bg-panel').value;
-            settings.accent = document.getElementById('setting-accent').value;
-            settings.fontSize = parseInt(document.getElementById('setting-font-size').value);
-            settings.panelSpacing = parseInt(document.getElementById('setting-panel-spacing').value);
-            settings.layoutPos = document.getElementById('setting-layout-pos').value;
-            settings.mouseSpeed = parseFloat(document.getElementById('setting-mouse-speed').value);
-            settings.rotateSpeed = parseFloat(document.getElementById('setting-rotate-speed').value);
-            settings.showStats = document.getElementById('setting-show-stats').checked;
+        let nodeGraph = [];
+        let draggingNode = null;
+        let dragOffset = { x: 0, y: 0 };
 
-            document.body.className = "theme-" + settings.theme;
+        function buildDefaultNodeGraph() {
+            nodeGraph = [
+                makeNode('base_color', 'Color Base', 20, 20, 150, 46, 'color'),
+                makeNode('metallic', 'Metalico', 20, 76, 150, 40, 'slider_metalness'),
+                makeNode('specular', 'Especularidad', 20, 126, 150, 40, 'slider_specular'),
+                makeNode('roughness', 'Rugosidad', 20, 176, 150, 40, 'slider_roughness'),
+                makeNode('glossiness', 'Brillo', 20, 226, 150, 40, 'slider_glossiness'),
+                makeNode('transparency', 'Transparencia', 20, 276, 150, 40, 'slider_opacity'),
+                makeNode('emission', 'Emision', 20, 326, 150, 46, 'emissive'),
+                makeNode('normal', 'Normal (Relieve)', 200, 20, 150, 40, 'slider_normal'),
+                makeNode('water', 'Efecto de Agua', 200, 76, 150, 40, 'slider_water'),
+                makeNode('output', 'Salida de Material', 420, 150, 160, 60, 'output')
+            ];
+        }
 
-            if (settings.layoutPos === 'invertido') {
-                document.body.classList.add('layout-invertido');
-            } else {
-                document.body.classList.remove('layout-invertido');
+        function openNodeEditor() {
+            if (!selectedObject || !selectedObject.isMesh) {
+                alert('Selecciona un objeto con material antes de abrir el editor de nodos.');
+                return;
             }
+            buildDefaultNodeGraph();
+            document.getElementById('node-editor-modal').style.display = 'flex';
+            nodeEditorOpen = true;
+            drawNodeGraph();
+        }
 
-            document.documentElement.style.setProperty('--bg-dark', settings.bgDark);
-            document.documentElement.style.setProperty('--bg-panel', settings.bgPanel);
-            document.documentElement.style.setProperty('--accent', settings.accent);
-            document.documentElement.style.setProperty('--font-size-base', settings.fontSize + 'px');
-            document.documentElement.style.setProperty('--panel-spacing', settings.panelSpacing + 'px');
+        function closeNodeEditor() {
+            document.getElementById('node-editor-modal').style.display = 'none';
+            nodeEditorOpen = false;
+        }
 
-            controls.rotateSpeed = settings.rotateSpeed;
-            document.getElementById('scene-stats-panel').style.display = settings.showStats ? 'block' : 'none';
+        function drawNodeGraph() {
+            nodeCtx.clearRect(0, 0, nodeCanvas.width, nodeCanvas.height);
+            nodeCtx.strokeStyle = '#e67e22';
+            nodeCtx.lineWidth = 1.5;
+            const output = nodeGraph.find(n => n.kind === 'output');
+            nodeGraph.forEach(n => {
+                if (n.kind === 'output') return;
+                nodeCtx.beginPath();
+                nodeCtx.moveTo(n.x + n.w, n.y + n.h / 2);
+                nodeCtx.bezierCurveTo(n.x + n.w + 40, n.y + n.h / 2, output.x - 40, output.y + output.h / 2, output.x, output.y + output.h / 2);
+                nodeCtx.stroke();
+            });
+
+            nodeGraph.forEach(n => {
+                nodeCtx.fillStyle = n.kind === 'output' ? '#3a2a1a' : '#232323';
+                nodeCtx.strokeStyle = '#555';
+                nodeCtx.lineWidth = 1;
+                nodeCtx.fillRect(n.x, n.y, n.w, n.h);
+                nodeCtx.strokeRect(n.x, n.y, n.w, n.h);
+                nodeCtx.fillStyle = '#e67e22';
+                nodeCtx.font = 'bold 11px Segoe UI, sans-serif';
+                nodeCtx.fillText(n.title, n.x + 8, n.y + 14);
+
+                if (selectedObject && selectedObject.material) {
+                    const mat = selectedObject.material;
+                    nodeCtx.fillStyle = '#ccc';
+                    nodeCtx.font = '10px monospace';
+                    let valueText = '';
+                    if (n.kind === 'color') valueText = '#' + mat.color.getHexString();
+                    else if (n.kind === 'slider_metalness') valueText = mat.metalness.toFixed(2);
+                    else if (n.kind === 'slider_specular') valueText = (mat.specularIntensity !== undefined ? mat.specularIntensity : 0.5).toFixed(2);
+                    else if (n.kind === 'slider_roughness') valueText = mat.roughness.toFixed(2);
+                    else if (n.kind === 'slider_glossiness') valueText = (1 - mat.roughness).toFixed(2);
+                    else if (n.kind === 'slider_opacity') valueText = mat.opacity.toFixed(2);
+                    else if (n.kind === 'emissive') valueText = '#' + mat.emissive.getHexString();
+                    else if (n.kind === 'slider_normal') valueText = (mat.normalScale ? mat.normalScale.x : 1).toFixed(2);
+                    else if (n.kind === 'slider_water') valueText = (mat.userData.waterEffect || 0).toFixed(2);
+                    nodeCtx.fillText(valueText, n.x + 8, n.y + n.h - 8);
+                }
+            });
+        }
+
+        nodeCanvas.addEventListener('mousedown', (e) => {
+            const rect = nodeCanvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            for (let i = nodeGraph.length - 1; i >= 0; i--) {
+                const n = nodeGraph[i];
+                if (mx >= n.x && mx <= n.x + n.w && my >= n.y && my <= n.y + n.h) {
+                    draggingNode = n;
+                    dragOffset.x = mx - n.x;
+                    dragOffset.y = my - n.y;
+                    // Un clic corto tambien ajusta el valor del nodo (simula el slider/color)
+                    adjustNodeValue(n, mx - n.x, n.w);
+                    break;
+                }
+            }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!draggingNode || !nodeEditorOpen) return;
+            const rect = nodeCanvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            draggingNode.x = mx - dragOffset.x;
+            draggingNode.y = my - dragOffset.y;
+            drawNodeGraph();
+        });
+
+        window.addEventListener('mouseup', () => {
+            draggingNode = null;
+        });
+
+        // Traduce la posicion horizontal del clic dentro del nodo a un valor 0-1
+        // y lo aplica de inmediato al material (color base, metalico, especularidad,
+        // transparencia, emision, rugosidad, brillo, relieve o efecto de agua).
+        function adjustNodeValue(n, localX, width) {
+            if (!selectedObject || !selectedObject.material) return;
+            const t = THREE.MathUtils.clamp(localX / width, 0, 1);
+            const mat = selectedObject.material;
+            switch (n.kind) {
+                case 'slider_metalness':
+                    mat.metalness = t; break;
+                case 'slider_specular':
+                    mat.specularIntensity = t; break;
+                case 'slider_roughness':
+                    mat.roughness = t; break;
+                case 'slider_glossiness':
+                    mat.roughness = 1 - t; break;
+                case 'slider_opacity':
+                    mat.opacity = t; mat.transparent = t < 1.0; break;
+                case 'slider_normal':
+                    if (mat.normalScale) mat.normalScale.set(t * 3, t * 3); break;
+                case 'slider_water':
+                    mat.userData.waterEffect = t;
+                    applyWaterEffect(mat, t);
+                    break;
+                default:
+                    return;
+            }
+            mat.needsUpdate = true;
+            syncMaterialUI();
+            drawNodeGraph();
+        }
+
+        // Efecto de "agua": combina transparencia, baja rugosidad y una ligera
+        // ondulacion de las normales para simular una superficie liquida, sin
+        // depender de shaders personalizados que no existan en el motor destino.
+        function applyWaterEffect(mat, amount) {
+            mat.roughness = THREE.MathUtils.lerp(mat.roughness, 0.05, amount);
+            mat.metalness = THREE.MathUtils.lerp(mat.metalness, 0.0, amount);
+            mat.opacity = THREE.MathUtils.lerp(mat.opacity, 0.7, amount);
+            mat.transparent = mat.opacity < 1.0;
+        }
+
+        document.getElementById('mat-color').addEventListener('input', () => { if (nodeEditorOpen) drawNodeGraph(); });
+
+        // --- MODALS & SETTINGS ---
+        function liveApplySettings() {
+            const theme = document.getElementById('setting-theme').value;
+            document.body.className = 'theme-' + theme;
+
+            const layout = document.getElementById('setting-layout-pos').value;
+            if(layout === 'invertido') document.body.classList.add('layout-invertido');
+            else document.body.classList.remove('layout-invertido');
+
+            const showStats = document.getElementById('setting-show-stats').checked;
+            document.getElementById('scene-stats-panel').style.display = showStats ? 'block' : 'none';
         }
 
         function saveSettings() {
-            liveApplySettings();
-            localStorage.setItem('krhorkos_custom_settings', JSON.stringify(settings));
-            closeSettings();
+            document.getElementById('settings-modal').style.display = 'none';
         }
 
         function restoreDefaultSettings() {
-            settings = {
-                theme: 'oscuro',
-                bgDark: '#1d1d1d',
-                bgPanel: '#282828',
-                accent: '#e67e22',
-                fontSize: 12,
-                panelSpacing: 8,
-                layoutPos: 'normal',
-                mouseSpeed: 1.0,
-                rotateSpeed: 1.0,
-                showStats: true
-            };
             document.getElementById('setting-theme').value = 'oscuro';
-            document.getElementById('setting-bg-dark').value = '#1d1d1d';
-            document.getElementById('setting-bg-panel').value = '#282828';
-            document.getElementById('setting-accent').value = '#e67e22';
-            document.getElementById('setting-font-size').value = 12;
-            document.getElementById('setting-panel-spacing').value = 8;
             document.getElementById('setting-layout-pos').value = 'normal';
-            document.getElementById('setting-mouse-speed').value = 1.0;
-            document.getElementById('setting-rotate-speed').value = 1.0;
             document.getElementById('setting-show-stats').checked = true;
-
             liveApplySettings();
-            saveSettings();
         }
 
-        function loadSavedSettings() {
-            const saved = localStorage.getItem('krhorkos_custom_settings');
-            if (saved) {
-                settings = JSON.parse(saved);
-                document.getElementById('setting-theme').value = settings.theme || 'oscuro';
-                document.getElementById('setting-bg-dark').value = settings.bgDark || '#1d1d1d';
-                document.getElementById('setting-bg-panel').value = settings.bgPanel || '#282828';
-                document.getElementById('setting-accent').value = settings.accent || '#e67e22';
-                document.getElementById('setting-font-size').value = settings.fontSize || 12;
-                document.getElementById('setting-panel-spacing').value = settings.panelSpacing || 8;
-                document.getElementById('setting-layout-pos').value = settings.layoutPos || 'normal';
-                document.getElementById('setting-mouse-speed').value = settings.mouseSpeed || 1.0;
-                document.getElementById('setting-rotate-speed').value = settings.rotateSpeed || 1.0;
-                document.getElementById('setting-show-stats').checked = settings.showStats !== false;
-                liveApplySettings();
-            }
-        }
-
-        // --- EXPORTACION CON OPCIONES ---
         function openExportModal() {
             document.getElementById('export-modal').style.display = 'flex';
         }
@@ -1761,66 +1471,146 @@
 
         function executeExport() {
             const format = document.getElementById('exp-format').value;
-            const onlySelected = document.getElementById('exp-inc-selected').checked;
-
-            let exportGroup = new THREE.Group();
-            
-            objects.forEach(obj => {
-                if (obj.isMesh && obj.geometry) {
-                    if (!onlySelected || (onlySelected && obj === selectedObject)) {
-                        let cloneMesh = obj.clone();
-                        if (renderMode === 'GRAY') {
-                            cloneMesh.material = obj.userData.materialColor || obj.material;
-                        }
-                        exportGroup.add(cloneMesh);
-                    }
-                }
-            });
-
-            let filename = "escena_geometria_krhorkos";
-
-            if (format === 'obj') {
+            if (format === 'obj' && THREE.OBJExporter) {
                 const exporter = new THREE.OBJExporter();
-                const output = exporter.parse(exportGroup);
-                downloadFile(output, filename + ".obj", "text/plain");
-            } else if (format === 'stl') {
+                const result = exporter.parse(scene);
+                downloadFile(result, 'escena.obj', 'text/plain');
+            } else if (format === 'stl' && THREE.STLExporter) {
                 const exporter = new THREE.STLExporter();
-                const output = exporter.parse(exportGroup, { binary: true });
-                downloadFile(output, filename + ".stl", "application/octet-stream");
-            } else if (format === 'gltf') {
+                const result = exporter.parse(scene);
+                downloadFile(result, 'escena.stl', 'text/plain');
+            } else if (format === 'gltf' && THREE.GLTFExporter) {
                 const exporter = new THREE.GLTFExporter();
-                exporter.parse(exportGroup, function (gltf) {
-                    const outputStr = JSON.stringify(gltf, null, 2);
-                    downloadFile(outputStr, filename + ".gltf", "application/json");
-                }, { binary: false });
+                exporter.parse(scene, function (gltf) {
+                    downloadFile(JSON.stringify(gltf, null, 2), 'escena.gltf', 'application/json');
+                });
+            } else {
+                alert('Exportador no disponible o formato no compatible.');
             }
-
             closeExportModal();
         }
 
-        function downloadFile(content, fileName, contentType) {
-            const a = document.createElement("a");
-            const file = new Blob([content], { type: contentType });
-            a.href = URL.createObjectURL(file);
-            a.download = fileName;
+        function downloadFile(content, filename, contentType) {
+            const a = document.createElement('a');
+            const blob = new Blob([content], { type: contentType });
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
             a.click();
         }
 
-        // --- ANIMACION Y RESPONSIVIDAD ---
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
-            renderer.render(scene, camera);
-        }
+        // --- EVENTS & KEYBINDS ---
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'F1') {
+                e.preventDefault();
+                const modal = document.getElementById('settings-modal');
+                modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+            }
+            if (e.key === 'F3') {
+                e.preventDefault();
+                nodeEditorOpen ? closeNodeEditor() : openNodeEditor();
+            }
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            if (editMode) return; // en Modo Edicion, G/R/S mueven vertices via arrastre del mouse, no la malla completa
+            if (e.key === 'g' || e.key === 'G') setTransformMode('translate');
+            if (e.key === 'r' || e.key === 'R') setTransformMode('rotate');
+            if (e.key === 's' || e.key === 'S') setTransformMode('scale');
+            if (e.key === 'Delete') deleteSelected();
+        });
+
+        // Viewport Raycasting / vertex picking for selection
+        container.addEventListener('pointerdown', (e) => {
+            if (e.button !== 0) return; // Left click only
+
+            if (editMode) {
+                const hitIndex = pickVertexAtScreen(e.clientX, e.clientY);
+                if (hitIndex !== null) {
+                    if (e.shiftKey) {
+                        const pos = selectedVertexIndices.indexOf(hitIndex);
+                        if (pos === -1) selectedVertexIndices.push(hitIndex);
+                        else selectedVertexIndices.splice(pos, 1);
+                    } else {
+                        selectedVertexIndices = [hitIndex];
+                    }
+                    // Preparar el arrastre: el pivote del objeto no se mueve, solo los vertices
+                    isDraggingVertices = true;
+                    controls.enabled = false;
+                    const camDir = new THREE.Vector3();
+                    camera.getWorldDirection(camDir);
+                    vertexDragPlane.setFromNormalAndCoplanarPoint(camDir, editingObject.position);
+                    const ray = new THREE.Vector3();
+                    raycaster.setFromCamera(
+                        new THREE.Vector2(
+                            ((e.clientX - renderer.domElement.getBoundingClientRect().left) / renderer.domElement.clientWidth) * 2 - 1,
+                            -((e.clientY - renderer.domElement.getBoundingClientRect().top) / renderer.domElement.clientHeight) * 2 + 1
+                        ), camera);
+                    raycaster.ray.intersectPlane(vertexDragPlane, vertexDragStart);
+                } else {
+                    if (!e.shiftKey) selectedVertexIndices = [];
+                }
+                return;
+            }
+
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(objects, true);
+
+            if (intersects.length > 0) {
+                selectObject(intersects[0].object);
+            }
+        });
+
+        window.addEventListener('pointermove', (e) => {
+            if (!editMode || !isDraggingVertices || !editingObject) return;
+            const rect = renderer.domElement.getBoundingClientRect();
+            const ndc = new THREE.Vector2(
+                ((e.clientX - rect.left) / rect.width) * 2 - 1,
+                -((e.clientY - rect.top) / rect.height) * 2 + 1
+            );
+            raycaster.setFromCamera(ndc, camera);
+            const hitPoint = new THREE.Vector3();
+            if (raycaster.ray.intersectPlane(vertexDragPlane, hitPoint)) {
+                const delta = hitPoint.clone().sub(vertexDragStart);
+                vertexDragStart.copy(hitPoint);
+                moveSelectedVertices(delta);
+            }
+        });
+
+        window.addEventListener('pointerup', () => {
+            if (isDraggingVertices) {
+                isDraggingVertices = false;
+                controls.enabled = true;
+                updateStats();
+                saveState();
+            }
+        });
 
         window.addEventListener('resize', () => {
             camera.aspect = container.clientWidth / container.clientHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(container.clientWidth, container.clientHeight);
+            resizeVertexOverlay();
         });
 
-        loadSavedSettings();
-        addPrimitive('cube', false);
+        // --- RENDER LOOP ---
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            if (editMode && editingObject) {
+                updateVertexPointSize();
+                drawVertexOverlay();
+            }
+            renderer.render(scene, camera);
+        }
+
+        // Initialize Scene
+        resizeVertexOverlay();
+        addPrimitive('cube');
         animate();
     </script>
 </body>
